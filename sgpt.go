@@ -110,16 +110,17 @@ func Run() error {
 	// Execute response in shell, if flags are provided
 	if shell && execute {
 		fmt.Println(ColorRed + responseText + ColorReset)
-		fmt.Print("Do you want to execute this command? (Y/n) ")
 
 		// Require user confirmation
 		for {
+			fmt.Print("Do you want to execute this command? (Y/n) ")
 			reader := bufio.NewReader(os.Stdin)
-			char, size, err := reader.ReadRune()
+			char, _, err := reader.ReadRune()
 			if err != nil {
 				return err
 			}
-			if size == 1 || char == 'Y' || char == 'y' {
+			// 10 = enter
+			if char == 10 || char == 'Y' || char == 'y' {
 				break
 			} else if char == 'N' || char == 'n' {
 				return nil
