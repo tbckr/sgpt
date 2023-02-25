@@ -1,0 +1,128 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = false
+max_line_length = 120
+tab_width = 4
+ij_continuation_indent_size = 8
+ij_formatter_off_tag = @formatter:off
+ij_formatter_on_tag = @formatter:on
+ij_formatter_tags_enabled = false
+ij_smart_tabs = false
+ij_visual_guides = none
+ij_wrap_on_typing = false
+
+[.editorconfig]
+ij_editorconfig_align_group_field_declarations = false
+ij_editorconfig_space_after_colon = false
+ij_editorconfig_space_after_comma = true
+ij_editorconfig_space_before_colon = false
+ij_editorconfig_space_before_comma = false
+ij_editorconfig_spaces_around_assignment_operators = true
+
+[{*.bash,*.sh,*.zsh}]
+indent_size = 2
+tab_width = 2
+ij_shell_binary_ops_start_line = false
+ij_shell_keep_column_alignment_padding = false
+ij_shell_minify_program = false
+ij_shell_redirect_followed_by_space = false
+ij_shell_switch_cases_indented = false
+ij_shell_use_unix_line_separator = true
+
+[{*.go,*.go2}]
+indent_style = tab
+ij_continuation_indent_size = 4
+ij_go_GROUP_CURRENT_PROJECT_IMPORTS = false
+ij_go_add_leading_space_to_comments = false
+ij_go_add_parentheses_for_single_import = false
+ij_go_call_parameters_new_line_after_left_paren = true
+ij_go_call_parameters_right_paren_on_new_line = true
+ij_go_call_parameters_wrap = off
+ij_go_fill_paragraph_width = 80
+ij_go_group_stdlib_imports = false
+ij_go_import_sorting = gofmt
+ij_go_keep_indents_on_empty_lines = false
+ij_go_local_group_mode = project
+ij_go_move_all_imports_in_one_declaration = false
+ij_go_move_all_stdlib_imports_in_one_group = false
+ij_go_remove_redundant_import_aliases = false
+ij_go_run_go_fmt_on_reformat = true
+ij_go_use_back_quotes_for_imports = false
+ij_go_wrap_comp_lit = off
+ij_go_wrap_comp_lit_newline_after_lbrace = true
+ij_go_wrap_comp_lit_newline_before_rbrace = true
+ij_go_wrap_func_params = off
+ij_go_wrap_func_params_newline_after_lparen = true
+ij_go_wrap_func_params_newline_before_rparen = true
+ij_go_wrap_func_result = off
+ij_go_wrap_func_result_newline_after_lparen = true
+ij_go_wrap_func_result_newline_before_rparen = true
+
+[{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.stylelintrc,bowerrc,jest.config}]
+indent_size = 2
+ij_json_array_wrapping = split_into_lines
+ij_json_keep_blank_lines_in_code = 0
+ij_json_keep_indents_on_empty_lines = false
+ij_json_keep_line_breaks = true
+ij_json_keep_trailing_comma = false
+ij_json_object_wrapping = split_into_lines
+ij_json_property_alignment = do_not_align
+ij_json_space_after_colon = true
+ij_json_space_after_comma = true
+ij_json_space_before_colon = false
+ij_json_space_before_comma = false
+ij_json_spaces_within_braces = false
+ij_json_spaces_within_brackets = false
+ij_json_wrap_long_lines = false
+
+[{*.hcl,*.nomad}]
+indent_size = 2
+ij_hcl_array_wrapping = normal
+ij_hcl_keep_blank_lines_in_code = 2
+ij_hcl_keep_indents_on_empty_lines = false
+ij_hcl_keep_line_breaks = true
+ij_hcl_object_wrapping = normal
+ij_hcl_property_alignment = 2
+ij_hcl_property_line_commenter_character = 1
+ij_hcl_space_after_comma = true
+ij_hcl_space_before_comma = false
+ij_hcl_spaces_around_assignment_operators = true
+ij_hcl_spaces_within_braces = false
+ij_hcl_spaces_within_brackets = false
+ij_hcl_wrap_long_lines = false
+
+[{*.markdown,*.md}]
+ij_markdown_force_one_space_after_blockquote_symbol = true
+ij_markdown_force_one_space_after_header_symbol = true
+ij_markdown_force_one_space_after_list_bullet = true
+ij_markdown_force_one_space_between_words = true
+ij_markdown_format_tables = true
+ij_markdown_insert_quote_arrows_on_wrap = true
+ij_markdown_keep_indents_on_empty_lines = false
+ij_markdown_keep_line_breaks_inside_text_blocks = true
+ij_markdown_max_lines_around_block_elements = 1
+ij_markdown_max_lines_around_header = 1
+ij_markdown_max_lines_between_paragraphs = 1
+ij_markdown_min_lines_around_block_elements = 1
+ij_markdown_min_lines_around_header = 1
+ij_markdown_min_lines_between_paragraphs = 1
+ij_markdown_wrap_text_if_long = true
+ij_markdown_wrap_text_inside_blockquotes = true
+
+[{*.yml,*playbook.yaml,*playbook.yml,main.yaml,main.yml,user-data}]
+indent_size = 2
+ij_yaml_align_values_properties = do_not_align
+ij_yaml_autoinsert_sequence_marker = true
+ij_yaml_block_mapping_on_new_line = false
+ij_yaml_indent_sequence_value = true
+ij_yaml_keep_indents_on_empty_lines = false
+ij_yaml_keep_line_breaks = true
+ij_yaml_sequence_on_new_line = false
+ij_yaml_space_before_colon = false
+ij_yaml_spaces_within_braces = true
+ij_yaml_spaces_within_brackets = true
