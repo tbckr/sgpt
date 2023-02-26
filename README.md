@@ -7,5 +7,5 @@ Rewrite of [shell-gpt](https://github.com/TheR1D/shell_gpt) in [go](https://go.d
 ## Usage
 
 ```shell
-alias xgpt='sgpt --code --model "code-davinci-002" --max-tokens 8000'
+alias xgpt='sgpt --code --model "code-davinci-002"'
 ```
