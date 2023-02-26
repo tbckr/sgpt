@@ -16,6 +16,12 @@ import (
 const EnvKey = "OPENAI_API_KEY"
 
 var (
+	version = "dev"
+	commit  = ""
+	date    = ""
+)
+
+var (
 	ColorReset = "\033[0m"
 	ColorRed   = "\033[31m"
 )

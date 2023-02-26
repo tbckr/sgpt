@@ -167,3 +167,5 @@ Temporary Items
 
 # custom
 /.idea
+
+dist/
