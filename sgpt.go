@@ -6,7 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	gogpt "github.com/sashabaranov/go-gpt3"
+	gogpt "github.com/sashabaranov/go-openai"
 	"os"
 	"os/exec"
 	"runtime"
