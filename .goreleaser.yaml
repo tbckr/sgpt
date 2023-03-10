@@ -6,6 +6,8 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    main: ./cmd/sgpt
+    binary: sgpt
     goos:
       - linux
       - windows
@@ -25,6 +27,12 @@ archives:
     format_overrides:
     - goos: windows
       format: zip
+
+gomod:
+  proxy: true
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org
 
 checksum:
   name_template: 'checksums.txt'
