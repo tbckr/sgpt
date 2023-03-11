@@ -62,7 +62,7 @@ func init() {
 
 func createConfig(prompt string) configStruct {
 	// If default values where not changed, make it more accurate
-	if *temperature == float64(1) && *temperature == *topP {
+	if *temperature == float64(1) && *topP == float64(1) {
 		if shell {
 			*temperature = 0.2
 			*topP = 0.9
@@ -154,9 +154,8 @@ func Run() error {
 
 	// Check, if prompt was provided via command line
 	if flag.NArg() != 1 {
-		return errors.New("A prompt must be provided")
+		return errors.New("a prompt must be provided")
 	}
-
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(EnvKey)
 	if !exists {
@@ -165,7 +164,6 @@ func Run() error {
 
 	// Create config with flags
 	config := createConfig(flag.Arg(0))
-
 	// Create api client and do request
 	client := openai.NewClient(apiKey)
 	ctx := context.Background()
@@ -207,10 +205,8 @@ func Run() error {
 		if err := cmd.Run(); err != nil {
 			return err
 		}
-
 	} else {
 		fmt.Println(response)
 	}
-
 	return nil
 }
