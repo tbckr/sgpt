@@ -2,14 +2,12 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/tbckr/sgpt/cmd/sgpt/cli"
+	"github.com/tbckr/sgpt"
 )
 
 func main() {
-	args := os.Args[1:]
-	if err := cli.Run(args); err != nil {
+	if err := sgpt.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
