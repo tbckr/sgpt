@@ -1,0 +1,16 @@
+run:
+  go: 1.20
+linters:
+  disable-all: true
+  enable:
+    # uber style guide
+    - errcheck
+    - goimports
+    - revive
+    - govet
+    - staticcheck
+    # custom
+    - gosimple
+    - ineffassign
+    - typecheck
+    - gosec
