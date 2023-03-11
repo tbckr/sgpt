@@ -6,11 +6,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	openai "github.com/sashabaranov/go-openai"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
+	openai "github.com/sashabaranov/go-openai"
 )
 
 const EnvKey = "OPENAI_API_KEY"

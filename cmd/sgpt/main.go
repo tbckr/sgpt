@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/tbckr/sgpt"
 	"log"
+
+	"github.com/tbckr/sgpt"
 )
 
 func main() {
