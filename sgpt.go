@@ -12,7 +12,7 @@ import (
 const envKey = "OPENAI_API_KEY"
 
 var (
-	ErrMissingAPIKey = fmt.Errorf("%s is not set", envKey)
+	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKey)
 )
 
 type CompletionOptions struct {
