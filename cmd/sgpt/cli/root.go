@@ -14,13 +14,13 @@ import (
 )
 
 var (
-	Stdout io.Writer = os.Stdout
-	Stderr io.Writer = os.Stderr
+	stdout io.Writer = os.Stdout
+	stderr io.Writer = os.Stderr
 )
 
 func newFlagSet(name string) *flag.FlagSet {
 	fs := flag.NewFlagSet(name, flag.ExitOnError)
-	fs.SetOutput(Stderr)
+	fs.SetOutput(stderr)
 	return fs
 }
 
@@ -28,7 +28,7 @@ func newFlagSet(name string) *flag.FlagSet {
 func Run(args []string) error {
 	rootCmd := &ffcli.Command{
 		Name:       "sgpt",
-		ShortUsage: "sgpt [flags] [subcommand] [command flags] <prompt>",
+		ShortUsage: "sgpt <subcommand> [command flags] [prompt]",
 		ShortHelp:  "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
 		LongHelp: strings.TrimSpace(`
 For help on subcommands, add --help after: "sgpt sh --help".
@@ -36,6 +36,7 @@ For help on subcommands, add --help after: "sgpt sh --help".
 		Subcommands: []*ffcli.Command{
 			textCmd,
 			shellCmd,
+			codeCmd,
 			versionCmd,
 		},
 		Exec: func(ctx context.Context, args []string) error {

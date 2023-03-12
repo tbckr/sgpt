@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"strings"
@@ -12,34 +11,32 @@ import (
 	"github.com/tbckr/sgpt"
 )
 
-const nilModifier = ""
+const codeModifier = "Provide only code as output."
 
-var ErrMissingPrompt = errors.New("a prompt must be provided")
-
-var textCmd = &ffcli.Command{
-	Name:       "txt",
+var codeCmd = &ffcli.Command{
+	Name:       "code",
 	ShortUsage: "",
 	ShortHelp:  "",
 	LongHelp:   strings.TrimSpace(``),
-	Exec:       runText,
+	Exec:       runCode,
 	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("text")
+		fs := newFlagSet("code")
 		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
 		fs.IntVar(&textArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
-		fs.Float64Var(&textArgs.temperature, "temperature", 1.0, "Randomness of generated output")
-		fs.Float64Var(&textArgs.topP, "top-p", 1.0, "Limits highest probable tokens")
+		fs.Float64Var(&textArgs.temperature, "temperature", 0.8, "Randomness of generated output")
+		fs.Float64Var(&textArgs.topP, "top-p", 0.2, "Limits highest probable tokens")
 		return fs
 	})(),
 }
 
-var textArgs struct {
+var codeArgs struct {
 	model       string
 	maxTokens   int
 	temperature float64
 	topP        float64
 }
 
-func runText(ctx context.Context, args []string) error {
+func runCode(ctx context.Context, args []string) error {
 	// Check, if prompt was provided via command line
 	if len(args) != 1 {
 		return ErrMissingPrompt
@@ -47,10 +44,10 @@ func runText(ctx context.Context, args []string) error {
 	prompt := args[0]
 
 	options := sgpt.CompletionOptions{
-		Model:       textArgs.model,
-		MaxTokens:   textArgs.maxTokens,
-		Temperature: float32(textArgs.temperature),
-		TopP:        float32(textArgs.topP),
+		Model:       codeArgs.model,
+		MaxTokens:   codeArgs.maxTokens,
+		Temperature: float32(codeArgs.temperature),
+		TopP:        float32(codeArgs.topP),
 	}
 	sgpt.ValidateOptions(&options)
 
@@ -61,9 +58,9 @@ func runText(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, nilModifier)
+		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, codeModifier)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt, nilModifier)
+		response, err = sgpt.GetCompletion(ctx, client, options, prompt, codeModifier)
 	}
 	if err != nil {
 		return err

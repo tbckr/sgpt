@@ -14,11 +14,10 @@ import (
 	"github.com/tbckr/sgpt"
 )
 
-const shellModifier = "Provide only shell command as output."
-
-var (
-	ColorReset = "\033[0m"
-	ColorRed   = "\033[31m"
+const (
+	colorReset    = "\033[0m"
+	colorRed      = "\033[31m"
+	shellModifier = "Provide only shell command as output."
 )
 
 var shellCmd = &ffcli.Command{
@@ -28,11 +27,11 @@ var shellCmd = &ffcli.Command{
 	LongHelp:   strings.TrimSpace(``),
 	Exec:       runShell,
 	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("shell")
+		fs := newFlagSet("sh")
 		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
 		fs.IntVar(&textArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
-		fs.Float64Var(&textArgs.temperature, "temperature", float64(1), "Randomness of generated output")
-		fs.Float64Var(&textArgs.topP, "top-p", float64(1), "Limits highest probable tokens")
+		fs.Float64Var(&textArgs.temperature, "temperature", 0.2, "Randomness of generated output")
+		fs.Float64Var(&textArgs.topP, "top-p", 0.9, "Limits highest probable tokens")
 		fs.BoolVar(&shellArgs.execute, "execute", false, "Execute shell command")
 		return fs
 	})(),
@@ -52,12 +51,6 @@ func runShell(ctx context.Context, args []string) error {
 		return ErrMissingPrompt
 	}
 	prompt := args[0]
-
-	// If default values where not changed, make it more accurate
-	if shellArgs.temperature == float64(1) && shellArgs.topP == float64(1) {
-		shellArgs.temperature = 0.2
-		shellArgs.topP = 0.9
-	}
 
 	options := sgpt.CompletionOptions{
 		Model:       shellArgs.model,
@@ -82,15 +75,17 @@ func runShell(ctx context.Context, args []string) error {
 		return err
 	}
 
-	fmt.Fprint(Stdout, ColorRed, response, ColorReset)
+	if _, err = fmt.Fprint(stdout, colorRed, response, colorReset); err != nil {
+		return err
+	}
 
 	if shellArgs.execute {
-		var continueConfirmed bool
-		continueConfirmed, err = getUserConfirmation()
+		var confirmationReceived bool
+		confirmationReceived, err = getUserConfirmation()
 		if err != nil {
 			return err
 		}
-		if continueConfirmed {
+		if confirmationReceived {
 			return executeShellCommand(ctx, response)
 		}
 	}
@@ -100,7 +95,9 @@ func runShell(ctx context.Context, args []string) error {
 func getUserConfirmation() (bool, error) {
 	// Require user confirmation
 	for {
-		fmt.Fprint(Stdout, "Do you want to execute this command? (Y/n) ")
+		if _, err := fmt.Fprint(stdout, "Do you want to execute this command? (Y/n) "); err != nil {
+			return false, err
+		}
 		reader := bufio.NewReader(os.Stdin)
 		char, _, err := reader.ReadRune()
 		if err != nil {
@@ -118,6 +115,6 @@ func getUserConfirmation() (bool, error) {
 func executeShellCommand(ctx context.Context, response string) error {
 	// Execute cmd from response text
 	cmd := exec.CommandContext(ctx, "bash", "-c", response)
-	cmd.Stdout = Stdout
+	cmd.Stdout = stdout
 	return cmd.Run()
 }

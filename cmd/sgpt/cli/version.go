@@ -9,7 +9,7 @@ import (
 )
 
 var versionCmd = &ffcli.Command{
-	Name:       "",
+	Name:       "version",
 	ShortUsage: "",
 	ShortHelp:  "",
 	LongHelp:   strings.TrimSpace(``),
@@ -25,6 +25,6 @@ var versionArgs struct {
 	json bool
 }
 
-func runVersion(ctx context.Context, args []string) error {
+func runVersion(_ context.Context, _ []string) error {
 	return nil
 }
