@@ -80,12 +80,12 @@ func runShell(ctx context.Context, args []string) error {
 	}
 
 	if shellArgs.execute {
-		var confirmationReceived bool
-		confirmationReceived, err = getUserConfirmation()
+		var ok bool
+		ok, err = getUserConfirmation()
 		if err != nil {
 			return err
 		}
-		if confirmationReceived {
+		if ok {
 			return executeShellCommand(ctx, response)
 		}
 	}

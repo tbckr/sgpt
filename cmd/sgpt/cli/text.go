@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"strings"
@@ -13,8 +12,6 @@ import (
 )
 
 const nilModifier = ""
-
-var ErrMissingPrompt = errors.New("a prompt must be provided")
 
 var textCmd = &ffcli.Command{
 	Name:       "txt",
