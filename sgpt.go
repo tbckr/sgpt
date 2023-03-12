@@ -22,6 +22,10 @@ type CompletionOptions struct {
 	TopP        float32
 }
 
+type ImageOptions struct {
+	Count int
+}
+
 func CreateClient() (*openai.Client, error) {
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKey)
@@ -31,7 +35,7 @@ func CreateClient() (*openai.Client, error) {
 	return openai.NewClient(apiKey), nil
 }
 
-func ValidateOptions(options *CompletionOptions) {
+func ValidateCompletionOptions(options *CompletionOptions) {
 	// curie has a max limit of 2048 for input and output
 	if (*options).Model == "text-curie-001" && (*options).MaxTokens == 2048 {
 		(*options).MaxTokens = 1024
@@ -80,4 +84,20 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 		return "", err
 	}
 	return strings.TrimSpace(resp.Choices[0].Message.Content), nil
+}
+
+func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, prompt string) ([]string, error) {
+	req := openai.ImageRequest{
+		Prompt: prompt,
+		N:      options.Count,
+	}
+	resp, err := client.CreateImage(ctx, req)
+	if err != nil {
+		return []string{}, err
+	}
+	var imageUrls []string
+	for _, image := range resp.Data {
+		imageUrls = append(imageUrls, strings.TrimSpace(image.URL))
+	}
+	return imageUrls, nil
 }

@@ -16,7 +16,7 @@ var versionCmd = &ffcli.Command{
 	Exec:       runVersion,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("version")
-		fs.BoolVar(&versionArgs.json, "json", false, "execute shell command")
+		fs.BoolVar(&versionArgs.json, "json", false, "Output in json format")
 		return fs
 	})(),
 }

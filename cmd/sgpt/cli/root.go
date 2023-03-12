@@ -37,6 +37,7 @@ For help on subcommands, add --help after: "sgpt sh --help".
 			textCmd,
 			shellCmd,
 			codeCmd,
+			imageCmd,
 			versionCmd,
 		},
 		Exec: func(ctx context.Context, args []string) error {

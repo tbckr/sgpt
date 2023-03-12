@@ -58,7 +58,7 @@ func runShell(ctx context.Context, args []string) error {
 		Temperature: float32(shellArgs.temperature),
 		TopP:        float32(shellArgs.topP),
 	}
-	sgpt.ValidateOptions(&options)
+	sgpt.ValidateCompletionOptions(&options)
 
 	client, err := sgpt.CreateClient()
 	if err != nil {

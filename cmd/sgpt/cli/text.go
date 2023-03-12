@@ -52,7 +52,7 @@ func runText(ctx context.Context, args []string) error {
 		Temperature: float32(textArgs.temperature),
 		TopP:        float32(textArgs.topP),
 	}
-	sgpt.ValidateOptions(&options)
+	sgpt.ValidateCompletionOptions(&options)
 
 	client, err := sgpt.CreateClient()
 	if err != nil {
@@ -68,7 +68,6 @@ func runText(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-
 	_, err = fmt.Fprint(stdout, response)
 	return err
 }
