@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -27,25 +28,39 @@ func newFlagSet(name string) *flag.FlagSet {
 func Run(args []string) error {
 	rootCmd := &ffcli.Command{
 		Name:       "sgpt",
-		ShortUsage: "sgpt [flags] <subcommand> [command flags]",
+		ShortUsage: "sgpt [flags] [subcommand] [command flags] <prompt>",
 		ShortHelp:  "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
 		LongHelp: strings.TrimSpace(`
-For help on subcommands, add --help after: "sgpt shell --help".
+For help on subcommands, add --help after: "sgpt sh --help".
 `),
 		Subcommands: []*ffcli.Command{
 			textCmd,
 			shellCmd,
 			versionCmd,
 		},
-		Exec:      runRoot,
+		Exec: func(ctx context.Context, args []string) error {
+			return flag.ErrHelp
+		},
 		UsageFunc: usageFunc,
 	}
-
-	return rootCmd.ParseAndRun(context.Background(), args)
-}
-
-func runRoot(ctx context.Context, args []string) error {
-	return nil
+	// add usage to subcommands
+	for _, c := range rootCmd.Subcommands {
+		if c.UsageFunc == nil {
+			c.UsageFunc = usageFunc
+		}
+	}
+	// parse flags
+	if err := rootCmd.Parse(args); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return nil
+		}
+		return err
+	}
+	err := rootCmd.Run(context.Background())
+	if errors.Is(err, flag.ErrHelp) {
+		return nil
+	}
+	return err
 }
 
 func usageFunc(c *ffcli.Command) string {
