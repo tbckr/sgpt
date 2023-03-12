@@ -3,11 +3,11 @@ package cli
 import (
 	"context"
 	"flag"
-	"github.com/peterbourgon/ff/v3/ffcli"
 	"strings"
+
+	"github.com/peterbourgon/ff/v3/ffcli"
 )
 
-// TODO implement command
 var versionCmd = &ffcli.Command{
 	Name:       "",
 	ShortUsage: "",
