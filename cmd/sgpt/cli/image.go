@@ -13,10 +13,12 @@ import (
 
 var imageCmd = &ffcli.Command{
 	Name:       "image",
-	ShortUsage: "",
-	ShortHelp:  "",
-	LongHelp:   strings.TrimSpace(``),
-	Exec:       runImage,
+	ShortUsage: "sgpt image [command flags] <prompt>",
+	ShortHelp:  "Create an AI generated image with dalle.",
+	LongHelp: strings.TrimSpace(`
+Create an AI generated image with the dalle API. 
+`),
+	Exec: runImage,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("image")
 		fs.IntVar(&imageArgs.count, "n", 1, "Number of images to generate")

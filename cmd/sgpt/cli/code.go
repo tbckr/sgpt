@@ -15,10 +15,13 @@ const codeModifier = "Provide only code as output."
 
 var codeCmd = &ffcli.Command{
 	Name:       "code",
-	ShortUsage: "",
-	ShortHelp:  "",
-	LongHelp:   strings.TrimSpace(``),
-	Exec:       runCode,
+	ShortUsage: "sgpt code [command flags] <prompt>",
+	ShortHelp:  "Query the openai models for code-specific questions.",
+	LongHelp: strings.TrimSpace(`
+Query a openai model for code specific questions.
+The supported completion models can be listed via: "sgpt txt --help"
+`),
+	Exec: runCode,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("code")
 		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")

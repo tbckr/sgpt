@@ -13,12 +13,36 @@ import (
 
 const nilModifier = ""
 
+var openaiModels = []string{
+	openai.GPT3Dot5Turbo0301,
+	openai.GPT3Dot5Turbo,
+	openai.GPT3TextDavinci003,
+	openai.GPT3TextDavinci002,
+	openai.GPT3TextCurie001,
+	openai.GPT3TextBabbage001,
+	openai.GPT3TextAda001,
+	openai.GPT3TextDavinci001,
+	openai.GPT3DavinciInstructBeta,
+	openai.GPT3Davinci,
+	openai.GPT3CurieInstructBeta,
+	openai.GPT3Curie,
+	openai.GPT3Ada,
+	openai.GPT3Babbage,
+
+	openai.CodexCodeDavinci002,
+	openai.CodexCodeCushman001,
+	openai.CodexCodeDavinci001,
+}
+
 var textCmd = &ffcli.Command{
 	Name:       "txt",
-	ShortUsage: "",
-	ShortHelp:  "",
-	LongHelp:   strings.TrimSpace(``),
-	Exec:       runText,
+	ShortUsage: "sgpt txt [command flags] <prompt>",
+	ShortHelp:  "Query the different openai models for a text completion.",
+	LongHelp: strings.TrimSpace(fmt.Sprintf(`
+Query a openai model for a text completion. The following models are supported:
+- %s
+`, strings.Join(openaiModels, "\n- "))),
+	Exec: runText,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("text")
 		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")

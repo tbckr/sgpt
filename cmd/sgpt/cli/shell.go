@@ -22,10 +22,13 @@ const (
 
 var shellCmd = &ffcli.Command{
 	Name:       "sh",
-	ShortUsage: "",
-	ShortHelp:  "",
-	LongHelp:   strings.TrimSpace(``),
-	Exec:       runShell,
+	ShortUsage: "sgpt sh [command flags] <prompt>",
+	ShortHelp:  "Query the openai models for a shell command.",
+	LongHelp: strings.TrimSpace(`
+Query a openai model for a shell command. The retrieved command can be executed at the same time.
+The supported completion models can be listed via: "sgpt txt --help"
+`),
+	Exec: runShell,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("sh")
 		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")

@@ -14,10 +14,12 @@ import (
 
 var versionCmd = &ffcli.Command{
 	Name:       "version",
-	ShortUsage: "",
-	ShortHelp:  "",
-	LongHelp:   strings.TrimSpace(``),
-	Exec:       runVersion,
+	ShortUsage: "sgpt version [command flags]",
+	ShortHelp:  "Get the programs version.",
+	LongHelp: strings.TrimSpace(`
+Get the program version.
+`),
+	Exec: runVersion,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("version")
 		fs.BoolVar(&versionArgs.json, "json", false, "Output in json format")
