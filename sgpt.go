@@ -13,6 +13,7 @@ const envKey = "OPENAI_API_KEY"
 
 var (
 	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKey)
+	Version          = "dev"
 )
 
 type CompletionOptions struct {

@@ -2,8 +2,12 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
+	"fmt"
 	"strings"
+
+	"github.com/tbckr/sgpt"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
 )
@@ -26,5 +30,21 @@ var versionArgs struct {
 }
 
 func runVersion(_ context.Context, _ []string) error {
+	var output string
+	if versionArgs.json {
+		versionMap := map[string]string{
+			"version": sgpt.Version,
+		}
+		byteData, err := json.Marshal(versionMap)
+		if err != nil {
+			return err
+		}
+		output = string(byteData)
+	} else {
+		output = sgpt.Version
+	}
+	if _, err := fmt.Fprintln(stdout, output); err != nil {
+		return err
+	}
 	return nil
 }

@@ -12,6 +12,8 @@ builds:
       - linux
       - windows
       - darwin
+    ldflags:
+      - -X 'sgpt.Version={{.Version}}'
 
 archives:
   - format: tar.gz
