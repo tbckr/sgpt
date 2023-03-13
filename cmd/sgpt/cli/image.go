@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"strings"
@@ -25,7 +24,7 @@ Create an AI generated image with the dalle API.
 		//fs.BoolVar(&imageArgs.open, "open", false, "Open image in default browser")
 		//fs.BoolVar(&imageArgs.download, "download", false, "Download generated images")
 		//fs.StringVar(&imageArgs.outputDirectory, "output", ".", "Path to folder to save the image in")
-		fs.BoolVar(&imageArgs.json, "json", false, "Output image urls in json format")
+		//fs.BoolVar(&imageArgs.json, "json", false, "Output image urls in json format")
 		return fs
 	})(),
 }
@@ -63,15 +62,15 @@ func runImage(ctx context.Context, args []string) error {
 }
 
 func handleImageURLs(imageUrls []string) error {
-	if imageArgs.json {
-		if err := printURLsAsJSON(imageUrls); err != nil {
-			return err
-		}
-	} else {
-		if err := printURLs(imageUrls); err != nil {
-			return err
-		}
+	//if imageArgs.json {
+	//	if err := printURLsAsJSON(imageUrls); err != nil {
+	//		return err
+	//	}
+	//} else {
+	if err := printURLs(imageUrls); err != nil {
+		return err
 	}
+	//}
 
 	//if imageArgs.download {
 	//	if err := downloadImages(imageUrls); err != nil {
@@ -95,17 +94,17 @@ func printURLs(urls []string) error {
 	return nil
 }
 
-func printURLsAsJSON(urls []string) error {
-	urlMap := map[string][]string{
-		"imageURLs": urls,
-	}
-	jsonData, err := json.Marshal(urlMap)
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprintln(stdout, jsonData)
-	return err
-}
+//func printURLsAsJSON(urls []string) error {
+//	urlMap := map[string][]string{
+//		"imageURLs": urls,
+//	}
+//	jsonData, err := json.Marshal(urlMap)
+//	if err != nil {
+//		return err
+//	}
+//	_, err = fmt.Fprintln(stdout, string(jsonData))
+//	return err
+//}
 
 //func openImages(_ []string) error {
 //	return nil
