@@ -114,7 +114,7 @@ ij_markdown_min_lines_between_paragraphs = 1
 ij_markdown_wrap_text_if_long = true
 ij_markdown_wrap_text_inside_blockquotes = true
 
-[{*.yml,*playbook.yaml,*playbook.yml,main.yaml,main.yml,user-data}]
+[{*.yml,*playbook.yaml,*playbook.yml,main.yaml,main.yml,user-data,*.yaml}]
 indent_size = 2
 ij_yaml_align_values_properties = do_not_align
 ij_yaml_autoinsert_sequence_marker = true
