@@ -31,10 +31,10 @@ The supported completion models can be listed via: "sgpt txt --help"
 	Exec: runShell,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("sh")
-		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
-		fs.IntVar(&textArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
-		fs.Float64Var(&textArgs.temperature, "temperature", 0.2, "Randomness of generated output")
-		fs.Float64Var(&textArgs.topP, "top-p", 0.9, "Limits highest probable tokens")
+		fs.StringVar(&shellArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
+		fs.IntVar(&shellArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
+		fs.Float64Var(&shellArgs.temperature, "temperature", 0.2, "Randomness of generated output")
+		fs.Float64Var(&shellArgs.topP, "top-p", 0.9, "Limits highest probable tokens")
 		fs.BoolVar(&shellArgs.execute, "execute", false, "Execute shell command")
 		return fs
 	})(),
@@ -78,7 +78,7 @@ func runShell(ctx context.Context, args []string) error {
 		return err
 	}
 
-	if _, err = fmt.Fprint(stdout, colorRed, response, colorReset); err != nil {
+	if _, err = fmt.Fprintln(stdout, colorRed, response, colorReset); err != nil {
 		return err
 	}
 

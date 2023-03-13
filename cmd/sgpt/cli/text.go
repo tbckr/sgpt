@@ -89,6 +89,6 @@ func runText(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprint(stdout, response)
+	_, err = fmt.Fprintln(stdout, response)
 	return err
 }

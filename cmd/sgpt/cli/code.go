@@ -24,10 +24,10 @@ The supported completion models can be listed via: "sgpt txt --help"
 	Exec: runCode,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("code")
-		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
-		fs.IntVar(&textArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
-		fs.Float64Var(&textArgs.temperature, "temperature", 0.8, "Randomness of generated output")
-		fs.Float64Var(&textArgs.topP, "top-p", 0.2, "Limits highest probable tokens")
+		fs.StringVar(&codeArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
+		fs.IntVar(&codeArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
+		fs.Float64Var(&codeArgs.temperature, "temperature", 0.8, "Randomness of generated output")
+		fs.Float64Var(&codeArgs.topP, "top-p", 0.2, "Limits highest probable tokens")
 		return fs
 	})(),
 }
@@ -68,6 +68,6 @@ func runCode(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprint(stdout, response)
+	_, err = fmt.Fprintln(stdout, response)
 	return err
 }
