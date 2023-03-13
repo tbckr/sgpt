@@ -88,7 +88,7 @@ func handleImageURLs(imageUrls []string) error {
 
 func printURLs(urls []string) error {
 	for _, element := range urls {
-		if _, err := fmt.Fprint(stdout, element); err != nil {
+		if _, err := fmt.Fprintln(stdout, element); err != nil {
 			return err
 		}
 	}
