@@ -170,7 +170,7 @@ func deriveFilename(url string, resp *http.Response) string {
 		}
 	}
 	// If no filename was specified in the header, use the URL path
-	// This does not work for openai urls
+	// TODO: This does not work for openai urls, maybe we can find a different way?
 	//if filename == "" {
 	//	filename = path.Base(url)
 	//}
@@ -201,6 +201,10 @@ func createUniqueFilename(filename string) (string, error) {
 	ext := filepath.Ext(filename)
 	name := filename[:len(filename)-len(ext)]
 
+	if ext == "" {
+		ext = defaultImageFiletype
+	}
+
 	// Generate a random byte slice
 	b := make([]byte, 6)
 	_, err := rand.Read(b)
@@ -209,7 +213,11 @@ func createUniqueFilename(filename string) (string, error) {
 	}
 
 	// Encode the byte slice as a string using base64 encoding
-	s := base64.URLEncoding.EncodeToString(b)
+	randomSuffix := base64.URLEncoding.EncodeToString(b)
 
-	return fmt.Sprintf("%s_%s%s", name, s, ext), nil
+	if name == "" {
+		return fmt.Sprintf("%s%s", randomSuffix, ext), nil
+	}
+	return fmt.Sprintf("%s_%s%s", name, randomSuffix, ext), nil
+
 }
