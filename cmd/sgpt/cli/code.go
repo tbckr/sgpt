@@ -24,7 +24,7 @@ The supported completion models can be listed via: "sgpt txt --help"
 	Exec: runCode,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("code")
-		fs.StringVar(&codeArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
+		fs.StringVar(&codeArgs.model, "model", openai.GPT3Dot5Turbo, "GPT-3 model name")
 		fs.IntVar(&codeArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
 		fs.Float64Var(&codeArgs.temperature, "temperature", 0.8, "Randomness of generated output")
 		fs.Float64Var(&codeArgs.topP, "top-p", 0.2, "Limits highest probable tokens")

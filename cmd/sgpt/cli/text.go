@@ -45,7 +45,7 @@ Query a openai model for a text completion. The following models are supported:
 	Exec: runText,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("text")
-		fs.StringVar(&textArgs.model, "model", "gpt-3.5-turbo", "GPT-3 model name")
+		fs.StringVar(&textArgs.model, "model", openai.GPT3Dot5Turbo, "GPT-3 model name")
 		fs.IntVar(&textArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
 		fs.Float64Var(&textArgs.temperature, "temperature", 1.0, "Randomness of generated output")
 		fs.Float64Var(&textArgs.topP, "top-p", 1.0, "Limits highest probable tokens")
