@@ -52,7 +52,9 @@ func runCode(ctx context.Context, args []string) error {
 		Temperature: float32(codeArgs.temperature),
 		TopP:        float32(codeArgs.topP),
 	}
-	sgpt.ValidateCompletionOptions(&options)
+	if err := sgpt.ValidateCompletionOptions(options); err != nil {
+		return err
+	}
 
 	client, err := sgpt.CreateClient()
 	if err != nil {
