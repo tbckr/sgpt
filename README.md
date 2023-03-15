@@ -62,7 +62,7 @@ $ sgpt image "v for vendetta"
 <url to image>
 ```
 
-Create images via the DALLE api and download it into the current directory:
+Create images via the DALLE api and download it into the current working directory:
 
 ```shell
 $ sgpt image --download "v for vendetta"
