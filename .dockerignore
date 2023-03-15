@@ -147,3 +147,5 @@ Temporary Items
 .editorconfig
 README.md
 .git
+.golangci.yaml
+.goreleaser.yaml
