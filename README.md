@@ -2,14 +2,14 @@
 
 A command-line interface (CLI) tool to access the OpenAI models via the command line.
 
-Rewrite of [shell-gpt](https://github.com/TheR1D/shell_gpt) in [go](https://go.dev/).
+Developed with the help of [sgpt](https://github.com/tbckr/sgpt).
 
 ## Install
 
 Install via go:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@latest
+go install github.com/tbckr/sgpt/cmd/sgpt@v1.0.0
 ```
 
 ## Usage
@@ -17,21 +17,21 @@ go install github.com/tbckr/sgpt/cmd/sgpt@latest
 Ask simple questions:
 
 ```shell
-$ sgpt "mass of sun"
-The mass of the Sun is approximately 1.989 x 10^30 kilograms, or about 333,000 times the mass of the Earth.
+$ sgpt txt "mass of sun"
+The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
 Generate shell commands:
 
 ```shell
-$ sgpt --shell "make all files in current directory read only"
+$ sgpt sh "make all files in current directory read only"
 chmod -R 444 *
 ```
 
 Generate shell command and execute it:
 
 ```shell
-$ sgpt --shell --execute "make all files in current directory read only"
+$ sgpt sh --execute "make all files in current directory read only"
 chmod -R 444 *
 Do you want to execute this command? (Y/n) y
 ```
@@ -39,7 +39,7 @@ Do you want to execute this command? (Y/n) y
 Generate code:
 
 ```shell
-$ sgpt --code "Solve classic fizz buzz problem using Python"
+$ sgpt code "Solve classic fizz buzz problem using Python"
 Here's the Python code for the classic Fizz Buzz problem:
 
 for i in range(1, 101):
@@ -54,3 +54,7 @@ for i in range(1, 101):
 
 This code will print the numbers from 1 to 100, replacing multiples of 3 with "Fizz", multiples of 5 with "Buzz", and multiples of both 3 and 5 with "FizzBuzz".
 ```
+
+## Acknowledgements
+
+Inspired by [shell-gpt](https://github.com/TheR1D/shell_gpt).
