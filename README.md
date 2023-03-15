@@ -55,6 +55,20 @@ for i in range(1, 101):
 This code will print the numbers from 1 to 100, replacing multiples of 3 with "Fizz", multiples of 5 with "Buzz", and multiples of both 3 and 5 with "FizzBuzz".
 ```
 
+Create images via the DALLE api:
+
+```shell
+$ sgpt image "v for vendetta"
+<url to image>
+```
+
+Create images via the DALLE api and download it:
+
+```shell
+$ sgpt image --download "v for vendetta"
+1c561592-6d93-438f-9bee-d96c898a31a8.png
+```
+
 ## Acknowledgements
 
 Inspired by [shell-gpt](https://github.com/TheR1D/shell_gpt).
