@@ -55,6 +55,7 @@ func runImage(ctx context.Context, args []string) error {
 
 	options := sgpt.ImageOptions{
 		Count: imageArgs.count,
+		Size:  imageArgs.size,
 	}
 
 	var responseFormat string
