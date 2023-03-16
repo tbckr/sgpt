@@ -56,9 +56,6 @@ func runImage(ctx context.Context, args []string) error {
 	options := sgpt.ImageOptions{
 		Count: imageArgs.count,
 	}
-	if err := sgpt.ValidateImageOptions(options); err != nil {
-		return err
-	}
 
 	var responseFormat string
 	if imageArgs.download {

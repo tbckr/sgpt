@@ -90,14 +90,6 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	return strings.TrimSpace(resp.Choices[0].Message.Content), nil
 }
 
-func ValidateImageOptions(options ImageOptions) error {
-	// curie has a max limit of 2048 for input and output
-	//if options.Model == "text-curie-001" && (*options).MaxTokens == 2048 {
-	//	(*options).MaxTokens = 1024
-	//}
-	return nil
-}
-
 func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, prompt, responseFormat string) ([]string, error) {
 	req := openai.ImageRequest{
 		Prompt:         prompt,
