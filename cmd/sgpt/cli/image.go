@@ -34,16 +34,16 @@ Create an AI generated image with the DALLE API.
 		fs.IntVar(&imageArgs.count, "count", 1, "Number of images to generate")
 		fs.StringVar(&imageArgs.size, "size", openai.CreateImageSize256x256, "Image size")
 		fs.BoolVar(&imageArgs.download, "download", false, "Download generated images")
-		fs.StringVar(&imageArgs.outputFilename, "output", "", "Filename including path to file - might be used for base name, if multiple images are created")
+		fs.StringVar(&imageArgs.filename, "output", "", "Filename including path to file - might be used for base name, if multiple images are created")
 		return fs
 	})(),
 }
 
 var imageArgs struct {
-	count          int
-	size           string
-	download       bool
-	outputFilename string
+	count    int
+	size     string
+	download bool
+	filename string
 }
 
 func runImage(ctx context.Context, args []string) error {
@@ -134,13 +134,13 @@ func getFilename() (string, error) {
 	var err error
 
 	// Generate a filename, if no default filename was provided
-	if imageArgs.outputFilename == "" {
+	if imageArgs.filename == "" {
 		filename, err = generateFilename()
 		if err != nil {
 			return "", err
 		}
 	} else {
-		filename = imageArgs.outputFilename
+		filename = imageArgs.filename
 	}
 
 	// Check, if file already exists
