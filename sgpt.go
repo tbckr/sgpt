@@ -25,6 +25,7 @@ type CompletionOptions struct {
 
 type ImageOptions struct {
 	Count int
+	Size  string
 }
 
 func CreateClient() (*openai.Client, error) {
@@ -97,18 +98,25 @@ func ValidateImageOptions(options ImageOptions) error {
 	return nil
 }
 
-func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, prompt string) ([]string, error) {
+func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, prompt, responseFormat string) ([]string, error) {
 	req := openai.ImageRequest{
-		Prompt: prompt,
-		N:      options.Count,
+		Prompt:         prompt,
+		N:              options.Count,
+		Size:           options.Size,
+		ResponseFormat: responseFormat,
 	}
 	resp, err := client.CreateImage(ctx, req)
 	if err != nil {
 		return []string{}, err
 	}
-	var imageUrls []string
+
+	var imageData []string
 	for _, image := range resp.Data {
-		imageUrls = append(imageUrls, strings.TrimSpace(image.URL))
+		if responseFormat == openai.CreateImageResponseFormatURL {
+			imageData = append(imageData, strings.TrimSpace(image.URL))
+		} else if responseFormat == openai.CreateImageResponseFormatB64JSON {
+			imageData = append(imageData, strings.TrimSpace(image.B64JSON))
+		}
 	}
-	return imageUrls, nil
+	return imageData, nil
 }
