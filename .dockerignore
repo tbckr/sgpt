@@ -149,3 +149,6 @@ README.md
 .git
 .golangci.yaml
 .goreleaser.yaml
+Dockerfile.goreleaser
+renovate.json
+LICENSE
