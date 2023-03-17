@@ -12,7 +12,7 @@ Install via go:
 go install github.com/tbckr/sgpt/cmd/sgpt@v1.2.0
 ```
 
-Download latest release from Github [here]()https://github.com/tbckr/sgpt/releases.
+Download latest release from Github [here](https://github.com/tbckr/sgpt/releases).
 
 ## Usage
 
