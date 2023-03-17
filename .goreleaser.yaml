@@ -3,6 +3,10 @@ before:
     # You may remove this if you don't use go modules.
     - go mod tidy
 
+env:
+  - GITHUB_REPO=tbckr/sgpt
+  - IMAGE_NAME=ghcr.io/tbckr/sgpt
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -12,8 +16,76 @@ builds:
       - linux
       - windows
       - darwin
+    goarm:
+      - 7
     ldflags:
       - -X 'sgpt.Version={{.Version}}'
+
+dockers:
+  -
+    id: "linux-amd64"
+    goos: linux
+    goarch: amd64
+    use: buildx
+    dockerfile: "Dockerfile.goreleaser"
+    image_templates:
+    - "{{.Env.IMAGE_NAME}}:latest-amd64"
+    - "{{.Env.IMAGE_NAME}}:{{ .Major }}-amd64"
+    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-amd64"
+    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-amd64"
+    # Template of the docker build flags.
+    build_flag_templates:
+    - "--pull"
+    - "--platform=linux/amd64"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.description={{ .ProjectName }}"
+    - "--label=org.opencontainers.image.url=https://github.com/tbckr/{{ .ProjectName }}"
+    - "--label=org.opencontainers.image.source=https://github.com/tbckr/{{ .ProjectName }}"
+    - "--label=org.opencontainers.image.licenses=MIT"
+  -
+    id: "linux-arm64"
+    goos: linux
+    goarch: arm64
+    use: buildx
+    dockerfile: "Dockerfile.goreleaser"
+    image_templates:
+    - "{{.Env.IMAGE_NAME}}:latest-arm64"
+    - "{{.Env.IMAGE_NAME}}:{{ .Major }}-arm64"
+    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-arm64"
+    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-arm64"
+    # Template of the docker build flags.
+    build_flag_templates:
+    - "--pull"
+    - "--platform=linux/arm64"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.description={{ .ProjectName }}"
+    - "--label=org.opencontainers.image.url=https://github.com/tbckr/{{ .ProjectName }}"
+    - "--label=org.opencontainers.image.source=https://github.com/tbckr/{{ .ProjectName }}"
+    - "--label=org.opencontainers.image.licenses=MIT"
+
+docker_manifests:
+- name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}"
+  image_templates:
+  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-amd64"
+  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-arm64"
+- name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}"
+  image_templates:
+  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-amd64"
+  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-arm64"
+- name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}"
+  image_templates:
+  - "{{.Env.IMAGE_NAME}}:{{ .Major }}-amd64"
+  - "{{.Env.IMAGE_NAME}}:{{ .Major }}-arm64"
+- name_template: "{{.Env.IMAGE_NAME}}:latest"
+  image_templates:
+  - "{{.Env.IMAGE_NAME}}:latest-amd64"
+  - "{{.Env.IMAGE_NAME}}:latest-arm64"
 
 archives:
   - format: tar.gz
