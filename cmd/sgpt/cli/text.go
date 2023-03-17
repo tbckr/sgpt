@@ -9,6 +9,7 @@ import (
 	"github.com/peterbourgon/ff/v3/ffcli"
 	"github.com/sashabaranov/go-openai"
 	"github.com/tbckr/sgpt"
+	"github.com/tbckr/sgpt/shell"
 )
 
 const nilModifier = ""
@@ -61,11 +62,10 @@ var textArgs struct {
 }
 
 func runText(ctx context.Context, args []string) error {
-	// Check, if prompt was provided via command line
-	if len(args) != 1 {
-		return ErrMissingPrompt
+	prompt, err := shell.GetPrompt(args)
+	if err != nil {
+		return err
 	}
-	prompt := args[0]
 
 	options := sgpt.CompletionOptions{
 		Model:       textArgs.model,
@@ -73,11 +73,12 @@ func runText(ctx context.Context, args []string) error {
 		Temperature: float32(textArgs.temperature),
 		TopP:        float32(textArgs.topP),
 	}
-	if err := sgpt.ValidateCompletionOptions(options); err != nil {
+	if err = sgpt.ValidateCompletionOptions(options); err != nil {
 		return err
 	}
 
-	client, err := sgpt.CreateClient()
+	var client *openai.Client
+	client, err = sgpt.CreateClient()
 	if err != nil {
 		return err
 	}
