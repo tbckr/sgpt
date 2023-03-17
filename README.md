@@ -9,8 +9,10 @@ Developed with the help of [sgpt](https://github.com/tbckr/sgpt).
 Install via go:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@v1.1.0
+go install github.com/tbckr/sgpt/cmd/sgpt@v1.2.0
 ```
+
+Download latest release from Github [here]()https://github.com/tbckr/sgpt/releases.
 
 ## Usage
 
@@ -18,6 +20,13 @@ Ask simple questions:
 
 ```shell
 $ sgpt txt "mass of sun"
+The mass of the sun is approximately 1.989 x 10^30 kilograms.
+```
+
+Pipe prompts to sgpt:
+
+```shell
+$ echo -n "mass of sun" | sgpt txt
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
@@ -67,6 +76,14 @@ Create images via the DALLE api and download it into the current working directo
 ```shell
 $ sgpt image --download "v for vendetta"
 1c561592-6d93-438f-9bee-d96c898a31a8.png
+```
+
+Use the docker image to run queries:
+
+```shell
+$ docker pull ghcr.io/tbckr/sgpt:latest
+$ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} ghcr.io/tbckr/sgpt:latest txt "mass of sun"
+The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
 ## Acknowledgements
