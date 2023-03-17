@@ -16,8 +16,6 @@ import (
 var (
 	stdout io.Writer = os.Stdout
 	stderr io.Writer = os.Stderr
-
-	ErrMissingPrompt = errors.New("exactly one prompt must be provided")
 )
 
 func newFlagSet(name string) *flag.FlagSet {
