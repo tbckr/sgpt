@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tbckr/sgpt/shell"
-
 	"github.com/peterbourgon/ff/v3/ffcli"
 	"github.com/sashabaranov/go-openai"
 	"github.com/tbckr/sgpt"
+	"github.com/tbckr/sgpt/internal/shell"
 )
 
 var codeCmd = &ffcli.Command{

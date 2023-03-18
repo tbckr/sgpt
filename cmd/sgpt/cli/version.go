@@ -7,9 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tbckr/sgpt"
-
 	"github.com/peterbourgon/ff/v3/ffcli"
+	"github.com/tbckr/sgpt"
 )
 
 var versionCmd = &ffcli.Command{

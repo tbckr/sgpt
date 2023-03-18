@@ -12,7 +12,7 @@ import (
 	"github.com/peterbourgon/ff/v3/ffcli"
 	"github.com/sashabaranov/go-openai"
 	"github.com/tbckr/sgpt"
-	"github.com/tbckr/sgpt/shell"
+	"github.com/tbckr/sgpt/internal/shell"
 )
 
 const (
