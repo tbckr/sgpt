@@ -57,8 +57,6 @@ Generate code:
 
 ```shell
 $ sgpt code "Solve classic fizz buzz problem using Python"
-Here's the Python code for the classic Fizz Buzz problem:
-
 for i in range(1, 101):
     if i % 3 == 0 and i % 5 == 0:
         print("FizzBuzz")
@@ -68,8 +66,6 @@ for i in range(1, 101):
         print("Buzz")
     else:
         print(i)
-
-This code will print the numbers from 1 to 100, replacing multiples of 3 with "Fizz", multiples of 5 with "Buzz", and multiples of both 3 and 5 with "FizzBuzz".
 ```
 
 Create images via the DALLE api:

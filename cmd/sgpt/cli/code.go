@@ -13,8 +13,6 @@ import (
 	"github.com/tbckr/sgpt"
 )
 
-const codeModifier = "Provide only code as output."
-
 var codeCmd = &ffcli.Command{
 	Name:       "code",
 	ShortUsage: "sgpt code [command flags] <prompt>",
@@ -65,9 +63,9 @@ func runCode(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, codeModifier)
+		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, sgpt.ModifierCode)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt, codeModifier)
+		response, err = sgpt.GetCompletion(ctx, client, options, prompt, sgpt.ModifierCode)
 	}
 	if err != nil {
 		return err

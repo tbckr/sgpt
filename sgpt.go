@@ -4,15 +4,19 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 
 	openai "github.com/sashabaranov/go-openai"
 )
 
-const envKey = "OPENAI_API_KEY"
+const (
+	envKeyOpenAIApi = "OPENAI_API_KEY"
+	envKeyShell     = "SHELL"
+)
 
 var (
-	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKey)
+	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
 	Version          = "dev"
 )
 
@@ -30,7 +34,7 @@ type ImageOptions struct {
 
 func CreateClient() (*openai.Client, error) {
 	// Check, if api key was set
-	apiKey, exists := os.LookupEnv(envKey)
+	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
 	if !exists {
 		return nil, ErrMissingAPIKey
 	}
@@ -47,17 +51,30 @@ func ValidateCompletionOptions(options CompletionOptions) error {
 }
 
 func GetCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt, modifier string) (string, error) {
-	if modifier != "" {
-		prompt = prompt + ". " + modifier
+	var err error
+	var modifierPrompt string
+	switch modifier {
+	case ModifierShell:
+		modifierPrompt, err = completeShellModifier(completionModifierTemplate[ModifierShell])
+	case ModifierCode:
+		modifierPrompt, err = completionModifierTemplate[ModifierCode], nil
+	case ModifierNil:
+		modifierPrompt, err = "", nil
+	default:
+		return "", fmt.Errorf("unsupported modifier %s", modifier)
+	}
+	if err != nil {
+		return "", err
 	}
 	req := openai.CompletionRequest{
-		Prompt:      prompt,
+		Prompt:      modifierPrompt + prompt,
 		Model:       options.Model,
 		MaxTokens:   options.MaxTokens,
 		Temperature: options.Temperature,
 		TopP:        options.TopP,
 	}
-	resp, err := client.CreateCompletion(ctx, req)
+	var resp openai.CompletionResponse
+	resp, err = client.CreateCompletion(ctx, req)
 	if err != nil {
 		return "", err
 	}
@@ -65,11 +82,26 @@ func GetCompletion(ctx context.Context, client *openai.Client, options Completio
 }
 
 func GetChatCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt, modifier string) (string, error) {
+	var err error
+	var modifierPrompt string
+	switch modifier {
+	case ModifierShell:
+		modifierPrompt, err = completeShellModifier(chatCompletionModifierTemplate[ModifierShell])
+	case ModifierCode:
+		modifierPrompt, err = chatCompletionModifierTemplate[ModifierCode], nil
+	case ModifierNil:
+		modifierPrompt, err = "", nil
+	default:
+		return "", fmt.Errorf("unsupported modifier %s", modifier)
+	}
+	if err != nil {
+		return "", err
+	}
 	var messages []openai.ChatCompletionMessage
-	if modifier != "" {
+	if modifierPrompt != "" {
 		messages = append(messages, openai.ChatCompletionMessage{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: modifier,
+			Content: modifierPrompt,
 		})
 	}
 	messages = append(messages, openai.ChatCompletionMessage{
@@ -83,7 +115,8 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 		Temperature: options.Temperature,
 		TopP:        options.TopP,
 	}
-	resp, err := client.CreateChatCompletion(ctx, req)
+	var resp openai.ChatCompletionResponse
+	resp, err = client.CreateChatCompletion(ctx, req)
 	if err != nil {
 		return "", err
 	}
@@ -111,4 +144,22 @@ func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, 
 		}
 	}
 	return imageData, nil
+}
+
+func completeShellModifier(template string) (string, error) {
+	operatingSystem := runtime.GOOS
+	shell, ok := os.LookupEnv(envKeyShell)
+	// fallback to manually set shell
+	if !ok {
+		if operatingSystem == "windows" {
+			shell = "powershell"
+		} else if operatingSystem == "linux" {
+			shell = "bash"
+		} else if operatingSystem == "darwin" {
+			shell = "zsh"
+		} else {
+			return "", fmt.Errorf("unsupported os %s", operatingSystem)
+		}
+	}
+	return fmt.Sprintf(template, shell, operatingSystem, shell, operatingSystem, shell), nil
 }

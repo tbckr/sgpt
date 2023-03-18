@@ -12,8 +12,6 @@ import (
 	"github.com/tbckr/sgpt/shell"
 )
 
-const nilModifier = ""
-
 var openaiModels = []string{
 	openai.GPT4,
 	openai.GPT40314,
@@ -89,9 +87,9 @@ func runText(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, nilModifier)
+		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, sgpt.ModifierNil)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt, nilModifier)
+		response, err = sgpt.GetCompletion(ctx, client, options, prompt, sgpt.ModifierNil)
 	}
 	if err != nil {
 		return err

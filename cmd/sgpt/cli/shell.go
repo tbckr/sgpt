@@ -16,9 +16,8 @@ import (
 )
 
 const (
-	colorReset    = "\033[0m"
-	colorRed      = "\033[31m"
-	shellModifier = "Provide only shell command as output."
+	colorReset = "\033[0m"
+	colorRed   = "\033[31m"
 )
 
 var shellCmd = &ffcli.Command{
@@ -73,9 +72,9 @@ func runShell(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, shellModifier)
+		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, sgpt.ModifierShell)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt, shellModifier)
+		response, err = sgpt.GetCompletion(ctx, client, options, prompt, sgpt.ModifierShell)
 	}
 	if err != nil {
 		return err
