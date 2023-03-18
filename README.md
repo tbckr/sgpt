@@ -79,7 +79,12 @@ $ gsum
 feat: Add bash function to generate git commit messages
 
 Added `gsum()` function to `.bash_aliases` that generates a commit message using sgpt to summarize git changes. The user is prompted to confirm the commit message before executing `git add . && git commit -m "<commit_message>"`. This function is meant to automate the commit process and increase productivity in daily work.
+
+Additionally, updated the README.md file to include information about the new bash function and added a section to showcase useful bash aliases and functions found in `.bash_aliases`.
 Do you want to commit your changes with this commit message? [y/N] y
+[main d6db80a] feat: Add bash function to generate git commit messages
+ 2 files changed, 48 insertions(+)
+ create mode 100644 .bash_aliases
 ```
 
 A collection of useful bash aliases and functions can be found in [.bash_aliases](.bash_aliases).
