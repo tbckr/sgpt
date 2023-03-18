@@ -1,17 +1,14 @@
 #!/bin/bash
 
-VERSION=$(git describe --tags --abbrev=0)
-
 docker build \
   --pull \
   --platform=linux/amd64 \
   --label=org.opencontainers.image.title=sgpt \
-  --label=org.opencontainers.image.version=${VERSION} \
   --label=org.opencontainers.image.description=sgpt \
   --label=org.opencontainers.image.url=https://github.com/tbckr/sgpt \
   --label=org.opencontainers.image.source=https://github.com/tbckr/sgpt \
   --label=org.opencontainers.image.licenses=MIT \
   --build-arg TARGETOS=linux \
   --build-arg TARGETARCH=amd64 \
-  -t sgpt \
+  -t sgpt:latest \
   .
