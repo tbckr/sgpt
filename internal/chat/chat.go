@@ -47,6 +47,7 @@ func getFilepath(sessionName string) (string, error) {
 }
 
 func validateSession(_ string) error {
+	// TODO
 	return nil
 }
 
@@ -171,9 +172,11 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 }
 
 func ListSessions() ([]string, error) {
+	// TODO
 	return nil, nil
 }
 
 func DeleteSession(sessionName string) error {
+	// TODO
 	return nil
 }

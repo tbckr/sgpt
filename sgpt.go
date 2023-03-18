@@ -21,6 +21,7 @@ const (
 var (
 	ErrMissingAPIKey       = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
 	ErrUnsupportedModifier = errors.New("unsupported modifier")
+	ErrChatNotSupported    = errors.New("chat is not supported with this model")
 	Version                = "dev"
 )
 
@@ -58,6 +59,13 @@ func ValidateCompletionOptions(options CompletionOptions) error {
 
 func GetCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt string) (string, error) {
 	var err error
+
+	// A completion does not support chat
+	if options.ChatSession != "" {
+		return "", ErrChatNotSupported
+	}
+
+	// Add modifier
 	var modifierPrompt string
 	switch options.Modifier {
 	case ModifierShell:
@@ -72,6 +80,8 @@ func GetCompletion(ctx context.Context, client *openai.Client, options Completio
 	if err != nil {
 		return "", err
 	}
+
+	// Do request
 	req := openai.CompletionRequest{
 		Prompt:      modifierPrompt + prompt,
 		Model:       options.Model,

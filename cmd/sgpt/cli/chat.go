@@ -12,6 +12,7 @@ var chatCmd = &ffcli.Command{
 	Name:       "chat",
 	ShortUsage: "sgpt chat <subcommand> [subcommand flags]",
 	ShortHelp:  "Manage chat sessions",
+	// TODO
 	LongHelp: strings.TrimSpace(`
 `),
 	Subcommands: []*ffcli.Command{
@@ -28,6 +29,7 @@ var lsCmd = &ffcli.Command{
 	Name:       "ls",
 	ShortUsage: "sgpt chat ls",
 	ShortHelp:  "List all chat sessions",
+	// TODO
 	LongHelp: strings.TrimSpace(`
 `),
 	Exec:      runChatLsCmd,
@@ -38,6 +40,7 @@ var rmCmd = &ffcli.Command{
 	Name:       "rm",
 	ShortUsage: "sgpt chat rm [command flags] [chat session]",
 	ShortHelp:  "Remove the specified chat session",
+	// TODO
 	LongHelp: strings.TrimSpace(`
 `),
 	Exec: runChatRmCmd,
@@ -54,9 +57,11 @@ var chatRmArgs struct {
 }
 
 func runChatLsCmd(ctx context.Context, args []string) error {
+	// TODO
 	return nil
 }
 
 func runChatRmCmd(ctx context.Context, args []string) error {
+	// TODO
 	return nil
 }
