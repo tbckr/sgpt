@@ -9,7 +9,7 @@ Developed with the help of [sgpt](https://github.com/tbckr/sgpt).
 Install via go:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@v1.3.0
+go install github.com/tbckr/sgpt/cmd/sgpt@v1.5.0
 ```
 
 Download latest release from Github [here](https://github.com/tbckr/sgpt/releases).
