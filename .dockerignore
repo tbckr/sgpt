@@ -149,6 +149,8 @@ README.md
 .git
 .golangci.yaml
 .goreleaser.yaml
+Dockerfile
 Dockerfile.goreleaser
 renovate.json
 LICENSE
+.bash_aliases
