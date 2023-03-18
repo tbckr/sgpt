@@ -1,4 +1,5 @@
 https://github.com/TheR1D/shell_gpt
+
 MIT License
 
 Copyright (c) 2023 Farkhod Sadykov
