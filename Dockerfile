@@ -11,7 +11,7 @@ RUN \
     if [ "${TARGETARCH}" = "arm" ] && [ -n "${TARGETVARIANT}" ]; then \
       export GOARM="${TARGETVARIANT#v}"; \
     fi; \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -v ./cmd/sgpt.go
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o sgpt -v ./cmd/sgpt/main.go
 
 
 FROM cgr.dev/chainguard/static:latest
