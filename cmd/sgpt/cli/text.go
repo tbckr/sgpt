@@ -15,6 +15,10 @@ import (
 const nilModifier = ""
 
 var openaiModels = []string{
+	openai.GPT4,
+	openai.GPT40314,
+	openai.GPT432K,
+	openai.GPT432K0314,
 	openai.GPT3Dot5Turbo0301,
 	openai.GPT3Dot5Turbo,
 	openai.GPT3TextDavinci003,
