@@ -192,7 +192,7 @@ $ sgpt image "v for vendetta"
 <image url>
 ```
 
-SGPT will return an image URL representing the "V for Vendetta" concept.
+SGPT will return an image URL representing the "V for Vendetta" prompt.
 
 If you prefer to download the generated image directly to your current working directory, use the `--download` flag:
 
