@@ -7,6 +7,12 @@ env:
   - GITHUB_REPO=tbckr/sgpt
   - IMAGE_NAME=ghcr.io/tbckr/sgpt
 
+gomod:
+  proxy: true
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -28,6 +34,24 @@ builds:
         goarch: arm
     ldflags:
       - -X 'sgpt.Version={{.Version}}'
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of uname.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+    - goos: windows
+      format: zip
+
+sboms:
+  - artifacts: archive
 
 dockers:
   -
@@ -149,27 +173,6 @@ docker_manifests:
   - "{{.Env.IMAGE_NAME}}:latest-arm64"
   - "{{.Env.IMAGE_NAME}}:latest-armv7"
   - "{{.Env.IMAGE_NAME}}:latest-386"
-
-archives:
-  - format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of uname.
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
-    # use zip for windows archives
-    format_overrides:
-    - goos: windows
-      format: zip
-
-gomod:
-  proxy: true
-  env:
-    - GOPROXY=https://proxy.golang.org,direct
-    - GOSUMDB=sum.golang.org
 
 checksum:
   name_template: 'checksums.txt'
