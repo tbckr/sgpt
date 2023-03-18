@@ -38,6 +38,8 @@ $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} ghcr.io/tbckr/sgpt:latest 
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
+### Shell commands
+
 Generate shell commands:
 
 ```shell
@@ -53,6 +55,37 @@ chmod -R 444 *
 Do you want to execute this command? (Y/n) y
 ```
 
+Furthermore, you can create bash aliases and functions to automate your workflows with the help of sgpt.
+
+In fact, you can tell sgpt to generate your git commit message with the following bash function:
+
+```shell
+gsum() {
+  commit_message="$(sgpt txt "Generate git commit message, my changes: $(git diff)")"
+  printf "%s\n" "$commit_message"
+  read -rp "Do you want to commit your changes with this commit message? [y/N] " response
+  if [[ $response =~ ^[Yy]$ ]]; then
+    git add . && git commit -m "$commit_message"
+  else
+    echo "Commit cancelled."
+  fi
+}
+```
+
+For example, the commit for this description and bash function would look like this:
+
+```shell
+$ gsum
+feat: Add bash function to generate git commit messages
+
+Added `gsum()` function to `.bash_aliases` that generates a commit message using sgpt to summarize git changes. The user is prompted to confirm the commit message before executing `git add . && git commit -m "<commit_message>"`. This function is meant to automate the commit process and increase productivity in daily work.
+Do you want to commit your changes with this commit message? [y/N] y
+```
+
+A collection of useful bash aliases and functions can be found in [.bash_aliases](.bash_aliases).
+
+### Code generation
+
 Generate code:
 
 ```shell
@@ -67,6 +100,8 @@ for i in range(1, 101):
     else:
         print(i)
 ```
+
+### Text to Image
 
 Create images via the DALLE api:
 
