@@ -2,10 +2,13 @@ package sgpt
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
 	"strings"
+
+	"github.com/tbckr/sgpt/internal/chat"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -16,8 +19,9 @@ const (
 )
 
 var (
-	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
-	Version          = "dev"
+	ErrMissingAPIKey       = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
+	ErrUnsupportedModifier = errors.New("unsupported modifier")
+	Version                = "dev"
 )
 
 type CompletionOptions struct {
@@ -25,6 +29,8 @@ type CompletionOptions struct {
 	MaxTokens   int
 	Temperature float32
 	TopP        float32
+	Modifier    string
+	ChatSession string
 }
 
 type ImageOptions struct {
@@ -50,10 +56,10 @@ func ValidateCompletionOptions(options CompletionOptions) error {
 	return nil
 }
 
-func GetCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt, modifier string) (string, error) {
+func GetCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt string) (string, error) {
 	var err error
 	var modifierPrompt string
-	switch modifier {
+	switch options.Modifier {
 	case ModifierShell:
 		modifierPrompt, err = completeShellModifier(completionModifierTemplate[ModifierShell])
 	case ModifierCode:
@@ -61,7 +67,7 @@ func GetCompletion(ctx context.Context, client *openai.Client, options Completio
 	case ModifierNil:
 		modifierPrompt, err = "", nil
 	default:
-		return "", fmt.Errorf("unsupported modifier %s", modifier)
+		return "", ErrUnsupportedModifier
 	}
 	if err != nil {
 		return "", err
@@ -81,33 +87,63 @@ func GetCompletion(ctx context.Context, client *openai.Client, options Completio
 	return strings.TrimSpace(resp.Choices[0].Text), nil
 }
 
-func GetChatCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt, modifier string) (string, error) {
+func GetChatCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt string) (string, error) {
 	var err error
-	var modifierPrompt string
-	switch modifier {
-	case ModifierShell:
-		modifierPrompt, err = completeShellModifier(chatCompletionModifierTemplate[ModifierShell])
-	case ModifierCode:
-		modifierPrompt, err = chatCompletionModifierTemplate[ModifierCode], nil
-	case ModifierNil:
-		modifierPrompt, err = "", nil
-	default:
-		return "", fmt.Errorf("unsupported modifier %s", modifier)
-	}
-	if err != nil {
-		return "", err
-	}
 	var messages []openai.ChatCompletionMessage
-	if modifierPrompt != "" {
-		messages = append(messages, openai.ChatCompletionMessage{
-			Role:    openai.ChatMessageRoleSystem,
-			Content: modifierPrompt,
-		})
+
+	// Load existing chat messages
+	isChat := options.ChatSession != ""
+	chatExists := false
+	if isChat {
+		chatExists, err = chat.SessionExists(options.ChatSession)
+		if err != nil {
+			return "", err
+		}
+		if chatExists {
+			var loadedMessages []openai.ChatCompletionMessage
+			loadedMessages, err = chat.GetSession(options.ChatSession)
+			if err != nil {
+				return "", err
+			}
+			messages = append(messages, loadedMessages...)
+		}
 	}
+
+	// If this message is not part of a chat
+	// OR
+	// if this is the initial message of a chat,
+	// then add modifier message
+	if !isChat || (isChat && !chatExists) {
+		var modifierPrompt string
+		switch options.Modifier {
+		case ModifierShell:
+			modifierPrompt, err = completeShellModifier(chatCompletionModifierTemplate[ModifierShell])
+		case ModifierCode:
+			modifierPrompt, err = chatCompletionModifierTemplate[ModifierCode], nil
+		case ModifierNil:
+			modifierPrompt, err = "", nil
+		default:
+			return "", ErrUnsupportedModifier
+		}
+		if err != nil {
+			return "", err
+		}
+
+		if modifierPrompt != "" {
+			messages = append(messages, openai.ChatCompletionMessage{
+				Role:    openai.ChatMessageRoleSystem,
+				Content: modifierPrompt,
+			})
+		}
+	}
+
+	// Add prompt to messages
 	messages = append(messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
 		Content: prompt,
 	})
+
+	// Do request
 	req := openai.ChatCompletionRequest{
 		Messages:    messages,
 		Model:       options.Model,
@@ -120,7 +156,18 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimSpace(resp.Choices[0].Message.Content), nil
+	receivedMessage := resp.Choices[0].Message
+
+	// If a session was provided, save received message to this chat
+	if isChat {
+		messages = append(messages, receivedMessage)
+		if err = chat.SaveSession(options.ChatSession, messages); err != nil {
+			return "", err
+		}
+	}
+
+	// Return received message
+	return strings.TrimSpace(receivedMessage.Content), nil
 }
 
 func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, prompt, responseFormat string) ([]string, error) {

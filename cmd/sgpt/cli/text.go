@@ -31,7 +31,6 @@ var openaiModels = []string{
 	openai.GPT3Curie,
 	openai.GPT3Ada,
 	openai.GPT3Babbage,
-
 	openai.CodexCodeDavinci002,
 	openai.CodexCodeCushman001,
 	openai.CodexCodeDavinci001,
@@ -52,6 +51,7 @@ Query a openai model for a text completion. The following models are supported:
 		fs.IntVar(&textArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
 		fs.Float64Var(&textArgs.temperature, "temperature", 1.0, "Randomness of generated output")
 		fs.Float64Var(&textArgs.topP, "top-p", 1.0, "Limits highest probable tokens")
+		fs.StringVar(&textArgs.chatSession, "chat", "", "Use an existing chat session")
 		return fs
 	})(),
 }
@@ -61,6 +61,7 @@ var textArgs struct {
 	maxTokens   int
 	temperature float64
 	topP        float64
+	chatSession string
 }
 
 func runText(ctx context.Context, args []string) error {
@@ -74,6 +75,8 @@ func runText(ctx context.Context, args []string) error {
 		MaxTokens:   textArgs.maxTokens,
 		Temperature: float32(textArgs.temperature),
 		TopP:        float32(textArgs.topP),
+		Modifier:    sgpt.ModifierNil,
+		ChatSession: textArgs.chatSession,
 	}
 	if err = sgpt.ValidateCompletionOptions(options); err != nil {
 		return err
@@ -87,9 +90,9 @@ func runText(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, sgpt.ModifierNil)
+		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt, sgpt.ModifierNil)
+		response, err = sgpt.GetCompletion(ctx, client, options, prompt)
 	}
 	if err != nil {
 		return err

@@ -27,6 +27,7 @@ The supported completion models can be listed via: "sgpt txt --help"
 		fs.IntVar(&codeArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
 		fs.Float64Var(&codeArgs.temperature, "temperature", 0.8, "Randomness of generated output")
 		fs.Float64Var(&codeArgs.topP, "top-p", 0.2, "Limits highest probable tokens")
+		fs.StringVar(&codeArgs.chatSession, "chat", "", "Use an existing chat session")
 		return fs
 	})(),
 }
@@ -36,6 +37,7 @@ var codeArgs struct {
 	maxTokens   int
 	temperature float64
 	topP        float64
+	chatSession string
 }
 
 func runCode(ctx context.Context, args []string) error {
@@ -49,6 +51,8 @@ func runCode(ctx context.Context, args []string) error {
 		MaxTokens:   codeArgs.maxTokens,
 		Temperature: float32(codeArgs.temperature),
 		TopP:        float32(codeArgs.topP),
+		Modifier:    sgpt.ModifierCode,
+		ChatSession: codeArgs.chatSession,
 	}
 	if err = sgpt.ValidateCompletionOptions(options); err != nil {
 		return err
@@ -62,9 +66,9 @@ func runCode(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, sgpt.ModifierCode)
+		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt, sgpt.ModifierCode)
+		response, err = sgpt.GetCompletion(ctx, client, options, prompt)
 	}
 	if err != nil {
 		return err

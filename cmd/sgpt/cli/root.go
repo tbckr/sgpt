@@ -38,9 +38,10 @@ For help on subcommands, add --help after: "sgpt sh --help".
 			shellCmd,
 			codeCmd,
 			imageCmd,
+			chatCmd,
 			versionCmd,
 		},
-		Exec: func(ctx context.Context, args []string) error {
+		Exec: func(_ context.Context, _ []string) error {
 			return flag.ErrHelp
 		},
 		UsageFunc: usageFunc,
