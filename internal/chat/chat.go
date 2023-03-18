@@ -18,6 +18,8 @@ const (
 
 var ErrChatSessionNotExist = errors.New("chat session does not exist")
 
+// TODO refactor functions: move to file package, rm duplicates
+
 func getAppCacheDir() (string, error) {
 	// Get user specific config dir
 	baseConfigDir, err := os.UserCacheDir()
