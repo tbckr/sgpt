@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	colorReset = "\033[0m"
-	colorRed   = "\033[31m"
+	shellFormat = "\033[31m" // color red
 )
 
 var shellCmd = &ffcli.Command{
@@ -36,6 +35,7 @@ The supported completion models can be listed via: "sgpt txt --help"
 		fs.Float64Var(&shellArgs.temperature, "temperature", 0.2, "Randomness of generated output")
 		fs.Float64Var(&shellArgs.topP, "top-p", 0.9, "Limits highest probable tokens")
 		fs.BoolVar(&shellArgs.execute, "execute", false, "Execute shell command")
+		fs.StringVar(&shellArgs.chatSession, "chat", "", "Use an existing chat session")
 		return fs
 	})(),
 }
@@ -46,6 +46,7 @@ var shellArgs struct {
 	temperature float64
 	topP        float64
 	execute     bool
+	chatSession string
 }
 
 func runShell(ctx context.Context, args []string) error {
@@ -59,6 +60,8 @@ func runShell(ctx context.Context, args []string) error {
 		MaxTokens:   shellArgs.maxTokens,
 		Temperature: float32(shellArgs.temperature),
 		TopP:        float32(shellArgs.topP),
+		Modifier:    sgpt.ModifierShell,
+		ChatSession: shellArgs.chatSession,
 	}
 	if err = sgpt.ValidateCompletionOptions(options); err != nil {
 		return err
@@ -72,15 +75,15 @@ func runShell(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt, sgpt.ModifierShell)
+		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt, sgpt.ModifierShell)
+		response, err = sgpt.GetCompletion(ctx, client, options, prompt)
 	}
 	if err != nil {
 		return err
 	}
 
-	if _, err = fmt.Fprintln(stdout, colorRed, response, colorReset); err != nil {
+	if _, err = fmt.Fprintln(stdout, shellFormat, response, resetFormat); err != nil {
 		return err
 	}
 

@@ -13,6 +13,10 @@ import (
 	"github.com/peterbourgon/ff/v3/ffcli"
 )
 
+const (
+	resetFormat = "\033[0m"
+)
+
 var (
 	stdout io.Writer = os.Stdout
 	stderr io.Writer = os.Stderr
@@ -38,9 +42,10 @@ For help on subcommands, add --help after: "sgpt sh --help".
 			shellCmd,
 			codeCmd,
 			imageCmd,
+			chatCmd,
 			versionCmd,
 		},
-		Exec: func(ctx context.Context, args []string) error {
+		Exec: func(_ context.Context, _ []string) error {
 			return flag.ErrHelp
 		},
 		UsageFunc: usageFunc,
