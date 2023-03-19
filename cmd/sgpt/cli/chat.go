@@ -66,19 +66,42 @@ func runChatLsCmd(_ context.Context, _ []string) error {
 	if err != nil {
 		return err
 	}
+	if len(sessions) == 0 {
+		return nil
+	}
 	_, err = fmt.Fprintln(stdout, strings.Join(sessions, "\n"))
 	return err
 }
 
 func runChatRmCmd(_ context.Context, args []string) error {
-	if len(args) != 0 {
-		return ErrMissingChatSession
+	// Get session/s
+	var chatSessions []string
+	if chatRmArgs.deleteAll {
+		retrievedSessions, err := chat.ListSessions()
+		if err != nil {
+			return err
+		}
+		chatSessions = append(chatSessions, retrievedSessions...)
+	} else {
+		if len(args) != 0 {
+			return ErrMissingChatSession
+		}
+		sessionName := args[0]
+		chatSessions = append(chatSessions, sessionName)
 	}
-	sessionName := args[0]
-	err := chat.DeleteSession(sessionName)
-	if err != nil {
-		return err
+	return deleteChatSessions(chatSessions)
+}
+
+func deleteChatSessions(chatSessions []string) error {
+	for _, chatSession := range chatSessions {
+		err := chat.DeleteSession(chatSession)
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(stdout, chatSession)
+		if err != nil {
+			return err
+		}
 	}
-	_, err = fmt.Fprintf(stdout, "Chat session %s removed\n", sessionName)
-	return err
+	return nil
 }
