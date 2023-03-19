@@ -212,7 +212,8 @@ Do you want to commit your changes with this commit message? [y/N] y
  create mode 100644 .bash_aliases
 ```
 
-A compilation of beneficial bash aliases and functions is available in [.bash_aliases](.bash_aliases).
+A compilation of beneficial bash aliases and functions, including an updated gsum function, is available
+in [.bash_aliases](.bash_aliases).
 
 ### Code Generation Capabilities
 
