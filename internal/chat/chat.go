@@ -69,11 +69,13 @@ func validateSession(sessionName string) error {
 }
 
 func fileExists(filepath string) (bool, error) {
-	_, err := os.Stat(filepath)
-	if os.IsExist(err) || os.IsNotExist(err) {
-		return os.IsExist(err), nil
+	fileInfo, err := os.Stat(filepath)
+	if os.IsNotExist(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
 	}
-	return false, err
+	return fileInfo.Name() != "", nil
 }
 
 func SessionExists(sessionName string) (bool, error) {
@@ -84,8 +86,7 @@ func SessionExists(sessionName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	_, err = os.Stat(file)
-	return os.IsExist(err), nil
+	return fileExists(file)
 }
 
 func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
