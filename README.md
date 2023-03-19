@@ -54,21 +54,21 @@ This will create an executable named sgpt in the current directory.
 
 To build a Docker image for SGPT, use the `docker-build.sh` script located in the `bin` folder:
 
-1. Ensure you have [Docker](https://www.docker.com/products/docker-desktop/) installed on your system.
-2. Make sure you are in the root of the cloned SGPT repository.
-3. Make the docker-build.sh script executable:
+1. Make sure you are in the root of the cloned SGPT repository.
+2. Make the docker-build.sh script executable:
 
 ```shell
 chmod +x bin/docker-build.sh
 ```
 
-4. Run the `docker-build.sh` script to build the Docker image:
+3. Run the `docker-build.sh` script to build the Docker image:
 
 ```shell
 bin/docker-build.sh
 ```
 
-The script will build the Docker image with the tag `ghcr.io/tbckr/sgpt:latest`.
+The script will build the Docker image for the linux/amd64 platform with the tag `sgpt:latest`. Change the platform,
+build args or tag according to your needs.
 
 ## Usage Guide
 
