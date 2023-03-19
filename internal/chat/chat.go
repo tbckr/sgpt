@@ -42,7 +42,7 @@ func getAppCacheDir() (string, error) {
 	// Check, if application cache dir exists
 	if os.IsNotExist(err) {
 		// Create application cache dir
-		if err = os.Mkdir(configPath, dirPermissions); err != nil {
+		if err = os.MkdirAll(configPath, dirPermissions); err != nil {
 			return "", err
 		}
 	}

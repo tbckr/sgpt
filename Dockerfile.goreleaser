@@ -1,6 +1,7 @@
 FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/static:latest
 
 ENV HOME /home/nonroot
+VOLUME /home/nonroot
 
 COPY sgpt /sgpt
 ENTRYPOINT ["/sgpt"]

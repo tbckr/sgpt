@@ -17,6 +17,7 @@ RUN \
 FROM cgr.dev/chainguard/static:latest
 
 ENV HOME /home/nonroot
+VOLUME /home/nonroot
 
 COPY --from=build /work/sgpt /sgpt
 ENTRYPOINT ["/sgpt"]
