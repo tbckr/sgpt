@@ -169,7 +169,6 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	receivedMessage := resp.Choices[0].Message
 	// Remove surrounding white spaces
 	receivedMessage.Content = strings.TrimSpace(receivedMessage.Content)
-
 	// If a session was provided, save received message to this chat
 	if isChat {
 		messages = append(messages, receivedMessage)
@@ -177,7 +176,6 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 			return "", err
 		}
 	}
-
 	// Return received message
 	return receivedMessage.Content, nil
 }
