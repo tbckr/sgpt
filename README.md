@@ -15,7 +15,7 @@ There are two primary ways to install SGPT:
 With Go installed on your system, run the following command:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@v1.5.0
+go install github.com/tbckr/sgpt/cmd/sgpt@v1.6.0
 ```
 
 2. Download the latest release:
