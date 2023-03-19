@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	colorReset = "\033[0m"
-	colorRed   = "\033[31m"
+	shellFormat = "\033[31m" // color red
 )
 
 var shellCmd = &ffcli.Command{
@@ -84,7 +83,7 @@ func runShell(ctx context.Context, args []string) error {
 		return err
 	}
 
-	if _, err = fmt.Fprintln(stdout, colorRed, response, colorReset); err != nil {
+	if _, err = fmt.Fprintln(stdout, shellFormat, response, resetFormat); err != nil {
 		return err
 	}
 

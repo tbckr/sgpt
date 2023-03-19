@@ -13,6 +13,10 @@ import (
 	"github.com/peterbourgon/ff/v3/ffcli"
 )
 
+const (
+	resetFormat = "\033[0m"
+)
+
 var (
 	stdout io.Writer = os.Stdout
 	stderr io.Writer = os.Stderr

@@ -13,6 +13,10 @@ import (
 	"github.com/tbckr/sgpt/internal/chat"
 )
 
+const (
+	chatRoleFormat = "\033[1m"
+)
+
 var (
 	ErrMissingChatSession  = errors.New("no chat session name provided")
 	ErrChatSessionNotExist = errors.New("given chat does not exist")
@@ -22,8 +26,8 @@ var chatCmd = &ffcli.Command{
 	Name:       "chat",
 	ShortUsage: "sgpt chat <subcommand> [subcommand flags]",
 	ShortHelp:  "Manage chat sessions",
-	// TODO
 	LongHelp: strings.TrimSpace(`
+Manage all open chat sessions - list, show, and delete chat sessions.
 `),
 	Subcommands: []*ffcli.Command{
 		lsCmd,
@@ -40,8 +44,8 @@ var lsCmd = &ffcli.Command{
 	Name:       "ls",
 	ShortUsage: "sgpt chat ls",
 	ShortHelp:  "List all chat sessions",
-	// TODO
 	LongHelp: strings.TrimSpace(`
+List all chat sessions.
 `),
 	Exec:      runChatLsCmd,
 	UsageFunc: usageFunc,
@@ -51,8 +55,8 @@ var showCmd = &ffcli.Command{
 	Name:       "show",
 	ShortUsage: "sgpt chat show <chat session>",
 	ShortHelp:  "Show the conversation for the given chat session",
-	// TODO
 	LongHelp: strings.TrimSpace(`
+Show the conversation for the given chat session.
 `),
 	Exec:      runChatShowCmd,
 	UsageFunc: usageFunc,
@@ -62,8 +66,8 @@ var rmCmd = &ffcli.Command{
 	Name:       "rm",
 	ShortUsage: "sgpt chat rm [command flags] [chat session]",
 	ShortHelp:  "Remove the specified chat session",
-	// TODO
 	LongHelp: strings.TrimSpace(`
+Remove the specified chat session. The --all flag removes all chat sessions.
 `),
 	Exec: runChatRmCmd,
 	FlagSet: (func() *flag.FlagSet {
@@ -112,7 +116,8 @@ func runChatShowCmd(_ context.Context, args []string) error {
 
 func showConversation(messages []openai.ChatCompletionMessage) error {
 	for _, message := range messages {
-		if _, err := fmt.Fprintf(stdout, "%s: %s\n", message.Role, message.Content); err != nil {
+		if _, err := fmt.Fprintf(stdout, "%s%s:%s %s\n", chatRoleFormat, message.Role, resetFormat,
+			message.Content); err != nil {
 			return err
 		}
 	}
