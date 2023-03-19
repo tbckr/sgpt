@@ -2,11 +2,16 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"flag"
+	"fmt"
 	"strings"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
+	"github.com/tbckr/sgpt/internal/chat"
 )
+
+var ErrMissingChatSession = errors.New("no chat session name provided")
 
 var chatCmd = &ffcli.Command{
 	Name:       "chat",
@@ -56,12 +61,24 @@ var chatRmArgs struct {
 	deleteAll bool
 }
 
-func runChatLsCmd(ctx context.Context, args []string) error {
-	// TODO
-	return nil
+func runChatLsCmd(_ context.Context, _ []string) error {
+	sessions, err := chat.ListSessions()
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintln(stdout, strings.Join(sessions, "\n"))
+	return err
 }
 
-func runChatRmCmd(ctx context.Context, args []string) error {
-	// TODO
-	return nil
+func runChatRmCmd(_ context.Context, args []string) error {
+	if len(args) != 0 {
+		return ErrMissingChatSession
+	}
+	sessionName := args[0]
+	err := chat.DeleteSession(sessionName)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintf(stdout, "Chat session %s removed\n", sessionName)
+	return err
 }

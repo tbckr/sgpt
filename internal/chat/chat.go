@@ -4,19 +4,29 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path"
+	"regexp"
+	"unicode/utf8"
 
 	"github.com/sashabaranov/go-openai"
 )
 
 const (
-	appConfigDir    = "sgpt"
-	dirPermissions  = 0750
-	filePermissions = 0755
+	appConfigDir         = "sgpt"
+	dirPermissions       = 0750
+	filePermissions      = 0755
+	sessionNameMaxLength = 65
 )
 
-var ErrChatSessionNotExist = errors.New("chat session does not exist")
+var (
+	ErrChatSessionNotExist    = errors.New("chat session does not exist")
+	ErrChatSessionNameInvalid = fmt.Errorf("chat session name does not match the regex %s", sessionNameRegex)
+	ErrChatSessionNameTooLong = fmt.Errorf("chat session name is greater than %d", sessionNameMaxLength)
+	sessionNameRegex          = "^([-a-zA-Z0-9]*[a-zA-Z0-9])?"
+	sessionNameMatcher        = regexp.MustCompile(sessionNameRegex)
+)
 
 // TODO refactor functions: move to file package, rm duplicates
 
@@ -48,8 +58,13 @@ func getFilepath(sessionName string) (string, error) {
 	return filePath, nil
 }
 
-func validateSession(_ string) error {
-	// TODO
+func validateSession(sessionName string) error {
+	if !sessionNameMatcher.Match([]byte(sessionName)) {
+		return ErrChatSessionNameInvalid
+	}
+	if utf8.RuneCountInString(sessionName) > sessionNameMaxLength {
+		return ErrChatSessionNameTooLong
+	}
 	return nil
 }
 
@@ -174,11 +189,34 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 }
 
 func ListSessions() ([]string, error) {
-	// TODO
-	return nil, nil
+	dir, err := getAppCacheDir()
+	if err != nil {
+		return nil, err
+	}
+	var files []os.DirEntry
+	files, err = os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	var fileList []string
+	for _, file := range files {
+		fileList = append(fileList, file.Name())
+	}
+	return fileList, nil
 }
 
 func DeleteSession(sessionName string) error {
-	// TODO
-	return nil
+	filepath, err := getFilepath(sessionName)
+	if err != nil {
+		return err
+	}
+	var exists bool
+	exists, err = fileExists(filepath)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return nil
+	}
+	return os.Remove(filepath)
 }
