@@ -54,12 +54,3 @@ jobs:
           # You can change the path to your Go source code by modifying the 'path' parameter
           # The default path is '.'
           path: .
-
-      - name: Upload SARIF results
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          # Path to the SARIF file
-          # This should be a relative path to the root of your repository
-          # You can change the name of the SARIF file by modifying the 'name' parameter
-          # The default name is 'codeql.sarif'
-          sarif_file: codeql.sarif
