@@ -1,6 +1,9 @@
-# These are some bash aliases and functions to make you more productive in your daily work
+# These are some bash aliases and functions to make you more productive in your daily work.
 
-# gsum aka git summarize
+## git summarize ##
+# Leverage SGPT to produce intelligent and context-sensitive git commit messages.
+# By providing one argument, you can define the type of semantic commit (e.g. feat, fix, chore).
+# When supplying two arguments, the second parameter allows you to include more details for a more explicit prompt.
 gsum() {
     if [ $# -eq 2 ]; then
         query="Generate git commit message using semantic versioning. Declare commit message as $1. $2. My changes: $(git diff)"
