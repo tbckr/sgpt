@@ -7,11 +7,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sashabaranov/go-openai"
+
 	"github.com/peterbourgon/ff/v3/ffcli"
 	"github.com/tbckr/sgpt/internal/chat"
 )
 
-var ErrMissingChatSession = errors.New("no chat session name provided")
+var (
+	ErrMissingChatSession  = errors.New("no chat session name provided")
+	ErrChatSessionNotExist = errors.New("given chat does not exist")
+)
 
 var chatCmd = &ffcli.Command{
 	Name:       "chat",
@@ -22,6 +27,7 @@ var chatCmd = &ffcli.Command{
 `),
 	Subcommands: []*ffcli.Command{
 		lsCmd,
+		showCmd,
 		rmCmd,
 	},
 	Exec: func(_ context.Context, _ []string) error {
@@ -38,6 +44,17 @@ var lsCmd = &ffcli.Command{
 	LongHelp: strings.TrimSpace(`
 `),
 	Exec:      runChatLsCmd,
+	UsageFunc: usageFunc,
+}
+
+var showCmd = &ffcli.Command{
+	Name:       "show",
+	ShortUsage: "sgpt chat show <chat session>",
+	ShortHelp:  "Show the conversation for the given chat session",
+	// TODO
+	LongHelp: strings.TrimSpace(`
+`),
+	Exec:      runChatShowCmd,
 	UsageFunc: usageFunc,
 }
 
@@ -73,6 +90,35 @@ func runChatLsCmd(_ context.Context, _ []string) error {
 	return err
 }
 
+func runChatShowCmd(_ context.Context, args []string) error {
+	if len(args) != 1 {
+		return ErrMissingChatSession
+	}
+	sessionName := args[0]
+	exists, err := chat.SessionExists(sessionName)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return ErrChatSessionNotExist
+	}
+	var messages []openai.ChatCompletionMessage
+	messages, err = chat.GetSession(sessionName)
+	if err != nil {
+		return err
+	}
+	return showConversation(messages)
+}
+
+func showConversation(messages []openai.ChatCompletionMessage) error {
+	for _, message := range messages {
+		if _, err := fmt.Fprintf(stdout, "%s: %s\n", message.Role, message.Content); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func runChatRmCmd(_ context.Context, args []string) error {
 	// Get session/s
 	var chatSessions []string
@@ -83,7 +129,7 @@ func runChatRmCmd(_ context.Context, args []string) error {
 		}
 		chatSessions = append(chatSessions, retrievedSessions...)
 	} else {
-		if len(args) != 0 {
+		if len(args) != 1 {
 			return ErrMissingChatSession
 		}
 		sessionName := args[0]
