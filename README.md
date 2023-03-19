@@ -72,6 +72,22 @@ build args or tag according to your needs.
 
 ## Usage Guide
 
+### Obtaining an OpenAI API Key
+
+To use the OpenAI API, you must first obtain an API key.
+
+1. Visit [https://platform.openai.com/overview](https://platform.openai.com/overview) and sign up for an account.
+2. Navigate to [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) and generate
+   a new API key.
+3. Update your `.bashrc` or `.zshrc` file to include the following export statement:
+
+```shell
+export OPENAI_API_KEY="sk-..."
+```
+
+After completing these steps, you'll have an OpenAI API key that can be used to interact with the OpenAI models through
+the SGPT tool.
+
 ### Querying OpenAI Models
 
 SGPT allows you to ask simple questions and receive informative answers. For example:
