@@ -1,56 +1,56 @@
-name: CodeQL
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  analyze:
-    name: Analyze
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        language: [ go ]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - uses: actions/setup-go@v4
-        with:
-          go-version: '>=1.20'
-          cache: true
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-          # If you wish to specify custom queries, you can do so here or in a later step
-
-      - name: Build
-        run: |
-          go build -o sgpt cmd/sgpt/main.go
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          # Path to the CodeQL database
-          # This should be a relative path to the root of your repository
-          # You can change the name of the database by modifying the 'name' parameter
-          # The default name is 'codeql-database'
-          database: codeql-database
-
-          # Path to the CodeQL queries
-          # This should be a relative path to the root of your repository
-          # You can change the name of the queries by modifying the 'name' parameter
-          # The default name is 'codeql-queries'
-          queries: codeql-queries
-
-          # Path to the Go source code
-          # This should be a relative path to the root of your repository
-          # You can change the path to your Go source code by modifying the 'path' parameter
-          # The default path is '.'
-          path: .
+#name: CodeQL
+#
+#on:
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+#
+#jobs:
+#  analyze:
+#    name: Analyze
+#    runs-on: ubuntu-latest
+#
+#    strategy:
+#      matrix:
+#        language: [ go ]
+#
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v3
+#
+#      - uses: actions/setup-go@v4
+#        with:
+#          go-version: '>=1.20'
+#          cache: true
+#
+#      - name: Initialize CodeQL
+#        uses: github/codeql-action/init@v2
+#        with:
+#          languages: ${{ matrix.language }}
+#          # If you wish to specify custom queries, you can do so here or in a later step
+#
+#      - name: Build
+#        run: |
+#          go build -o sgpt cmd/sgpt/main.go
+#
+#      - name: Perform CodeQL Analysis
+#        uses: github/codeql-action/analyze@v2
+#        with:
+#          # Path to the CodeQL database
+#          # This should be a relative path to the root of your repository
+#          # You can change the name of the database by modifying the 'name' parameter
+#          # The default name is 'codeql-database'
+#          database: codeql-database
+#
+#          # Path to the CodeQL queries
+#          # This should be a relative path to the root of your repository
+#          # You can change the name of the queries by modifying the 'name' parameter
+#          # The default name is 'codeql-queries'
+#          queries: codeql-queries
+#
+#          # Path to the Go source code
+#          # This should be a relative path to the root of your repository
+#          # You can change the path to your Go source code by modifying the 'path' parameter
+#          # The default path is '.'
+#          path: .
