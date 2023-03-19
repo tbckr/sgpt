@@ -88,6 +88,42 @@ $ echo -n "mass of sun" | sgpt txt
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
+### Chat Capabilities
+
+SGPT provides chat functionality that enables interactive conversations with OpenAI models. You can use the `--chat`
+flag with the `txt`, `sh`, and `code` subcommands to initiate and reference chat sessions.
+
+The chat capabilities allow you to interact with OpenAI models in a more dynamic and engaging way, making it
+easier to obtain relevant responses, code, or shell commands through continuous conversations.
+
+The example below demonstrates how to fine-tune the model's responses for more targeted outcomes.
+
+1. The first command initiates a chat session named `ls-files` and asks the model to "list all files directory":
+
+```shell
+$ sgpt sh --chat ls-files "list all files directory"
+ls
+```
+
+The model responds with the shell command ls, which is used to list all files in a directory.
+
+2. The second command continues the conversation within the `ls-files` chat session and requests to "sort by name":
+
+```shell
+$ sgpt sh --chat ls-files "sort by name"
+ls | sort
+```
+
+The model provides the appropriate shell command `ls | sort`, which lists all files in a directory and sorts them by
+name.
+
+To manage active chat sessions, use the `sgpt chat` command. Here are the available options for chat session management:
+
+- `sgpt chat ls`: List all active chat sessions.
+- `sgpt chat show <chat session>`: Display the content of a specific chat session.
+- `sgpt chat rm <chat session>`: Remove a chat session.
+- `sgpt chat rm --all`: Delete all chat sessions.
+
 ### Running Queries with Docker
 
 For users who prefer to use Docker, SGPT provides a Docker image:
@@ -103,6 +139,39 @@ $ docker pull ghcr.io/tbckr/sgpt:latest
 ```shell
 $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} ghcr.io/tbckr/sgpt:latest txt "mass of sun"
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
+```
+
+### Saving Chat Sessions in Docker
+
+When using SGPT within a Docker container, you can mount a local folder to the container's `/home/nonroot` path to save
+and persist all active chat sessions. This allows you to maintain your chat history and resume previous conversations
+across different container instances.
+
+To mount a local folder and save chat sessions, follow these steps:
+
+1. Pull the SGPT Docker image:
+
+```shell
+$ docker pull ghcr.io/tbckr/sgpt:latest
+```
+
+2. Create a local folder to store your chat sessions, e.g., `sgpt-chat-sessions`:
+
+```shell
+mkdir sgpt-chat-sessions
+```
+
+3. Run the Docker container with the local folder mounted to `/home/nonroot`:
+
+```shell
+$ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "mass of sun"
+The mass of the sun is approximately 1.99 x 10^30 kilograms.
+$ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "convert to earth masses"
+To convert the mass of the sun to earth masses, we need to divide it by the mass of the Earth:
+
+1.99 x 10^30 kg / 5.97 x 10^24 kg = 333,000 Earth masses (rounded to the nearest thousand) 
+
+So the mass of the sun is about 333,000 times greater than the mass of the Earth.
 ```
 
 ### Generating and Executing Shell Commands
