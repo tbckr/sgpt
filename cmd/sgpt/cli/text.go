@@ -31,9 +31,6 @@ var openaiModels = []string{
 	openai.GPT3Curie,
 	openai.GPT3Ada,
 	openai.GPT3Babbage,
-	openai.CodexCodeDavinci002,
-	openai.CodexCodeCushman001,
-	openai.CodexCodeDavinci001,
 }
 
 var textCmd = &ffcli.Command{
