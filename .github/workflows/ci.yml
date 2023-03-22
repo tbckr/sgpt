@@ -1,4 +1,4 @@
-name: CI Pipeline (golangci-lint)
+name: CI Pipeline
 
 on:
   push:
