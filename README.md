@@ -27,9 +27,8 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
   - [Code Generation Capabilities](#code-generation-capabilities)
   - [Transforming Text to Images](#transforming-text-to-images)
 - [Development](#development)
-  - [Build from Source Code](#build-from-source-code)
-    - [Build with Go](#build-with-go)
-    - [Build a Docker Image](#build-a-docker-image)
+  - [Build with Go](#build-with-go)
+  - [Build Docker Image](#build-docker-image)
 - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
