@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'README.md'
 
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
