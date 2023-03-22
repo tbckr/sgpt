@@ -10,16 +10,17 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Installation Methods](#installation-methods)
+- [Features](#features)
+- [Installation](#installation)
   - [For Homebrew Users (macOS, Linux)](#for-homebrew-users-macos-linux)
   - [For scoop Users on Windows](#for-scoop-users-on-windows)
   - [Using Go](#using-go)
   - [Other platforms](#other-platforms)
-- [Build from Source Code](#build-from-source-code)
-  - [Build with Go](#build-with-go)
-  - [Build a Docker Image](#build-a-docker-image)
+  - [Build from Source Code](#build-from-source-code)
+    - [Build with Go](#build-with-go)
+    - [Build a Docker Image](#build-a-docker-image)
 - [Usage Guide](#usage-guide)
-  - [Obtaining an OpenAI API Key](#obtaining-an-openai-api-key)
+  - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
   - [Querying OpenAI Models](#querying-openai-models)
   - [Chat Capabilities](#chat-capabilities)
   - [Running Queries with Docker](#running-queries-with-docker)
