@@ -7,9 +7,8 @@ simple commands. Streamline your workflow and enhance productivity with this pow
 Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- param::isNotitle::true:: -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+<!-- param::isNotitle::true:: -->
 
 - [Features](#features)
 - [Installation](#installation)
@@ -27,9 +26,6 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
   - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
   - [Code Generation Capabilities](#code-generation-capabilities)
   - [Transforming Text to Images](#transforming-text-to-images)
-- [Development](#development)
-  - [Go Build](#go-build)
-  - [Build Docker Image](#build-docker-image)
 - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->

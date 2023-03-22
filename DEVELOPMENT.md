@@ -1,7 +1,13 @@
 # Development
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
+
+- [Source Build](#source-build)
+  - [Go Build](#go-build)
+  - [Build Docker Image](#build-docker-image)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Source Build
