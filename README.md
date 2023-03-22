@@ -63,7 +63,7 @@ scoop install tbckr/sgpt
 If you have Go installed on your system, use this command:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@v1.8.1
+go install github.com/tbckr/sgpt/cmd/sgpt@v1.9.0
 ```
 
 ### Other platforms
