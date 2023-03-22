@@ -341,7 +341,7 @@ chmod +x bin/docker-build.sh
 bin/docker-build.sh
 ```
 
-The script will build the Docker image for the linux/amd64 platform with the tag `sgpt:latest`. Change the platform,
+The script will build the Docker image for the `linux/amd64` platform with the tag `sgpt:latest`. Change the platform,
 build args or tag according to your needs.
 
 ## Acknowledgements
