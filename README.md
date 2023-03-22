@@ -300,9 +300,7 @@ The image will be downloaded with a unique file name, making it easily accessibl
 
 ## Development
 
-### Build from Source Code
-
-#### Build with Go
+### Build with Go
 
 To build SGPT from the source code using Go, follow these steps:
 
@@ -327,7 +325,7 @@ go build -o sgpt cmd/sgpt/main.go
 
 This will create an executable named sgpt in the current directory.
 
-#### Build a Docker Image
+### Build Docker Image
 
 To build a Docker image for SGPT, use the `docker-build.sh` script located in the `bin` folder:
 
