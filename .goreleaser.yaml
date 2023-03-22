@@ -223,6 +223,7 @@ scoop:
   commit_author:
     name: "goreleaserbot"
     email: "11543666+tbckr@users.noreply.github.com"
+  commit_msg_template: "feat: Scoop update for {{ .ProjectName }} version {{ .Tag }}"
   description: "SGPT is a command-line tool that provides a convenient way to interact with OpenAI models, enabling users to run queries, generate shell commands, produce code, and create images from text directly from the terminal."
   license: MIT
 
@@ -234,6 +235,7 @@ brews:
     commit_author:
       name: "goreleaserbot"
       email: "11543666+tbckr@users.noreply.github.com"
+    commit_msg_template: "feat: Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     folder: Formula
     description: "SGPT is a command-line tool that provides a convenient way to interact with OpenAI models, enabling users to run queries, generate shell commands, produce code, and create images from text directly from the terminal."
     license: MIT
