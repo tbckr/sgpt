@@ -4,8 +4,11 @@ before:
     - go mod tidy
 
 env:
+  - GITHUB_USER=tbckr
   - GITHUB_REPO=tbckr/sgpt
   - IMAGE_NAME=ghcr.io/tbckr/sgpt
+  - SCOOP_BUCKET=scoop-bucket
+  - HOMEBREW_TAP=homebrew-tap
 
 gomod:
   proxy: true
@@ -33,7 +36,7 @@ builds:
       - goos: windows
         goarch: arm
     ldflags:
-      - -X 'sgpt.Version={{.Version}}'
+      - "-X 'sgpt.Version={{.Version}}'"
 
 archives:
   - format: tar.gz
@@ -211,6 +214,32 @@ changelog:
       order: 400
     - title: Other work
       order: 9999
+
+scoop:
+  bucket:
+    owner: "{{ .Env.GITHUB_USER }}"
+    name: "{{ .Env.SCOOP_BUCKET }}"
+    token: "{{ .Env.SCOOP_TAP_GITHUB_TOKEN }}"
+  commit_author:
+    name: "goreleaserbot"
+    email: "11543666+tbckr@users.noreply.github.com"
+  description: "SGPT is a command-line tool that provides a convenient way to interact with OpenAI models, enabling users to run queries, generate shell commands, produce code, and create images from text directly from the terminal."
+  license: MIT
+
+brews:
+  - tap:
+      owner: "{{ .Env.GITHUB_USER }}"
+      name: "{{ .Env.SCOOP_BUCKET }}"
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: "goreleaserbot"
+      email: "11543666+tbckr@users.noreply.github.com"
+    folder: Formula
+    description: "SGPT is a command-line tool that provides a convenient way to interact with OpenAI models, enabling users to run queries, generate shell commands, produce code, and create images from text directly from the terminal."
+    license: MIT
+    dependencies:
+    - name: go
+      type: optional
 
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
