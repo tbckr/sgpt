@@ -32,7 +32,16 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Installation Methods
+## Features
+
+- Ask simple questions to get an answer immediately in the shell
+- Generate shell commands and execute them
+- Produce code in any programming language
+- Use ChatGPT chat capabilities to further refine your prompts
+- Create images from prompts with DALLE
+- Use the responses in bash functions and aliases to improve and optimize your workflows
+
+## Installation
 
 ### For Homebrew Users (macOS, Linux)
 
@@ -64,9 +73,9 @@ go install github.com/tbckr/sgpt/cmd/sgpt@v1.8.1
 Visit the GitHub [release page](https://github.com/tbckr/sgpt/releases) and download the latest release for your
 platform.
 
-## Build from Source Code
+###  Build from Source Code
 
-### Build with Go
+#### Build with Go
 
 To build SGPT from the source code using Go, follow these steps:
 
@@ -91,7 +100,7 @@ go build -o sgpt cmd/sgpt/main.go
 
 This will create an executable named sgpt in the current directory.
 
-### Build a Docker Image
+#### Build a Docker Image
 
 To build a Docker image for SGPT, use the `docker-build.sh` script located in the `bin` folder:
 
@@ -113,7 +122,7 @@ build args or tag according to your needs.
 
 ## Usage Guide
 
-### Obtaining an OpenAI API Key
+### Getting started: Obtaining an OpenAI API Key
 
 To use the OpenAI API, you must first obtain an API key.
 
