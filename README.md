@@ -4,21 +4,36 @@ SGPT is a powerful command-line interface (CLI) tool designed for seamless inter
 your terminal. Effortlessly run queries, generate shell commands or code, create images from text, and more, using
 simple commands. Streamline your workflow and enhance productivity with this powerful and user-friendly CLI tool.
 
-Developed with the help of [sgpt](https://github.com/tbckr/sgpt).
+Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
 ## Installation Methods
 
-There are two primary ways to install SGPT:
+### For Homebrew Users (macOS, Linux)
 
-1. Install using Go:
-
-With Go installed on your system, run the following command:
+Execute the following command in your terminal:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@v1.7.0
+brew install tbckr/tap/sgpt
 ```
 
-2. Download the latest release:
+### For scoop Users on Windows
+
+Run these commands in your PowerShell:
+
+```shell
+scoop bucket add tbckr https://github.com/tbckr/scoop-bucket.git
+scoop install tbckr/sgpt
+```
+
+### Using Go
+
+If you have Go installed on your system, use this command:
+
+```shell
+go install github.com/tbckr/sgpt/cmd/sgpt@v1.8.1
+```
+
+### Other platforms
 
 Visit the GitHub [release page](https://github.com/tbckr/sgpt/releases) and download the latest release for your
 platform.
