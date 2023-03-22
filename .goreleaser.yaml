@@ -36,7 +36,9 @@ builds:
       - goos: windows
         goarch: arm
     ldflags:
-      - "-X 'sgpt.Version={{.Version}}'"
+      - -X 'github.com/tbckr/sgpt/internal/buildinfo.version={{.Version}}'
+      - -X 'github.com/tbckr/sgpt/internal/buildinfo.commit={{.Commit}}'
+      - -X 'github.com/tbckr/sgpt/internal/buildinfo.commitDate={{.CommitDate}}'
 
 archives:
   - format: tar.gz

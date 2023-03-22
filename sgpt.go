@@ -22,7 +22,6 @@ var (
 	ErrMissingAPIKey       = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
 	ErrUnsupportedModifier = errors.New("unsupported modifier")
 	ErrChatNotSupported    = errors.New("chat is not supported with this model")
-	Version                = "dev"
 )
 
 type CompletionOptions struct {

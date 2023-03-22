@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
-	"github.com/tbckr/sgpt"
+	"github.com/tbckr/sgpt/internal/buildinfo"
 )
 
 var versionCmd = &ffcli.Command{
@@ -34,7 +34,9 @@ func runVersion(_ context.Context, _ []string) error {
 	var output string
 	if versionArgs.json {
 		versionMap := map[string]string{
-			"version": sgpt.Version,
+			"version":    buildinfo.Version(),
+			"commit":     buildinfo.Commit(),
+			"commitDate": buildinfo.CommitDate(),
 		}
 		byteData, err := json.Marshal(versionMap)
 		if err != nil {
@@ -42,7 +44,8 @@ func runVersion(_ context.Context, _ []string) error {
 		}
 		output = string(byteData)
 	} else {
-		output = sgpt.Version
+		output = fmt.Sprintf("version: %s\ncommit: %s\ncommitDate: %s",
+			buildinfo.Version(), buildinfo.Commit(), buildinfo.CommitDate())
 	}
 	if _, err := fmt.Fprintln(stdout, output); err != nil {
 		return err
