@@ -6,7 +6,21 @@ on:
       - 'v*'
     branches:
       - main
+    paths:
+      - '**.go'
+      - '.golangci.yaml'
+      - '.goreleaser.yaml'
+      - '.github/workflows/ci.yml'
+      - 'go.mod'
+      - 'go.sum'
   pull_request:
+    paths:
+      - '**.go'
+      - '.golangci.yaml'
+      - '.goreleaser.yaml'
+      - '.github/workflows/ci.yml'
+      - 'go.mod'
+      - 'go.sum'
 
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
