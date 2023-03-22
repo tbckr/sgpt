@@ -229,7 +229,7 @@ scoop:
 brews:
   - tap:
       owner: "{{ .Env.GITHUB_USER }}"
-      name: "{{ .Env.SCOOP_BUCKET }}"
+      name: "{{ .Env.HOMEBREW_TAP }}"
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     commit_author:
       name: "goreleaserbot"
