@@ -8,8 +8,31 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
 **Table of Contents**
 
-<!-- toc -->
-<!-- tocstop -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Installation Methods](#installation-methods)
+  - [For Homebrew Users (macOS, Linux)](#for-homebrew-users-macos-linux)
+  - [For scoop Users on Windows](#for-scoop-users-on-windows)
+  - [Using Go](#using-go)
+  - [Other platforms](#other-platforms)
+- [Build from Source Code](#build-from-source-code)
+  - [Build with Go](#build-with-go)
+  - [Build a Docker Image](#build-a-docker-image)
+- [Usage Guide](#usage-guide)
+  - [Obtaining an OpenAI API Key](#obtaining-an-openai-api-key)
+  - [Querying OpenAI Models](#querying-openai-models)
+  - [Chat Capabilities](#chat-capabilities)
+  - [Running Queries with Docker](#running-queries-with-docker)
+  - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
+  - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
+  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
+  - [Code Generation Capabilities](#code-generation-capabilities)
+  - [Transforming Text to Images](#transforming-text-to-images)
+- [Acknowledgements](#acknowledgements)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Installation Methods
 
