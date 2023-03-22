@@ -6,6 +6,11 @@ simple commands. Streamline your workflow and enhance productivity with this pow
 
 Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
+**Table of Contents**
+
+<!-- toc -->
+<!-- tocstop -->
+
 ## Installation Methods
 
 ### For Homebrew Users (macOS, Linux)
