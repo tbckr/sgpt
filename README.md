@@ -299,7 +299,7 @@ The image will be downloaded with a unique file name, making it easily accessibl
 
 ## Development
 
-### Build with Go
+### Go Build
 
 To build SGPT from the source code using Go, follow these steps:
 
