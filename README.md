@@ -12,23 +12,23 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
 - [Features](#features)
 - [Installation](#installation)
-  - [For Homebrew Users (macOS, Linux)](#for-homebrew-users-macos-linux)
-  - [For scoop Users on Windows](#for-scoop-users-on-windows)
-  - [Using Go](#using-go)
-  - [Other platforms](#other-platforms)
-  - [Build from Source Code](#build-from-source-code)
-    - [Build with Go](#build-with-go)
-    - [Build a Docker Image](#build-a-docker-image)
+    - [For Homebrew Users (macOS, Linux)](#for-homebrew-users-macos-linux)
+    - [For scoop Users on Windows](#for-scoop-users-on-windows)
+    - [Using Go](#using-go)
+    - [Other platforms](#other-platforms)
+    - [Build from Source Code](#build-from-source-code)
+        - [Build with Go](#build-with-go)
+        - [Build a Docker Image](#build-a-docker-image)
 - [Usage Guide](#usage-guide)
-  - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
-  - [Querying OpenAI Models](#querying-openai-models)
-  - [Chat Capabilities](#chat-capabilities)
-  - [Running Queries with Docker](#running-queries-with-docker)
-  - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
-  - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
-  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
-  - [Code Generation Capabilities](#code-generation-capabilities)
-  - [Transforming Text to Images](#transforming-text-to-images)
+    - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
+    - [Querying OpenAI Models](#querying-openai-models)
+    - [Chat Capabilities](#chat-capabilities)
+    - [Running Queries with Docker](#running-queries-with-docker)
+    - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
+    - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
+    - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
+    - [Code Generation Capabilities](#code-generation-capabilities)
+    - [Transforming Text to Images](#transforming-text-to-images)
 - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -52,7 +52,7 @@ Execute the following command in your terminal:
 brew install tbckr/tap/sgpt
 ```
 
-### For scoop Users on Windows
+### For Scoop Users on Windows
 
 Run these commands in your PowerShell:
 
@@ -73,53 +73,6 @@ go install github.com/tbckr/sgpt/cmd/sgpt@v1.8.1
 
 Visit the GitHub [release page](https://github.com/tbckr/sgpt/releases) and download the latest release for your
 platform.
-
-###  Build from Source Code
-
-#### Build with Go
-
-To build SGPT from the source code using Go, follow these steps:
-
-1. Ensure you have [Go](https://go.dev/dl/) installed on your system.
-2. Clone the SGPT repository:
-
-```shell
-git clone https://github.com/tbckr/sgpt.git
-```
-
-3. Navigate to the cloned repository:
-
-```shell
-cd sgpt
-```
-
-4. Build the SGPT executable using Go:
-
-```shell
-go build -o sgpt cmd/sgpt/main.go
-```
-
-This will create an executable named sgpt in the current directory.
-
-#### Build a Docker Image
-
-To build a Docker image for SGPT, use the `docker-build.sh` script located in the `bin` folder:
-
-1. Make sure you are in the root of the cloned SGPT repository.
-2. Make the `docker-build.sh` script executable:
-
-```shell
-chmod +x bin/docker-build.sh
-```
-
-3. Run the `docker-build.sh` script to build the Docker image:
-
-```shell
-bin/docker-build.sh
-```
-
-The script will build the Docker image for the linux/amd64 platform with the tag `sgpt:latest`. Change the platform,
-build args or tag according to your needs.
 
 ## Usage Guide
 
@@ -343,6 +296,55 @@ $ sgpt image --download "v for vendetta"
 ```
 
 The image will be downloaded with a unique file name, making it easily accessible within your working directory.
+
+## Development
+
+### Build from Source Code
+
+#### Build with Go
+
+To build SGPT from the source code using Go, follow these steps:
+
+1. Ensure you have [Go](https://go.dev/dl/) installed on your system.
+2. Clone the SGPT repository:
+
+```shell
+git clone https://github.com/tbckr/sgpt.git
+```
+
+3. Navigate to the cloned repository:
+
+```shell
+cd sgpt
+```
+
+4. Build the SGPT executable using Go:
+
+```shell
+go build -o sgpt cmd/sgpt/main.go
+```
+
+This will create an executable named sgpt in the current directory.
+
+#### Build a Docker Image
+
+To build a Docker image for SGPT, use the `docker-build.sh` script located in the `bin` folder:
+
+1. Make sure you are in the root of the cloned SGPT repository.
+2. Make the `docker-build.sh` script executable:
+
+```shell
+chmod +x bin/docker-build.sh
+```
+
+3. Run the `docker-build.sh` script to build the Docker image:
+
+```shell
+bin/docker-build.sh
+```
+
+The script will build the Docker image for the linux/amd64 platform with the tag `sgpt:latest`. Change the platform,
+build args or tag according to your needs.
 
 ## Acknowledgements
 
