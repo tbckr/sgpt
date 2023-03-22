@@ -27,7 +27,7 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
   - [Code Generation Capabilities](#code-generation-capabilities)
   - [Transforming Text to Images](#transforming-text-to-images)
 - [Development](#development)
-  - [Build with Go](#build-with-go)
+  - [Go Build](#go-build)
   - [Build Docker Image](#build-docker-image)
 - [Acknowledgements](#acknowledgements)
 
