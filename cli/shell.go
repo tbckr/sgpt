@@ -1,21 +1,12 @@
 package cli
 
 import (
-	"bufio"
-	"context"
-	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/client"
 	"github.com/tbckr/sgpt/modifier"
 	"github.com/tbckr/sgpt/shell"
-)
-
-const (
-	shellFormat = "\033[31m" // color red
 )
 
 var shellArgs struct {
@@ -53,7 +44,6 @@ func runShell(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-
 	options := client.CompletionOptions{
 		Model:       shellArgs.model,
 		MaxTokens:   shellArgs.maxTokens,
@@ -62,7 +52,6 @@ func runShell(cmd *cobra.Command, args []string) error {
 		Modifier:    modifier.Shell,
 		ChatSession: shellArgs.chatSession,
 	}
-
 	var cli *client.Client
 	cli, err = client.CreateClient()
 	if err != nil {
@@ -78,47 +67,6 @@ func runShell(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-
-	if _, err = fmt.Fprintln(stdout, shellFormat, response, resetFormat); err != nil {
-		return err
-	}
-
-	if shellArgs.execute {
-		var ok bool
-		ok, err = getUserConfirmation()
-		if err != nil {
-			return err
-		}
-		if ok {
-			return executeShellCommand(cmd.Context(), response)
-		}
-	}
-	return nil
-}
-
-func getUserConfirmation() (bool, error) {
-	// Require user confirmation
-	for {
-		if _, err := fmt.Fprint(stdout, "Do you want to execute this command? (Y/n) "); err != nil {
-			return false, err
-		}
-		reader := bufio.NewReader(os.Stdin)
-		char, _, err := reader.ReadRune()
-		if err != nil {
-			return false, err
-		}
-		// 10 = enter
-		if char == 10 || char == 'Y' || char == 'y' {
-			return true, nil
-		} else if char == 'N' || char == 'n' {
-			return false, nil
-		}
-	}
-}
-
-func executeShellCommand(ctx context.Context, response string) error {
-	// Execute cmd from response text
-	cmd := exec.CommandContext(ctx, "bash", "-c", response)
-	cmd.Stdout = stdout
-	return cmd.Run()
+	response = strings.TrimSpace(response)
+	return shell.ExecuteCommandWithConfirmation(cmd.Context(), response)
 }

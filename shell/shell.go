@@ -2,8 +2,11 @@ package shell
 
 import (
 	"bufio"
+	"context"
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
 )
 
 var ErrMissingInput = errors.New("no input was provided")
@@ -51,4 +54,47 @@ func GetInput(args []string) (string, error) {
 		prompt = args[0]
 	}
 	return prompt, nil
+}
+
+func ExecuteCommandWithConfirmation(ctx context.Context, bashCommand string) error {
+	// Print out the command to be executed
+	if _, err := fmt.Fprintln(os.Stdout, bashCommand); err != nil {
+		return err
+	}
+	// Require user confirmation
+	ok, err := GetUserConfirmation()
+	if err != nil {
+		return err
+	}
+	if ok {
+		return ExecuteShellCommand(ctx, bashCommand)
+	}
+	return nil
+}
+
+func GetUserConfirmation() (bool, error) {
+	for {
+		if _, err := fmt.Fprint(os.Stdout, "Do you want to execute this command? (Y/n) "); err != nil {
+			return false, err
+		}
+		reader := bufio.NewReader(os.Stdin)
+		char, _, err := reader.ReadRune()
+		if err != nil {
+			return false, err
+		}
+		// 10 = enter
+		if char == 10 || char == 'Y' || char == 'y' {
+			return true, nil
+		} else if char == 'N' || char == 'n' {
+			return false, nil
+		}
+	}
+}
+
+func ExecuteShellCommand(ctx context.Context, response string) error {
+	// Execute cmd from response text
+	cmd := exec.CommandContext(ctx, "bash", "-c", response)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
