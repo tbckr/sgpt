@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -30,12 +31,12 @@ The supported completion models can be listed via: "sgpt txt --help"
 		Args: cobra.ExactArgs(1),
 	}
 	fs := cmd.Flags()
-	fs.StringVar(&shellArgs.model, "model", api.DefaultModel, "model name")
-	fs.IntVar(&shellArgs.maxTokens, "max-tokens", 2048, "strict length of output (tokens)")
-	fs.Float64Var(&shellArgs.temperature, "temperature", 0.2, "randomness of generated output")
-	fs.Float64Var(&shellArgs.topP, "top-p", 0.9, "limits highest probable tokens")
-	fs.BoolVar(&shellArgs.execute, "execute", false, "execute shell command")
-	fs.StringVar(&shellArgs.chatSession, "chat", "", "use an existing chat session")
+	fs.StringVarP(&shellArgs.model, "model", "m", api.DefaultModel, "model name")
+	fs.IntVarP(&shellArgs.maxTokens, "max-tokens", "s", 2048, "strict length of output (tokens)")
+	fs.Float64VarP(&shellArgs.temperature, "temperature", "t", 0.2, "randomness of generated output")
+	fs.Float64VarP(&shellArgs.topP, "top-p", "p", 0.9, "limits highest probable tokens")
+	fs.BoolVarP(&shellArgs.execute, "execute", "e", false, "execute shell command")
+	fs.StringVarP(&shellArgs.chatSession, "chat", "c", "", "use an existing chat session")
 	return cmd
 }
 
@@ -68,5 +69,11 @@ func runShell(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	response = strings.TrimSpace(response)
-	return shell.ExecuteCommandWithConfirmation(cmd.Context(), response)
+
+	if shellArgs.execute {
+		return shell.ExecuteCommandWithConfirmation(cmd.Context(), response)
+	}
+
+	_, err = fmt.Fprintln(stdout, response)
+	return err
 }
