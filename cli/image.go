@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
-	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt"
-	"github.com/tbckr/sgpt/internal/file"
-	"github.com/tbckr/sgpt/internal/shell"
+	openai "github.com/sashabaranov/go-openai"
+	"github.com/tbckr/sgpt/file"
+	sgpt "github.com/tbckr/sgpt/openai"
+	"github.com/tbckr/sgpt/shell"
 )
 
 const defaultImageFiletype = ".png"

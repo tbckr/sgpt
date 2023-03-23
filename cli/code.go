@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
-	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt"
-	"github.com/tbckr/sgpt/internal/shell"
+	openai "github.com/sashabaranov/go-openai"
+	"github.com/tbckr/sgpt/modifier"
+	sgpt "github.com/tbckr/sgpt/openai"
+	"github.com/tbckr/sgpt/shell"
 )
 
 var codeCmd = &ffcli.Command{
@@ -51,7 +52,7 @@ func runCode(ctx context.Context, args []string) error {
 		MaxTokens:   codeArgs.maxTokens,
 		Temperature: float32(codeArgs.temperature),
 		TopP:        float32(codeArgs.topP),
-		Modifier:    sgpt.ModifierCode,
+		Modifier:    modifier.ModifierCode,
 		ChatSession: codeArgs.chatSession,
 	}
 	if err = sgpt.ValidateCompletionOptions(options); err != nil {

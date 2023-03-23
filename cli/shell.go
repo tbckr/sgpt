@@ -9,10 +9,12 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/tbckr/sgpt/modifier"
+
 	"github.com/peterbourgon/ff/v3/ffcli"
-	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt"
-	"github.com/tbckr/sgpt/internal/shell"
+	openai "github.com/sashabaranov/go-openai"
+	sgpt "github.com/tbckr/sgpt/openai"
+	"github.com/tbckr/sgpt/shell"
 )
 
 const (
@@ -60,7 +62,7 @@ func runShell(ctx context.Context, args []string) error {
 		MaxTokens:   shellArgs.maxTokens,
 		Temperature: float32(shellArgs.temperature),
 		TopP:        float32(shellArgs.topP),
-		Modifier:    sgpt.ModifierShell,
+		Modifier:    modifier.ModifierShell,
 		ChatSession: shellArgs.chatSession,
 	}
 	if err = sgpt.ValidateCompletionOptions(options); err != nil {

@@ -1,4 +1,4 @@
-package sgpt
+package modifier
 
 import "strings"
 
@@ -10,7 +10,7 @@ const (
 
 // Use specific prompts to refine the models answers.
 // These prompts were inspired by similar open source projects like shell-gpt or yolo-ai-cmdbot.
-var chatCompletionModifierTemplate = map[string]string{
+var ChatCompletionModifierTemplate = map[string]string{
 	ModifierShell: strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
 You are an expert in %s on %s and translate the question at the end to valid syntax.
@@ -54,7 +54,7 @@ You must always follow them. No exceptions.
 `),
 }
 
-var completionModifierTemplate = map[string]string{
+var CompletionModifierTemplate = map[string]string{
 	ModifierShell: strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
 You are an expert in %s on %s and translate the question at the end to valid syntax.

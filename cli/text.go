@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/tbckr/sgpt/modifier"
+
 	"github.com/peterbourgon/ff/v3/ffcli"
-	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt"
-	"github.com/tbckr/sgpt/internal/shell"
+	openai "github.com/sashabaranov/go-openai"
+	sgpt "github.com/tbckr/sgpt/openai"
+	"github.com/tbckr/sgpt/shell"
 )
 
 var openaiModels = []string{
@@ -72,7 +74,7 @@ func runText(ctx context.Context, args []string) error {
 		MaxTokens:   textArgs.maxTokens,
 		Temperature: float32(textArgs.temperature),
 		TopP:        float32(textArgs.topP),
-		Modifier:    sgpt.ModifierNil,
+		Modifier:    modifier.ModifierNil,
 		ChatSession: textArgs.chatSession,
 	}
 	if err = sgpt.ValidateCompletionOptions(options); err != nil {

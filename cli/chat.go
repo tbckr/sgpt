@@ -10,7 +10,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
-	"github.com/tbckr/sgpt/internal/chat"
+	"github.com/tbckr/sgpt/chat"
 )
 
 const (

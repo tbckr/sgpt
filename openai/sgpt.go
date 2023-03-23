@@ -1,4 +1,4 @@
-package sgpt
+package openai
 
 import (
 	"context"
@@ -8,9 +8,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/tbckr/sgpt/internal/chat"
+	"github.com/tbckr/sgpt/modifier"
 
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/tbckr/sgpt/chat"
 )
 
 const (
@@ -67,11 +68,11 @@ func GetCompletion(ctx context.Context, client *openai.Client, options Completio
 	// Add modifier
 	var modifierPrompt string
 	switch options.Modifier {
-	case ModifierShell:
-		modifierPrompt, err = completeShellModifier(completionModifierTemplate[ModifierShell])
-	case ModifierCode:
-		modifierPrompt, err = completionModifierTemplate[ModifierCode], nil
-	case ModifierNil:
+	case modifier.ModifierShell:
+		modifierPrompt, err = completeShellModifier(modifier.CompletionModifierTemplate[modifier.ModifierShell])
+	case modifier.ModifierCode:
+		modifierPrompt, err = modifier.CompletionModifierTemplate[modifier.ModifierCode], nil
+	case modifier.ModifierNil:
 		modifierPrompt, err = "", nil
 	default:
 		return "", ErrUnsupportedModifier
@@ -125,11 +126,11 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	if !isChat || (isChat && !chatExists) {
 		var modifierPrompt string
 		switch options.Modifier {
-		case ModifierShell:
-			modifierPrompt, err = completeShellModifier(chatCompletionModifierTemplate[ModifierShell])
-		case ModifierCode:
-			modifierPrompt, err = chatCompletionModifierTemplate[ModifierCode], nil
-		case ModifierNil:
+		case modifier.ModifierShell:
+			modifierPrompt, err = completeShellModifier(modifier.ChatCompletionModifierTemplate[modifier.ModifierShell])
+		case modifier.ModifierCode:
+			modifierPrompt, err = modifier.ChatCompletionModifierTemplate[modifier.ModifierCode], nil
+		case modifier.ModifierNil:
 			modifierPrompt, err = "", nil
 		default:
 			return "", ErrUnsupportedModifier

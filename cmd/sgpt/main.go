@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/tbckr/sgpt/cli"
 	"log"
 	"os"
-
-	"github.com/tbckr/sgpt/cmd/sgpt/cli"
 )
 
 func main() {
