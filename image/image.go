@@ -63,8 +63,5 @@ func SaveB64EncodedImage(filename, imageData string) error {
 	}
 	defer file.Close()
 
-	if err = png.Encode(file, img); err != nil {
-		return err
-	}
-	return nil
+	return png.Encode(file, img)
 }
