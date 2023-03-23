@@ -8,11 +8,10 @@ Some packages may only be included on certain architectures or operating systems
 
 ### Overview
 
- - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.6/LICENSE))
- - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt))
- - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
- - [github.com/tbckr/sgpt](https://pkg.go.dev/github.com/tbckr/sgpt) ([MIT](https://github.com/tbckr/sgpt/blob/HEAD/LICENSE.md))
- - [github.com/tbckr/sgpt/cli](https://pkg.go.dev/github.com/tbckr/sgpt/cli) ([MIT](https://github.com/tbckr/sgpt/blob/HEAD/cli/licenses.go))
+- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.6/LICENSE))
+- [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt))
+- [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
+- [github.com/tbckr/sgpt](https://pkg.go.dev/github.com/tbckr/sgpt) ([MIT](https://github.com/tbckr/sgpt/blob/HEAD/LICENSE.md))
 
 ### Details
 
@@ -535,6 +534,63 @@ Get the open source licenses SGPT uses in markdown format.
 func runLicenses(_ *cobra.Command, _ []string) error {
 	_, err := fmt.Fprintln(stdout, licenses.All())
 	return err
+}
+
+```
+
+#### github.com/tbckr/sgpt/licenses
+
+* Name: github.com/tbckr/sgpt/licenses
+* Version: Unknown
+* License: [MIT](https://github.com/tbckr/sgpt/blob/HEAD/licenses/licenses.go)
+
+```
+// Copyright (c) 2023 Tim <tbckr>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// SPDX-License-Identifier: MIT
+
+package licenses
+
+import (
+	// revive:disable:blank-imports
+	_ "embed"
+	// revive:enable:blank-imports
+	"fmt"
+)
+
+//go:embed licenses.md
+var licenses string
+
+//go:embed 3RDPARTY.md
+var thirdParty string
+
+func Licenses() string {
+	return licenses
+}
+
+func ThirdParty() string {
+	return thirdParty
+}
+
+func All() string {
+	return fmt.Sprintln("# 3rd Party\n\n", ThirdParty(), "\n\n", Licenses())
 }
 
 ```
