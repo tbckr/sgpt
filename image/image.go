@@ -1,16 +1,19 @@
-package file
+package image
 
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"image"
 	"image/png"
-	"io"
 	"os"
+
+	"github.com/tbckr/sgpt/filesystem"
 )
 
-func SaveEncodedImage(defaultFilename, imageData string, out io.Writer) error {
+const DefaultExtension = ".png"
+
+func SaveB64EncodedImage(filename, imageData string) error {
 	imgBytes, err := base64.StdEncoding.DecodeString(imageData)
 	if err != nil {
 		return err
@@ -23,10 +26,13 @@ func SaveEncodedImage(defaultFilename, imageData string, out io.Writer) error {
 		return err
 	}
 
-	var filename string
-	filename, err = getFilename(defaultFilename)
+	var exists bool
+	exists, err = filesystem.FileExists(filename)
 	if err != nil {
 		return err
+	}
+	if exists {
+		return errors.New("file already exists")
 	}
 
 	var file *os.File
@@ -39,7 +45,5 @@ func SaveEncodedImage(defaultFilename, imageData string, out io.Writer) error {
 	if err = png.Encode(file, img); err != nil {
 		return err
 	}
-
-	_, err = fmt.Fprintln(out, filename)
-	return err
+	return nil
 }

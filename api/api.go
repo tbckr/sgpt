@@ -1,28 +1,56 @@
-package sgpt
+package api
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 
-	"github.com/tbckr/sgpt/internal/chat"
-
-	openai "github.com/sashabaranov/go-openai"
+	"github.com/sashabaranov/go-openai"
+	"github.com/tbckr/sgpt/chat"
+	"github.com/tbckr/sgpt/modifiers"
 )
 
 const (
 	envKeyOpenAIApi = "OPENAI_API_KEY"
-	envKeyShell     = "SHELL"
+
+	ImageURL  = "ImageURL"
+	ImageData = "ImageData"
 )
 
 var (
-	ErrMissingAPIKey       = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
-	ErrUnsupportedModifier = errors.New("unsupported modifier")
-	ErrChatNotSupported    = errors.New("chat is not supported with this model")
+	DefaultModel     = strings.Clone(openai.GPT3Dot5Turbo)
+	DefaultImageSize = strings.Clone(openai.CreateImageSize256x256)
+
+	ErrMissingAPIKey    = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
+	ErrChatNotSupported = errors.New("chat is not supported for this model")
 )
+
+var SupportedModels = []string{
+	openai.GPT4,
+	openai.GPT40314,
+	openai.GPT432K,
+	openai.GPT432K0314,
+	openai.GPT3Dot5Turbo0301,
+	openai.GPT3Dot5Turbo,
+	openai.GPT3TextDavinci003,
+	openai.GPT3TextDavinci002,
+	openai.GPT3TextCurie001,
+	openai.GPT3TextBabbage001,
+	openai.GPT3TextAda001,
+	openai.GPT3TextDavinci001,
+	openai.GPT3DavinciInstructBeta,
+	openai.GPT3Davinci,
+	openai.GPT3CurieInstructBeta,
+	openai.GPT3Curie,
+	openai.GPT3Ada,
+	openai.GPT3Babbage,
+}
+
+type Client struct {
+	api *openai.Client
+}
 
 type CompletionOptions struct {
 	Model       string
@@ -34,52 +62,42 @@ type CompletionOptions struct {
 }
 
 type ImageOptions struct {
-	Count int
-	Size  string
+	Count          int
+	Size           string
+	ResponseFormat string
 }
 
-func CreateClient() (*openai.Client, error) {
+func CreateClient() (*Client, error) {
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
 	if !exists {
 		return nil, ErrMissingAPIKey
 	}
-	return openai.NewClient(apiKey), nil
+	client := &Client{
+		api: openai.NewClient(apiKey),
+	}
+	return client, nil
 }
 
-func ValidateCompletionOptions(options CompletionOptions) error {
+func (c *Client) validateCompletionOptions(options CompletionOptions) error {
 	// curie has a max limit of 2048 for input and output
 	if options.Model == openai.GPT3TextCurie001 && options.MaxTokens > 1024 {
 		options.MaxTokens = 1024
 		return fmt.Errorf("model %s must not have more than 1024 in total", openai.GPT3TextCurie001)
 	}
+	// A completion does not support chat
+	if options.ChatSession != "" {
+		return ErrChatNotSupported
+	}
 	return nil
 }
 
-func GetCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt string) (string, error) {
-	var err error
-
-	// A completion does not support chat
-	if options.ChatSession != "" {
-		return "", ErrChatNotSupported
-	}
-
-	// Add modifier
-	var modifierPrompt string
-	switch options.Modifier {
-	case ModifierShell:
-		modifierPrompt, err = completeShellModifier(completionModifierTemplate[ModifierShell])
-	case ModifierCode:
-		modifierPrompt, err = completionModifierTemplate[ModifierCode], nil
-	case ModifierNil:
-		modifierPrompt, err = "", nil
-	default:
-		return "", ErrUnsupportedModifier
-	}
-	if err != nil {
+func (c *Client) GetCompletion(ctx context.Context, options CompletionOptions, prompt string) (string, error) {
+	if err := c.validateCompletionOptions(options); err != nil {
 		return "", err
 	}
-
+	// TODO: handle this error
+	modifierPrompt, _ := modifiers.GetModifier(options.Modifier)
 	// Do request
 	req := openai.CompletionRequest{
 		Prompt:      modifierPrompt + prompt,
@@ -88,21 +106,22 @@ func GetCompletion(ctx context.Context, client *openai.Client, options Completio
 		Temperature: options.Temperature,
 		TopP:        options.TopP,
 	}
-	var resp openai.CompletionResponse
-	resp, err = client.CreateCompletion(ctx, req)
+	resp, err := c.api.CreateCompletion(ctx, req)
 	if err != nil {
 		return "", err
 	}
 	return strings.TrimSpace(resp.Choices[0].Text), nil
 }
 
-func GetChatCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt string) (string, error) {
+func (c *Client) GetChatCompletion(ctx context.Context, options CompletionOptions, prompt string) (string, error) {
 	var err error
 	var messages []openai.ChatCompletionMessage
 
-	// Load existing chat messages
+	// Evaluate base decision factors
 	isChat := options.ChatSession != ""
 	chatExists := false
+
+	// Load existing chat messages
 	if isChat {
 		chatExists, err = chat.SessionExists(options.ChatSession)
 		if err != nil {
@@ -123,21 +142,8 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	// if this is the initial message of a chat,
 	// then add modifier message
 	if !isChat || (isChat && !chatExists) {
-		var modifierPrompt string
-		switch options.Modifier {
-		case ModifierShell:
-			modifierPrompt, err = completeShellModifier(chatCompletionModifierTemplate[ModifierShell])
-		case ModifierCode:
-			modifierPrompt, err = chatCompletionModifierTemplate[ModifierCode], nil
-		case ModifierNil:
-			modifierPrompt, err = "", nil
-		default:
-			return "", ErrUnsupportedModifier
-		}
-		if err != nil {
-			return "", err
-		}
-
+		// TODO: handle this error
+		modifierPrompt, _ := modifiers.GetChatModifier(options.Modifier)
 		if modifierPrompt != "" {
 			messages = append(messages, openai.ChatCompletionMessage{
 				Role:    openai.ChatMessageRoleSystem,
@@ -161,7 +167,7 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 		TopP:        options.TopP,
 	}
 	var resp openai.ChatCompletionResponse
-	resp, err = client.CreateChatCompletion(ctx, req)
+	resp, err = c.api.CreateChatCompletion(ctx, req)
 	if err != nil {
 		return "", err
 	}
@@ -179,14 +185,25 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	return receivedMessage.Content, nil
 }
 
-func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, prompt, responseFormat string) ([]string, error) {
+// GetImage creates an image via the DALLE API. It either returns a URL to the image or the image data based on the
+// provided ResponseFormat in the options.
+func (c *Client) GetImage(ctx context.Context, options ImageOptions, prompt string) ([]string, error) {
+	var responseFormat string
+	switch options.ResponseFormat {
+	case ImageData:
+		responseFormat = openai.CreateImageResponseFormatB64JSON
+	case ImageURL:
+	default: // defaulting to URL
+		responseFormat = openai.CreateImageResponseFormatURL
+	}
+
 	req := openai.ImageRequest{
 		Prompt:         prompt,
 		N:              options.Count,
 		Size:           options.Size,
 		ResponseFormat: responseFormat,
 	}
-	resp, err := client.CreateImage(ctx, req)
+	resp, err := c.api.CreateImage(ctx, req)
 	if err != nil {
 		return []string{}, err
 	}
@@ -202,20 +219,13 @@ func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, 
 	return imageData, nil
 }
 
-func completeShellModifier(template string) (string, error) {
-	operatingSystem := runtime.GOOS
-	shell, ok := os.LookupEnv(envKeyShell)
-	// fallback to manually set shell
-	if !ok {
-		if operatingSystem == "windows" {
-			shell = "powershell"
-		} else if operatingSystem == "linux" {
-			shell = "bash"
-		} else if operatingSystem == "darwin" {
-			shell = "zsh"
-		} else {
-			return "", fmt.Errorf("unsupported os %s", operatingSystem)
-		}
+func IsChatModel(model string) bool {
+	switch model {
+	case openai.GPT3Dot5Turbo, openai.GPT3Dot5Turbo0301,
+		openai.GPT4, openai.GPT432K,
+		openai.GPT40314, openai.GPT432K0314:
+		return true
+	default:
+		return false
 	}
-	return fmt.Sprintf(template, shell, operatingSystem, shell, operatingSystem, shell), nil
 }

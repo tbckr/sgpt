@@ -11,46 +11,26 @@ import (
 	"unicode/utf8"
 
 	"github.com/sashabaranov/go-openai"
+	"github.com/tbckr/sgpt/filesystem"
 )
 
 const (
-	appConfigDir         = "sgpt"
-	dirPermissions       = 0750
-	filePermissions      = 0755
-	sessionNameMaxLength = 65
+	appDirName             = "sgpt"
+	defaultFilePermissions = 0755
+	sessionNameMaxLength   = 65
 )
 
 var (
-	ErrChatSessionNotExist    = errors.New("chat session does not exist")
+	ErrChatSessionIsNotExist  = errors.New("chat session does not exist")
 	ErrChatSessionNameInvalid = fmt.Errorf("chat session name does not match the regex %s", sessionNameRegex)
 	ErrChatSessionNameTooLong = fmt.Errorf("chat session name is greater than %d", sessionNameMaxLength)
-	sessionNameRegex          = "^([-a-zA-Z0-9]*[a-zA-Z0-9])?"
-	sessionNameMatcher        = regexp.MustCompile(sessionNameRegex)
+
+	sessionNameRegex   = "^([-a-zA-Z0-9]*[a-zA-Z0-9])?"
+	sessionNameMatcher = regexp.MustCompile(sessionNameRegex)
 )
 
-// TODO refactor functions: reuse functions in file package or move to file package, rm duplicate implementations
-
-func getAppCacheDir() (string, error) {
-	// Get user specific config dir
-	baseConfigDir, err := os.UserCacheDir()
-	if err != nil {
-		return "", err
-	}
-	// Application specific cache dir
-	configPath := path.Join(baseConfigDir, appConfigDir)
-	_, err = os.Stat(configPath)
-	// Check, if application cache dir exists
-	if os.IsNotExist(err) {
-		// Create application cache dir
-		if err = os.MkdirAll(configPath, dirPermissions); err != nil {
-			return "", err
-		}
-	}
-	return configPath, nil
-}
-
-func getFilepath(sessionName string) (string, error) {
-	dir, err := getAppCacheDir()
+func getFilepathForSession(sessionName string) (string, error) {
+	dir, err := filesystem.GetAppCacheDir(appDirName)
 	if err != nil {
 		return "", err
 	}
@@ -68,25 +48,15 @@ func validateSession(sessionName string) error {
 	return nil
 }
 
-func fileExists(filepath string) (bool, error) {
-	fileInfo, err := os.Stat(filepath)
-	if os.IsNotExist(err) {
-		return false, nil
-	} else if err != nil {
-		return false, err
-	}
-	return fileInfo.Name() != "", nil
-}
-
 func SessionExists(sessionName string) (bool, error) {
 	if err := validateSession(sessionName); err != nil {
 		return false, err
 	}
-	file, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return false, err
 	}
-	return fileExists(file)
+	return filesystem.FileExists(filepath)
 }
 
 func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
@@ -96,19 +66,19 @@ func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 	}
 
 	// Get path to file
-	filepath, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return nil, err
 	}
 
 	// Check, if session exists
 	var exists bool
-	exists, err = fileExists(filepath)
+	exists, err = filesystem.FileExists(filepath)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return []openai.ChatCompletionMessage{}, ErrChatSessionNotExist
+		return []openai.ChatCompletionMessage{}, ErrChatSessionIsNotExist
 	}
 
 	// Open file
@@ -145,14 +115,14 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 	}
 
 	// Get path to file
-	filepath, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return err
 	}
 
 	// Check, if session exists
 	var exists bool
-	exists, err = fileExists(filepath)
+	exists, err = filesystem.FileExists(filepath)
 	if err != nil {
 		return err
 	}
@@ -161,7 +131,7 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 	var file *os.File
 	if exists {
 		// Open and truncate existing file
-		file, err = os.OpenFile(filepath, os.O_RDWR|os.O_TRUNC, filePermissions)
+		file, err = os.OpenFile(filepath, os.O_WRONLY|os.O_TRUNC, defaultFilePermissions)
 		if err != nil {
 			return err
 		}
@@ -190,29 +160,29 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 }
 
 func ListSessions() ([]string, error) {
-	dir, err := getAppCacheDir()
+	dir, err := filesystem.GetAppCacheDir(appDirName)
 	if err != nil {
 		return nil, err
 	}
-	var files []os.DirEntry
-	files, err = os.ReadDir(dir)
+	var dirFiles []os.DirEntry
+	dirFiles, err = os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
-	var fileList []string
-	for _, file := range files {
-		fileList = append(fileList, file.Name())
+	var files []string
+	for _, file := range dirFiles {
+		files = append(files, file.Name())
 	}
-	return fileList, nil
+	return files, nil
 }
 
 func DeleteSession(sessionName string) error {
-	filepath, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return err
 	}
 	var exists bool
-	exists, err = fileExists(filepath)
+	exists, err = filesystem.FileExists(filepath)
 	if err != nil {
 		return err
 	}
