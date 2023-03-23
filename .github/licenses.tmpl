@@ -1,0 +1,25 @@
+# SGPT CLI dependencies
+
+The following open source dependencies are used to build the SGPT command.
+
+## Go Packages
+
+Some packages may only be included on certain architectures or operating systems.
+
+### Overview
+{{ range . }}
+ - [{{.Name}}](https://pkg.go.dev/{{.Name}}) ([{{.LicenseName}}]({{.LicenseURL}}))
+{{- end }}
+
+### Details
+{{ range . }}
+#### {{ .Name }}
+
+* Name: {{ .Name }}
+* Version: {{ .Version }}
+* License: [{{ .LicenseName }}]({{ .LicenseURL }})
+
+```
+{{ .LicenseText }}
+```
+{{ end }}

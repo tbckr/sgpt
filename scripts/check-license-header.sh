@@ -22,4 +22,6 @@
 
 addlicense -c "Tim <tbckr>" -l MIT -s -check \
   -ignore ".idea/**" \
+  -ignore "licenses/3RDPARTY.md" \
+  -ignore "licenses/licenses.md" \
   .

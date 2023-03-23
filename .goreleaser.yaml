@@ -23,6 +23,7 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
+    - ./scripts/completions.sh
 
 env:
   - GITHUB_USER=tbckr
@@ -75,6 +76,12 @@ archives:
     format_overrides:
     - goos: windows
       format: zip
+    files:
+      - README.md
+      - LICENSE.md
+      - licenses/3RDPARTY.md
+      - licenses/licenses.md
+      - completions/*
 
 sboms:
   - artifacts: archive
@@ -265,6 +272,11 @@ brews:
     dependencies:
     - name: go
       type: optional
+    install: |-
+      bin.install "sgpt"
+      bash_completion.install "completions/sgpt.bash" => "sgpt"
+      zsh_completion.install "completions/sgpt.zsh" => "_sgpt"
+      fish_completion.install "completions/sgpt.fish"
 
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj

@@ -154,4 +154,3 @@ Dockerfile.goreleaser
 renovate.json
 LICENSE
 .bash_aliases
-3RDPARTY.md
