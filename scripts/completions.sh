@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright (c) 2023 Tim <tbckr>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -20,8 +20,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-addlicense -c "Tim <tbckr>" -l MIT -s -v \
-  -ignore ".idea/**" \
-  -ignore "licenses/3RDPARTY.md" \
-  -ignore "licenses/licenses.md" \
-  .
+set -e
+rm -rf completions
+mkdir completions
+for sh in bash zsh fish; do
+  go run cmd/sgpt/main.go completion "$sh" >"completions/sgpt.$sh"
+done

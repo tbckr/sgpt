@@ -169,3 +169,5 @@ Temporary Items
 /.idea
 
 dist/
+manpages/
+completions/
