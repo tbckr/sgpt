@@ -55,7 +55,7 @@ func runImage(cmd *cobra.Command, args []string) error {
 	}
 
 	var client *openai.Client
-	client, err = sgpt.CreateClient()
+	client, err = sgpt.CreateAPIClient()
 	if err != nil {
 		return err
 	}

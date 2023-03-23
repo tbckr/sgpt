@@ -8,10 +8,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/tbckr/sgpt/modifier"
-
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/tbckr/sgpt/chat"
+	"github.com/tbckr/sgpt/modifier"
 )
 
 const (
@@ -24,6 +23,10 @@ var (
 	ErrUnsupportedModifier = errors.New("unsupported modifier")
 	ErrChatNotSupported    = errors.New("chat is not supported with this model")
 )
+
+type Client struct {
+	api *openai.Client
+}
 
 type CompletionOptions struct {
 	Model       string
@@ -39,7 +42,20 @@ type ImageOptions struct {
 	Size  string
 }
 
-func CreateClient() (*openai.Client, error) {
+func CreateClient() (*Client, error) {
+	// Check, if api key was set
+	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
+	if !exists {
+		return nil, ErrMissingAPIKey
+	}
+	client := &Client{
+		api: openai.NewClient(apiKey),
+	}
+	return client, nil
+}
+
+// CreateAPIClient is deprecated, use CreateClient instead.
+func CreateAPIClient() (*openai.Client, error) {
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
 	if !exists {
@@ -48,31 +64,32 @@ func CreateClient() (*openai.Client, error) {
 	return openai.NewClient(apiKey), nil
 }
 
-func ValidateCompletionOptions(options CompletionOptions) error {
+func (c *Client) validateCompletionOptions(options CompletionOptions) error {
 	// curie has a max limit of 2048 for input and output
 	if options.Model == openai.GPT3TextCurie001 && options.MaxTokens > 1024 {
 		options.MaxTokens = 1024
 		return fmt.Errorf("model %s must not have more than 1024 in total", openai.GPT3TextCurie001)
 	}
+	// A completion does not support chat
+	if options.ChatSession != "" {
+		return ErrChatNotSupported
+	}
 	return nil
 }
 
-func GetCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt string) (string, error) {
+func (c *Client) GetCompletion(ctx context.Context, options CompletionOptions, prompt string) (string, error) {
 	var err error
-
-	// A completion does not support chat
-	if options.ChatSession != "" {
-		return "", ErrChatNotSupported
+	if err = c.validateCompletionOptions(options); err != nil {
+		return "", err
 	}
-
 	// Add modifier
 	var modifierPrompt string
 	switch options.Modifier {
-	case modifier.ModifierShell:
-		modifierPrompt, err = completeShellModifier(modifier.CompletionModifierTemplate[modifier.ModifierShell])
-	case modifier.ModifierCode:
-		modifierPrompt, err = modifier.CompletionModifierTemplate[modifier.ModifierCode], nil
-	case modifier.ModifierNil:
+	case modifier.Shell:
+		modifierPrompt, err = c.completeShellModifier(modifier.CompletionModifierTemplate[modifier.Shell])
+	case modifier.Code:
+		modifierPrompt, err = modifier.CompletionModifierTemplate[modifier.Code], nil
+	case modifier.Nil:
 		modifierPrompt, err = "", nil
 	default:
 		return "", ErrUnsupportedModifier
@@ -90,14 +107,14 @@ func GetCompletion(ctx context.Context, client *openai.Client, options Completio
 		TopP:        options.TopP,
 	}
 	var resp openai.CompletionResponse
-	resp, err = client.CreateCompletion(ctx, req)
+	resp, err = c.api.CreateCompletion(ctx, req)
 	if err != nil {
 		return "", err
 	}
 	return strings.TrimSpace(resp.Choices[0].Text), nil
 }
 
-func GetChatCompletion(ctx context.Context, client *openai.Client, options CompletionOptions, prompt string) (string, error) {
+func (c *Client) GetChatCompletion(ctx context.Context, options CompletionOptions, prompt string) (string, error) {
 	var err error
 	var messages []openai.ChatCompletionMessage
 
@@ -126,11 +143,11 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	if !isChat || (isChat && !chatExists) {
 		var modifierPrompt string
 		switch options.Modifier {
-		case modifier.ModifierShell:
-			modifierPrompt, err = completeShellModifier(modifier.ChatCompletionModifierTemplate[modifier.ModifierShell])
-		case modifier.ModifierCode:
-			modifierPrompt, err = modifier.ChatCompletionModifierTemplate[modifier.ModifierCode], nil
-		case modifier.ModifierNil:
+		case modifier.Shell:
+			modifierPrompt, err = c.completeShellModifier(modifier.ChatCompletionModifierTemplate[modifier.Shell])
+		case modifier.Code:
+			modifierPrompt, err = modifier.ChatCompletionModifierTemplate[modifier.Code], nil
+		case modifier.Nil:
 			modifierPrompt, err = "", nil
 		default:
 			return "", ErrUnsupportedModifier
@@ -162,7 +179,7 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 		TopP:        options.TopP,
 	}
 	var resp openai.ChatCompletionResponse
-	resp, err = client.CreateChatCompletion(ctx, req)
+	resp, err = c.api.CreateChatCompletion(ctx, req)
 	if err != nil {
 		return "", err
 	}
@@ -180,14 +197,14 @@ func GetChatCompletion(ctx context.Context, client *openai.Client, options Compl
 	return receivedMessage.Content, nil
 }
 
-func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, prompt, responseFormat string) ([]string, error) {
+func (c *Client) GetImage(ctx context.Context, options ImageOptions, prompt, responseFormat string) ([]string, error) {
 	req := openai.ImageRequest{
 		Prompt:         prompt,
 		N:              options.Count,
 		Size:           options.Size,
 		ResponseFormat: responseFormat,
 	}
-	resp, err := client.CreateImage(ctx, req)
+	resp, err := c.api.CreateImage(ctx, req)
 	if err != nil {
 		return []string{}, err
 	}
@@ -203,7 +220,7 @@ func GetImage(ctx context.Context, client *openai.Client, options ImageOptions, 
 	return imageData, nil
 }
 
-func completeShellModifier(template string) (string, error) {
+func (c *Client) completeShellModifier(template string) (string, error) {
 	operatingSystem := runtime.GOOS
 	shell, ok := os.LookupEnv(envKeyShell)
 	// fallback to manually set shell

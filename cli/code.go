@@ -50,7 +50,7 @@ func runCode(cmd *cobra.Command, args []string) error {
 		MaxTokens:   codeArgs.maxTokens,
 		Temperature: float32(codeArgs.temperature),
 		TopP:        float32(codeArgs.topP),
-		Modifier:    modifier.ModifierCode,
+		Modifier:    modifier.Code,
 		ChatSession: codeArgs.chatSession,
 	}
 	if err = sgpt.ValidateCompletionOptions(options); err != nil {
@@ -58,7 +58,7 @@ func runCode(cmd *cobra.Command, args []string) error {
 	}
 
 	var client *openai.Client
-	client, err = sgpt.CreateClient()
+	client, err = sgpt.CreateAPIClient()
 	if err != nil {
 		return err
 	}

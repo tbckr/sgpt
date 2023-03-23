@@ -3,15 +3,15 @@ package modifier
 import "strings"
 
 const (
-	ModifierNil   = "NIL_MODIFIER"
-	ModifierCode  = "CODE_MODIFIER"
-	ModifierShell = "SHELL_MODIFIER"
+	Nil   = "NIL_MODIFIER"
+	Code  = "CODE_MODIFIER"
+	Shell = "SHELL_MODIFIER"
 )
 
-// Use specific prompts to refine the models answers.
+// ChatCompletionModifierTemplate uses specific prompts to refine the models answers.
 // These prompts were inspired by similar open source projects like shell-gpt or yolo-ai-cmdbot.
 var ChatCompletionModifierTemplate = map[string]string{
-	ModifierShell: strings.TrimSpace(`
+	Shell: strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
 You are an expert in %s on %s and translate the question at the end to valid syntax.
 Follow these rules:
@@ -38,7 +38,7 @@ This is important you MUST follow the above rules.
 There are no exceptions to these rules.
 You must always follow them. No exceptions.
 `),
-	ModifierCode: strings.TrimSpace(`
+	Code: strings.TrimSpace(`
 Act as a natural language to code translation engine.
 Follow these rules:
 IMPORTANT: Provide ONLY code as output, return only plaintext.
@@ -55,7 +55,7 @@ You must always follow them. No exceptions.
 }
 
 var CompletionModifierTemplate = map[string]string{
-	ModifierShell: strings.TrimSpace(`
+	Shell: strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
 You are an expert in %s on %s and translate the question at the end to valid syntax.
 Follow these rules:
@@ -83,7 +83,7 @@ There are no exceptions to these rules.
 You must always follow them. No exceptions.
 Request: 
 `),
-	ModifierCode: strings.TrimSpace(`
+	Code: strings.TrimSpace(`
 Act as a natural language to code translation engine.
 Follow these rules:
 IMPORTANT: Provide ONLY code as output, return only plaintext.
