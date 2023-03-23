@@ -1,36 +1,34 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"strings"
 
-	"github.com/peterbourgon/ff/v3/ffcli"
+	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/internal/buildinfo"
 )
-
-var versionCmd = &ffcli.Command{
-	Name:       "version",
-	ShortUsage: "sgpt version [command flags]",
-	ShortHelp:  "Get the programs version.",
-	LongHelp: strings.TrimSpace(`
-Get the program version.
-`),
-	Exec: runVersion,
-	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("version")
-		fs.BoolVar(&versionArgs.json, "json", false, "Output in json format")
-		return fs
-	})(),
-}
 
 var versionArgs struct {
 	json bool
 }
 
-func runVersion(_ context.Context, _ []string) error {
+func versionCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "Get the programs version",
+		Long: strings.TrimSpace(`
+Get the program version.
+`),
+		RunE: runVersion,
+		Args: cobra.NoArgs,
+	}
+	fs := cmd.Flags()
+	fs.BoolVar(&versionArgs.json, "json", false, "Output in json format")
+	return cmd
+}
+
+func runVersion(_ *cobra.Command, _ []string) error {
 	var output string
 	if versionArgs.json {
 		versionMap := map[string]string{

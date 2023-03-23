@@ -1,37 +1,15 @@
 package cli
 
 import (
-	"context"
-	"flag"
 	"fmt"
 	"strings"
 
-	"github.com/peterbourgon/ff/v3/ffcli"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/file"
 	sgpt "github.com/tbckr/sgpt/openai"
 	"github.com/tbckr/sgpt/shell"
 )
-
-const defaultImageFiletype = ".png"
-
-var imageCmd = &ffcli.Command{
-	Name:       "image",
-	ShortUsage: "sgpt image [command flags] <prompt>",
-	ShortHelp:  "Create an AI generated image with dalle.",
-	LongHelp: strings.TrimSpace(`
-Create an AI generated image with the DALLE API. 
-`),
-	Exec: runImage,
-	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("image")
-		fs.IntVar(&imageArgs.count, "count", 1, "Number of images to generate")
-		fs.StringVar(&imageArgs.size, "size", openai.CreateImageSize256x256, "Image size")
-		fs.BoolVar(&imageArgs.download, "download", false, "Download generated images")
-		fs.StringVar(&imageArgs.filename, "output", "", "Filename including path to file - might be used for base name, if multiple images are created")
-		return fs
-	})(),
-}
 
 var imageArgs struct {
 	count    int
@@ -40,7 +18,25 @@ var imageArgs struct {
 	filename string
 }
 
-func runImage(ctx context.Context, args []string) error {
+func imageCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "image <prompt>",
+		Short: "Create an AI generated image with DALLE",
+		Long: strings.TrimSpace(`
+Create an AI generated image with the DALLE API. 
+`),
+		RunE: runImage,
+		Args: cobra.ExactArgs(1),
+	}
+	fs := cmd.Flags()
+	fs.IntVarP(&imageArgs.count, "count", "c", 1, "number of images to generate")
+	fs.StringVar(&imageArgs.size, "size", openai.CreateImageSize256x256, "image size")
+	fs.BoolVarP(&imageArgs.download, "download", "d", false, "download generated images")
+	fs.StringVarP(&imageArgs.filename, "output", "o", "", "filename including path to file - might be used for base name, if multiple images are created")
+	return cmd
+}
+
+func runImage(cmd *cobra.Command, args []string) error {
 	prompt, err := shell.GetPrompt(args)
 	if err != nil {
 		return err
@@ -65,7 +61,7 @@ func runImage(ctx context.Context, args []string) error {
 	}
 
 	var imageData []string
-	imageData, err = sgpt.GetImage(ctx, client, options, prompt, responseFormat)
+	imageData, err = sgpt.GetImage(cmd.Context(), client, options, prompt, responseFormat)
 	if err != nil {
 		return err
 	}

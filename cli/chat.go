@@ -1,15 +1,12 @@
 package cli
 
 import (
-	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"strings"
 
 	"github.com/sashabaranov/go-openai"
-
-	"github.com/peterbourgon/ff/v3/ffcli"
+	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/chat"
 )
 
@@ -22,67 +19,67 @@ var (
 	ErrChatSessionNotExist = errors.New("given chat does not exist")
 )
 
-var chatCmd = &ffcli.Command{
-	Name:       "chat",
-	ShortUsage: "sgpt chat <subcommand> [subcommand flags]",
-	ShortHelp:  "Manage chat sessions",
-	LongHelp: strings.TrimSpace(`
-Manage all open chat sessions - list, show, and delete chat sessions.
-`),
-	Subcommands: []*ffcli.Command{
-		lsCmd,
-		showCmd,
-		rmCmd,
-	},
-	Exec: func(_ context.Context, _ []string) error {
-		return flag.ErrHelp
-	},
-	UsageFunc: usageFunc,
-}
-
-var lsCmd = &ffcli.Command{
-	Name:       "ls",
-	ShortUsage: "sgpt chat ls",
-	ShortHelp:  "List all chat sessions",
-	LongHelp: strings.TrimSpace(`
-List all chat sessions.
-`),
-	Exec:      runChatLsCmd,
-	UsageFunc: usageFunc,
-}
-
-var showCmd = &ffcli.Command{
-	Name:       "show",
-	ShortUsage: "sgpt chat show <chat session>",
-	ShortHelp:  "Show the conversation for the given chat session",
-	LongHelp: strings.TrimSpace(`
-Show the conversation for the given chat session.
-`),
-	Exec:      runChatShowCmd,
-	UsageFunc: usageFunc,
-}
-
-var rmCmd = &ffcli.Command{
-	Name:       "rm",
-	ShortUsage: "sgpt chat rm [command flags] [chat session]",
-	ShortHelp:  "Remove the specified chat session",
-	LongHelp: strings.TrimSpace(`
-Remove the specified chat session. The --all flag removes all chat sessions.
-`),
-	Exec: runChatRmCmd,
-	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("chat-rm")
-		fs.BoolVar(&chatRmArgs.deleteAll, "all", false, "Remove all chat sessions")
-		return fs
-	})(),
-	UsageFunc: usageFunc,
-}
-
 var chatRmArgs struct {
 	deleteAll bool
 }
 
-func runChatLsCmd(_ context.Context, _ []string) error {
+func chatCmd() *cobra.Command {
+	rootChatCmd := &cobra.Command{
+		Use:   "chat",
+		Short: "Manage chat sessions",
+		Long: strings.TrimSpace(`
+Manage all open chat sessions - list, show, and delete chat sessions.
+`),
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return cmd.Help()
+		},
+		Args: cobra.NoArgs,
+	}
+
+	lsCmd := &cobra.Command{
+		Use:   "ls",
+		Short: "List all chat sessions",
+		Long: strings.TrimSpace(`
+List all chat sessions.
+`),
+		RunE: runChatLsCmd,
+		Args: cobra.NoArgs,
+	}
+
+	showCmd := &cobra.Command{
+		Use:     "show <session name>",
+		Aliases: []string{"cat"},
+		Short:   "Show the conversation for the given chat session",
+		Long: strings.TrimSpace(`
+Show the conversation for the given chat session.
+`),
+		RunE: runChatShowCmd,
+		Args: cobra.ExactArgs(1),
+	}
+
+	rmCmd := &cobra.Command{
+		Use:   "rm <session name>",
+		Short: "Remove the specified chat session",
+		Long: strings.TrimSpace(`
+Remove the specified chat session. The --all flag removes all chat sessions.
+`),
+		DisableFlagsInUseLine: true,
+		RunE:                  runChatRmCmd,
+		Args:                  cobra.RangeArgs(0, 1),
+	}
+	rmFs := rmCmd.Flags()
+	rmFs.BoolVarP(&chatRmArgs.deleteAll, "all", "a", false, "remove all chat sessions")
+
+	rootChatCmd.AddCommand(
+		lsCmd,
+		showCmd,
+		rmCmd,
+	)
+
+	return rootChatCmd
+}
+
+func runChatLsCmd(_ *cobra.Command, _ []string) error {
 	sessions, err := chat.ListSessions()
 	if err != nil {
 		return err
@@ -94,7 +91,7 @@ func runChatLsCmd(_ context.Context, _ []string) error {
 	return err
 }
 
-func runChatShowCmd(_ context.Context, args []string) error {
+func runChatShowCmd(_ *cobra.Command, args []string) error {
 	if len(args) != 1 {
 		return ErrMissingChatSession
 	}
@@ -124,7 +121,7 @@ func showConversation(messages []openai.ChatCompletionMessage) error {
 	return nil
 }
 
-func runChatRmCmd(_ context.Context, args []string) error {
+func runChatRmCmd(_ *cobra.Command, args []string) error {
 	// Get session/s
 	var chatSessions []string
 	if chatRmArgs.deleteAll {

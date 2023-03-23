@@ -1,15 +1,12 @@
 package cli
 
 import (
-	"context"
-	"flag"
 	"fmt"
 	"strings"
 
-	"github.com/tbckr/sgpt/modifier"
-
-	"github.com/peterbourgon/ff/v3/ffcli"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/spf13/cobra"
+	"github.com/tbckr/sgpt/modifier"
 	sgpt "github.com/tbckr/sgpt/openai"
 	"github.com/tbckr/sgpt/shell"
 )
@@ -35,26 +32,6 @@ var openaiModels = []string{
 	openai.GPT3Babbage,
 }
 
-var textCmd = &ffcli.Command{
-	Name:       "txt",
-	ShortUsage: "sgpt txt [command flags] <prompt>",
-	ShortHelp:  "Query the different openai models for a text completion.",
-	LongHelp: strings.TrimSpace(fmt.Sprintf(`
-Query a openai model for a text completion. The following models are supported:
-- %s
-`, strings.Join(openaiModels, "\n- "))),
-	Exec: runText,
-	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("text")
-		fs.StringVar(&textArgs.model, "model", openai.GPT3Dot5Turbo, "GPT-3 model name")
-		fs.IntVar(&textArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
-		fs.Float64Var(&textArgs.temperature, "temperature", 1.0, "Randomness of generated output")
-		fs.Float64Var(&textArgs.topP, "top-p", 1.0, "Limits highest probable tokens")
-		fs.StringVar(&textArgs.chatSession, "chat", "", "Use an existing chat session")
-		return fs
-	})(),
-}
-
 var textArgs struct {
 	model       string
 	maxTokens   int
@@ -63,7 +40,26 @@ var textArgs struct {
 	chatSession string
 }
 
-func runText(ctx context.Context, args []string) error {
+func textCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "txt <prompt>",
+		Short: "Query the different openai models for a text completion",
+		Long: strings.TrimSpace(fmt.Sprintf(`
+Query a openai model for a text completion. The following models are supported: %s.
+`, strings.Join(openaiModels, ", "))),
+		Args: cobra.ExactArgs(1),
+		RunE: runText,
+	}
+	fs := cmd.Flags()
+	fs.StringVarP(&textArgs.model, "model", "m", openai.GPT3Dot5Turbo, "model name to use")
+	fs.IntVarP(&textArgs.maxTokens, "max-tokens", "s", 2048, "strict length of output (tokens)")
+	fs.Float64VarP(&textArgs.temperature, "temperature", "t", 1.0, "randomness of generated output")
+	fs.Float64VarP(&textArgs.topP, "top-p", "p", 1.0, "limits highest probable tokens")
+	fs.StringVarP(&textArgs.chatSession, "chat", "c", "", "use an existing chat session")
+	return cmd
+}
+
+func runText(cmd *cobra.Command, args []string) error {
 	prompt, err := shell.GetPrompt(args)
 	if err != nil {
 		return err
@@ -89,9 +85,9 @@ func runText(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt)
+		response, err = sgpt.GetChatCompletion(cmd.Context(), client, options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt)
+		response, err = sgpt.GetCompletion(cmd.Context(), client, options, prompt)
 	}
 	if err != nil {
 		return err

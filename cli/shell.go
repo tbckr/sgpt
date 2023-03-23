@@ -3,16 +3,14 @@ package cli
 import (
 	"bufio"
 	"context"
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/tbckr/sgpt/modifier"
-
-	"github.com/peterbourgon/ff/v3/ffcli"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/spf13/cobra"
+	"github.com/tbckr/sgpt/modifier"
 	sgpt "github.com/tbckr/sgpt/openai"
 	"github.com/tbckr/sgpt/shell"
 )
@@ -20,27 +18,6 @@ import (
 const (
 	shellFormat = "\033[31m" // color red
 )
-
-var shellCmd = &ffcli.Command{
-	Name:       "sh",
-	ShortUsage: "sgpt sh [command flags] <prompt>",
-	ShortHelp:  "Query the openai models for a shell command.",
-	LongHelp: strings.TrimSpace(`
-Query a openai model for a shell command. The retrieved command can be executed at the same time.
-The supported completion models can be listed via: "sgpt txt --help"
-`),
-	Exec: runShell,
-	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("sh")
-		fs.StringVar(&shellArgs.model, "model", openai.GPT3Dot5Turbo, "GPT-3 model name")
-		fs.IntVar(&shellArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
-		fs.Float64Var(&shellArgs.temperature, "temperature", 0.2, "Randomness of generated output")
-		fs.Float64Var(&shellArgs.topP, "top-p", 0.9, "Limits highest probable tokens")
-		fs.BoolVar(&shellArgs.execute, "execute", false, "Execute shell command")
-		fs.StringVar(&shellArgs.chatSession, "chat", "", "Use an existing chat session")
-		return fs
-	})(),
-}
 
 var shellArgs struct {
 	model       string
@@ -51,7 +28,28 @@ var shellArgs struct {
 	chatSession string
 }
 
-func runShell(ctx context.Context, args []string) error {
+func shellCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "sh <prompt>",
+		Short: "Query the openai models for a shell command",
+		Long: strings.TrimSpace(`
+Query a openai model for a shell command. The retrieved command can be executed at the same time.
+The supported completion models can be listed via: "sgpt txt --help"
+`),
+		RunE: runShell,
+		Args: cobra.ExactArgs(1),
+	}
+	fs := cmd.Flags()
+	fs.StringVar(&shellArgs.model, "model", openai.GPT3Dot5Turbo, "model name")
+	fs.IntVar(&shellArgs.maxTokens, "max-tokens", 2048, "strict length of output (tokens)")
+	fs.Float64Var(&shellArgs.temperature, "temperature", 0.2, "randomness of generated output")
+	fs.Float64Var(&shellArgs.topP, "top-p", 0.9, "limits highest probable tokens")
+	fs.BoolVar(&shellArgs.execute, "execute", false, "execute shell command")
+	fs.StringVar(&shellArgs.chatSession, "chat", "", "use an existing chat session")
+	return cmd
+}
+
+func runShell(cmd *cobra.Command, args []string) error {
 	prompt, err := shell.GetPrompt(args)
 	if err != nil {
 		return err
@@ -77,9 +75,9 @@ func runShell(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt)
+		response, err = sgpt.GetChatCompletion(cmd.Context(), client, options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt)
+		response, err = sgpt.GetCompletion(cmd.Context(), client, options, prompt)
 	}
 	if err != nil {
 		return err
@@ -96,7 +94,7 @@ func runShell(ctx context.Context, args []string) error {
 			return err
 		}
 		if ok {
-			return executeShellCommand(ctx, response)
+			return executeShellCommand(cmd.Context(), response)
 		}
 	}
 	return nil

@@ -1,37 +1,15 @@
 package cli
 
 import (
-	"context"
-	"flag"
 	"fmt"
 	"strings"
 
-	"github.com/peterbourgon/ff/v3/ffcli"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/modifier"
 	sgpt "github.com/tbckr/sgpt/openai"
 	"github.com/tbckr/sgpt/shell"
 )
-
-var codeCmd = &ffcli.Command{
-	Name:       "code",
-	ShortUsage: "sgpt code [command flags] <prompt>",
-	ShortHelp:  "Query the openai models for code-specific questions.",
-	LongHelp: strings.TrimSpace(`
-Query a openai model for code specific questions.
-The supported completion models can be listed via: "sgpt txt --help"
-`),
-	Exec: runCode,
-	FlagSet: (func() *flag.FlagSet {
-		fs := newFlagSet("code")
-		fs.StringVar(&codeArgs.model, "model", openai.GPT3Dot5Turbo, "GPT-3 model name")
-		fs.IntVar(&codeArgs.maxTokens, "max-tokens", 2048, "Strict length of output (tokens)")
-		fs.Float64Var(&codeArgs.temperature, "temperature", 0.8, "Randomness of generated output")
-		fs.Float64Var(&codeArgs.topP, "top-p", 0.2, "Limits highest probable tokens")
-		fs.StringVar(&codeArgs.chatSession, "chat", "", "Use an existing chat session")
-		return fs
-	})(),
-}
 
 var codeArgs struct {
 	model       string
@@ -41,7 +19,27 @@ var codeArgs struct {
 	chatSession string
 }
 
-func runCode(ctx context.Context, args []string) error {
+func codeCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "code <prompt>",
+		Short: "Query the openai models for code-specific questions",
+		Long: strings.TrimSpace(`
+Query a openai model for code specific questions.
+The supported completion models can be listed via: "sgpt txt --help"
+`),
+		RunE: runCode,
+		Args: cobra.ExactArgs(1),
+	}
+	fs := cmd.Flags()
+	fs.StringVarP(&codeArgs.model, "model", "m", openai.GPT3Dot5Turbo, "model name")
+	fs.IntVarP(&codeArgs.maxTokens, "max-tokens", "s", 2048, "strict length of output (tokens)")
+	fs.Float64VarP(&codeArgs.temperature, "temperature", "t", 0.8, "randomness of generated output")
+	fs.Float64VarP(&codeArgs.topP, "top-p", "p", 0.2, "limits highest probable tokens")
+	fs.StringVarP(&codeArgs.chatSession, "chat", "c", "", "use an existing chat session")
+	return cmd
+}
+
+func runCode(cmd *cobra.Command, args []string) error {
 	prompt, err := shell.GetPrompt(args)
 	if err != nil {
 		return err
@@ -67,9 +65,9 @@ func runCode(ctx context.Context, args []string) error {
 
 	var response string
 	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(ctx, client, options, prompt)
+		response, err = sgpt.GetChatCompletion(cmd.Context(), client, options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(ctx, client, options, prompt)
+		response, err = sgpt.GetCompletion(cmd.Context(), client, options, prompt)
 	}
 	if err != nil {
 		return err
