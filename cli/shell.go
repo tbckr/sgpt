@@ -49,7 +49,7 @@ The supported completion models can be listed via: "sgpt txt --help"
 }
 
 func runShell(cmd *cobra.Command, args []string) error {
-	prompt, err := shell.GetPrompt(args)
+	prompt, err := shell.GetInput(args)
 	if err != nil {
 		return err
 	}

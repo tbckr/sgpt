@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var ErrMissingPrompt = errors.New("exactly one prompt must be provided")
+var ErrMissingInput = errors.New("no input was provided")
 
 func IsPipedShell() (bool, error) {
 	fi, err := os.Stdin.Stat()
@@ -31,7 +31,7 @@ func GetPipedData() (string, error) {
 	return string(buf), nil
 }
 
-func GetPrompt(args []string) (string, error) {
+func GetInput(args []string) (string, error) {
 	var prompt string
 	// Check, if prompt was provided via stdin
 	pipedShell, err := IsPipedShell()
@@ -46,7 +46,7 @@ func GetPrompt(args []string) (string, error) {
 	} else {
 		// Check, if prompt was provided via command line
 		if len(args) != 1 {
-			return "", ErrMissingPrompt
+			return "", ErrMissingInput
 		}
 		prompt = args[0]
 	}

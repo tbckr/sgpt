@@ -36,7 +36,7 @@ Create an AI generated image with the DALLE API.
 }
 
 func runImage(cmd *cobra.Command, args []string) error {
-	prompt, err := shell.GetPrompt(args)
+	prompt, err := shell.GetInput(args)
 	if err != nil {
 		return err
 	}
