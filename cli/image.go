@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/tbckr/sgpt/file"
+
 	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/client"
-	"github.com/tbckr/sgpt/file"
+	"github.com/tbckr/sgpt/image"
 	"github.com/tbckr/sgpt/shell"
 )
 
 var imageArgs struct {
-	count    int
-	size     string
-	download bool
-	filename string
+	count      int
+	size       string
+	download   bool
+	filePrefix string
 }
 
 func imageCmd() *cobra.Command {
@@ -22,7 +24,9 @@ func imageCmd() *cobra.Command {
 		Use:   "image <prompt>",
 		Short: "Create an AI generated image with DALLE",
 		Long: strings.TrimSpace(`
-Create an AI generated image with the DALLE API. 
+Create an AI generated image with the DALLE API.
+
+Downloaded images have the filename pattern: <prefix>-<random suffix>.png
 `),
 		RunE: runImage,
 		Args: cobra.ExactArgs(1),
@@ -31,7 +35,7 @@ Create an AI generated image with the DALLE API.
 	fs.IntVarP(&imageArgs.count, "count", "c", 1, "number of images to generate")
 	fs.StringVar(&imageArgs.size, "size", client.DefaultImageSize, "image size")
 	fs.BoolVarP(&imageArgs.download, "download", "d", false, "download generated images")
-	fs.StringVarP(&imageArgs.filename, "output", "o", "", "filename including path to file - might be used for base name, if multiple images are created")
+	fs.StringVar(&imageArgs.filePrefix, "prefix", "img", "file prefix for downloaded image")
 	return cmd
 }
 
@@ -70,17 +74,22 @@ func runImage(cmd *cobra.Command, args []string) error {
 }
 
 func handleImageURLs(images []string) error {
+	var filename string
 	for _, data := range images {
 		if imageArgs.download {
-			// Save base64 encoded data to file
-			if err := file.SaveEncodedImage(imageArgs.filename, data, stdout); err != nil {
+			suffix, err := file.GetRandomSuffix(10)
+			if err != nil {
+				return err
+			}
+			filename = fmt.Sprintf("%s-%s%s", imageArgs.filePrefix, suffix, image.DefaultExtension)
+			if err = image.SaveEncodedImage(filename, data); err != nil {
 				return err
 			}
 		} else {
-			// Print url to stdout
-			if _, err := fmt.Fprintln(stdout, data); err != nil {
-				return err
-			}
+			filename = data
+		}
+		if _, err := fmt.Fprintln(stdout, filename); err != nil {
+			return err
 		}
 	}
 	return nil

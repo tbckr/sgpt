@@ -28,8 +28,6 @@ var (
 	sessionNameMatcher        = regexp.MustCompile(sessionNameRegex)
 )
 
-// TODO refactor functions: reuse functions in file package or move to file package, rm duplicate implementations
-
 func getAppCacheDir() (string, error) {
 	// Get user specific config dir
 	baseConfigDir, err := os.UserCacheDir()
