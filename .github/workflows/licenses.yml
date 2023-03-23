@@ -30,7 +30,7 @@ on:
     paths:
       - go.mod
       - .github/licenses.tmpl
-      - .github/workflows/go-licenses.yml
+      - .github/workflows/licenses.yml
   workflow_dispatch:
 
 concurrency:
