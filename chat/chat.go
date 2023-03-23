@@ -16,7 +16,6 @@ import (
 
 const (
 	appDirName             = "sgpt"
-	defaultDirPermissions  = 0750
 	defaultFilePermissions = 0755
 	sessionNameMaxLength   = 65
 )
@@ -30,27 +29,8 @@ var (
 	sessionNameMatcher = regexp.MustCompile(sessionNameRegex)
 )
 
-func getAppCacheDir() (string, error) {
-	// Get user specific config dir
-	baseConfigDir, err := os.UserCacheDir()
-	if err != nil {
-		return "", err
-	}
-	// Application specific cache dir
-	configPath := path.Join(baseConfigDir, appDirName)
-	_, err = os.Stat(configPath)
-	// Check, if application cache dir exists
-	if os.IsNotExist(err) {
-		// Create application cache dir
-		if err = os.MkdirAll(configPath, defaultDirPermissions); err != nil {
-			return "", err
-		}
-	}
-	return configPath, nil
-}
-
 func getFilepathForSession(sessionName string) (string, error) {
-	dir, err := getAppCacheDir()
+	dir, err := files.GetAppCacheDir(appDirName)
 	if err != nil {
 		return "", err
 	}
@@ -180,17 +160,17 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 }
 
 func ListSessions() ([]string, error) {
-	dir, err := getAppCacheDir()
+	dir, err := files.GetAppCacheDir(appDirName)
 	if err != nil {
 		return nil, err
 	}
-	var files []os.DirEntry
-	files, err = os.ReadDir(dir)
+	var filesInDir []os.DirEntry
+	filesInDir, err = os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
 	var fileList []string
-	for _, file := range files {
+	for _, file := range filesInDir {
 		fileList = append(fileList, file.Name())
 	}
 	return fileList, nil
