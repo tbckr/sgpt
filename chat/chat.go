@@ -11,21 +11,23 @@ import (
 	"unicode/utf8"
 
 	"github.com/sashabaranov/go-openai"
+	"github.com/tbckr/sgpt/files"
 )
 
 const (
-	appConfigDir         = "sgpt"
-	dirPermissions       = 0750
-	filePermissions      = 0755
-	sessionNameMaxLength = 65
+	appDirName             = "sgpt"
+	defaultDirPermissions  = 0750
+	defaultFilePermissions = 0755
+	sessionNameMaxLength   = 65
 )
 
 var (
-	ErrChatSessionNotExist    = errors.New("chat session does not exist")
+	ErrChatSessionIsNotExist  = errors.New("chat session does not exist")
 	ErrChatSessionNameInvalid = fmt.Errorf("chat session name does not match the regex %s", sessionNameRegex)
 	ErrChatSessionNameTooLong = fmt.Errorf("chat session name is greater than %d", sessionNameMaxLength)
-	sessionNameRegex          = "^([-a-zA-Z0-9]*[a-zA-Z0-9])?"
-	sessionNameMatcher        = regexp.MustCompile(sessionNameRegex)
+
+	sessionNameRegex   = "^([-a-zA-Z0-9]*[a-zA-Z0-9])?"
+	sessionNameMatcher = regexp.MustCompile(sessionNameRegex)
 )
 
 func getAppCacheDir() (string, error) {
@@ -35,19 +37,19 @@ func getAppCacheDir() (string, error) {
 		return "", err
 	}
 	// Application specific cache dir
-	configPath := path.Join(baseConfigDir, appConfigDir)
+	configPath := path.Join(baseConfigDir, appDirName)
 	_, err = os.Stat(configPath)
 	// Check, if application cache dir exists
 	if os.IsNotExist(err) {
 		// Create application cache dir
-		if err = os.MkdirAll(configPath, dirPermissions); err != nil {
+		if err = os.MkdirAll(configPath, defaultDirPermissions); err != nil {
 			return "", err
 		}
 	}
 	return configPath, nil
 }
 
-func getFilepath(sessionName string) (string, error) {
+func getFilepathForSession(sessionName string) (string, error) {
 	dir, err := getAppCacheDir()
 	if err != nil {
 		return "", err
@@ -66,25 +68,15 @@ func validateSession(sessionName string) error {
 	return nil
 }
 
-func fileExists(filepath string) (bool, error) {
-	fileInfo, err := os.Stat(filepath)
-	if os.IsNotExist(err) {
-		return false, nil
-	} else if err != nil {
-		return false, err
-	}
-	return fileInfo.Name() != "", nil
-}
-
 func SessionExists(sessionName string) (bool, error) {
 	if err := validateSession(sessionName); err != nil {
 		return false, err
 	}
-	file, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return false, err
 	}
-	return fileExists(file)
+	return files.Exists(filepath)
 }
 
 func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
@@ -94,31 +86,31 @@ func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 	}
 
 	// Get path to file
-	filepath, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return nil, err
 	}
 
 	// Check, if session exists
 	var exists bool
-	exists, err = fileExists(filepath)
+	exists, err = files.Exists(filepath)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return []openai.ChatCompletionMessage{}, ErrChatSessionNotExist
+		return []openai.ChatCompletionMessage{}, ErrChatSessionIsNotExist
 	}
 
 	// Open file
-	var file *os.File
-	file, err = os.Open(filepath)
+	var f *os.File
+	f, err = os.Open(filepath)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer f.Close()
 
 	// Read messages
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
 
 	var messages []openai.ChatCompletionMessage
@@ -143,34 +135,34 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 	}
 
 	// Get path to file
-	filepath, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return err
 	}
 
 	// Check, if session exists
 	var exists bool
-	exists, err = fileExists(filepath)
+	exists, err = files.Exists(filepath)
 	if err != nil {
 		return err
 	}
 
 	// Open file
-	var file *os.File
+	var f *os.File
 	if exists {
 		// Open and truncate existing file
-		file, err = os.OpenFile(filepath, os.O_RDWR|os.O_TRUNC, filePermissions)
+		f, err = os.OpenFile(filepath, os.O_WRONLY|os.O_TRUNC, defaultFilePermissions)
 		if err != nil {
 			return err
 		}
 	} else {
 		// Create file
-		file, err = os.Create(filepath)
+		f, err = os.Create(filepath)
 		if err != nil {
 			return err
 		}
 	}
-	defer file.Close()
+	defer f.Close()
 
 	// Save messages to file
 	var data []byte
@@ -179,7 +171,7 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 		if err != nil {
 			return err
 		}
-		_, err = file.WriteString(string(data) + "\n")
+		_, err = f.WriteString(string(data) + "\n")
 		if err != nil {
 			return err
 		}
@@ -205,12 +197,12 @@ func ListSessions() ([]string, error) {
 }
 
 func DeleteSession(sessionName string) error {
-	filepath, err := getFilepath(sessionName)
+	filepath, err := getFilepathForSession(sessionName)
 	if err != nil {
 		return err
 	}
 	var exists bool
-	exists, err = fileExists(filepath)
+	exists, err = files.Exists(filepath)
 	if err != nil {
 		return err
 	}

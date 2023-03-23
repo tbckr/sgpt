@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/tbckr/sgpt/chat"
+
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
-	"github.com/tbckr/sgpt/chat"
 )
 
 const (

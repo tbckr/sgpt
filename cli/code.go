@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tbckr/sgpt/client"
-	"github.com/tbckr/sgpt/modifier"
+	"github.com/tbckr/sgpt/api"
+	"github.com/tbckr/sgpt/modifiers"
 	"github.com/tbckr/sgpt/shell"
 )
 
@@ -30,7 +30,7 @@ The supported completion models can be listed via: "sgpt txt --help"
 		Args: cobra.ExactArgs(1),
 	}
 	fs := cmd.Flags()
-	fs.StringVarP(&codeArgs.model, "model", "m", client.DefaultModel, "model name")
+	fs.StringVarP(&codeArgs.model, "model", "m", api.DefaultModel, "model name")
 	fs.IntVarP(&codeArgs.maxTokens, "max-tokens", "s", 2048, "strict length of output (tokens)")
 	fs.Float64VarP(&codeArgs.temperature, "temperature", "t", 0.8, "randomness of generated output")
 	fs.Float64VarP(&codeArgs.topP, "top-p", "p", 0.2, "limits highest probable tokens")
@@ -44,23 +44,23 @@ func runCode(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	options := client.CompletionOptions{
+	options := api.CompletionOptions{
 		Model:       codeArgs.model,
 		MaxTokens:   codeArgs.maxTokens,
 		Temperature: float32(codeArgs.temperature),
 		TopP:        float32(codeArgs.topP),
-		Modifier:    modifier.Code,
+		Modifier:    modifiers.Code,
 		ChatSession: codeArgs.chatSession,
 	}
 
-	var cli *client.Client
-	cli, err = client.CreateClient()
+	var cli *api.Client
+	cli, err = api.CreateClient()
 	if err != nil {
 		return err
 	}
 
 	var response string
-	if client.IsChatModel(options.Model) {
+	if api.IsChatModel(options.Model) {
 		response, err = cli.GetChatCompletion(cmd.Context(), options, prompt)
 	} else {
 		response, err = cli.GetCompletion(cmd.Context(), options, prompt)

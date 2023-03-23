@@ -8,7 +8,7 @@ import (
 	"image/png"
 	"os"
 
-	"github.com/tbckr/sgpt/file"
+	"github.com/tbckr/sgpt/files"
 )
 
 const DefaultExtension = ".png"
@@ -27,7 +27,7 @@ func SaveEncodedImage(filename, imageData string) error {
 	}
 
 	var exists bool
-	exists, err = file.Exists(filename)
+	exists, err = files.Exists(filename)
 	if err != nil {
 		return err
 	}

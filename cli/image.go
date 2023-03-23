@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tbckr/sgpt/file"
+	"github.com/tbckr/sgpt/api"
+	"github.com/tbckr/sgpt/files"
 
 	"github.com/spf13/cobra"
-	"github.com/tbckr/sgpt/client"
 	"github.com/tbckr/sgpt/image"
 	"github.com/tbckr/sgpt/shell"
 )
@@ -33,7 +33,7 @@ Downloaded images have the filename pattern: <prefix>-<random suffix>.png
 	}
 	fs := cmd.Flags()
 	fs.IntVarP(&imageArgs.count, "count", "c", 1, "number of images to generate")
-	fs.StringVar(&imageArgs.size, "size", client.DefaultImageSize, "image size")
+	fs.StringVar(&imageArgs.size, "size", api.DefaultImageSize, "image size")
 	fs.BoolVarP(&imageArgs.download, "download", "d", false, "download generated images")
 	fs.StringVar(&imageArgs.filePrefix, "prefix", "img", "file prefix for downloaded image")
 	return cmd
@@ -47,19 +47,19 @@ func runImage(cmd *cobra.Command, args []string) error {
 
 	var responseFormat string
 	if imageArgs.download {
-		responseFormat = client.ImageData
+		responseFormat = api.ImageData
 	} else {
-		responseFormat = client.ImageURL
+		responseFormat = api.ImageURL
 	}
 
-	options := client.ImageOptions{
+	options := api.ImageOptions{
 		Count:          imageArgs.count,
 		Size:           imageArgs.size,
 		ResponseFormat: responseFormat,
 	}
 
-	var cli *client.Client
-	cli, err = client.CreateClient()
+	var cli *api.Client
+	cli, err = api.CreateClient()
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func handleImageURLs(images []string) error {
 	var filename string
 	for _, data := range images {
 		if imageArgs.download {
-			suffix, err := file.GetRandomSuffix(10)
+			suffix, err := files.CreateRandomSuffix(10)
 			if err != nil {
 				return err
 			}

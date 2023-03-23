@@ -1,4 +1,4 @@
-package client
+package api
 
 import (
 	"context"
@@ -7,9 +7,10 @@ import (
 	"os"
 	"strings"
 
-	openai "github.com/sashabaranov/go-openai"
 	"github.com/tbckr/sgpt/chat"
-	"github.com/tbckr/sgpt/modifier"
+	"github.com/tbckr/sgpt/modifiers"
+
+	openai "github.com/sashabaranov/go-openai"
 )
 
 const (
@@ -24,7 +25,7 @@ var (
 	DefaultImageSize = strings.Clone(openai.CreateImageSize256x256)
 
 	ErrMissingAPIKey    = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
-	ErrChatNotSupported = errors.New("chat is not supported with this model")
+	ErrChatNotSupported = errors.New("chat is not supported for this model")
 )
 
 var SupportedModels = []string{
@@ -97,7 +98,7 @@ func (c *Client) GetCompletion(ctx context.Context, options CompletionOptions, p
 		return "", err
 	}
 	// TODO: handle this error
-	modifierPrompt, _ := modifier.GetModifier(options.Modifier)
+	modifierPrompt, _ := modifiers.GetModifier(options.Modifier)
 	// Do request
 	req := openai.CompletionRequest{
 		Prompt:      modifierPrompt + prompt,
@@ -143,7 +144,7 @@ func (c *Client) GetChatCompletion(ctx context.Context, options CompletionOption
 	// then add modifier message
 	if !isChat || (isChat && !chatExists) {
 		// TODO: handle this error
-		modifierPrompt, _ := modifier.GetChatModifier(options.Modifier)
+		modifierPrompt, _ := modifiers.GetChatModifier(options.Modifier)
 		if modifierPrompt != "" {
 			messages = append(messages, openai.ChatCompletionMessage{
 				Role:    openai.ChatMessageRoleSystem,
@@ -220,8 +221,12 @@ func (c *Client) GetImage(ctx context.Context, options ImageOptions, prompt stri
 }
 
 func IsChatModel(model string) bool {
-	if model == openai.GPT3Dot5Turbo || model == openai.GPT3Dot5Turbo0301 {
+	switch model {
+	case openai.GPT3Dot5Turbo, openai.GPT3Dot5Turbo0301,
+		openai.GPT4, openai.GPT432K,
+		openai.GPT40314, openai.GPT432K0314:
 		return true
+	default:
+		return false
 	}
-	return false
 }

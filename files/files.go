@@ -1,4 +1,4 @@
-package file
+package files
 
 import (
 	"crypto/rand"
@@ -16,7 +16,7 @@ func Exists(filename string) (bool, error) {
 	return true, nil
 }
 
-func GetRandomSuffix(size int) (string, error) {
+func CreateRandomSuffix(size int) (string, error) {
 	// Generate a random byte slice
 	b := make([]byte, size)
 	_, err := rand.Read(b)
