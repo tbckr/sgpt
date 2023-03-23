@@ -1,11 +1,10 @@
-package openai
+package client
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 
 	openai "github.com/sashabaranov/go-openai"
@@ -15,14 +14,39 @@ import (
 
 const (
 	envKeyOpenAIApi = "OPENAI_API_KEY"
-	envKeyShell     = "SHELL"
+
+	ImageURL  = "ImageURL"
+	ImageData = "ImageData"
 )
 
 var (
-	ErrMissingAPIKey       = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
-	ErrUnsupportedModifier = errors.New("unsupported modifier")
-	ErrChatNotSupported    = errors.New("chat is not supported with this model")
+	DefaultModel     = strings.Clone(openai.GPT3Dot5Turbo)
+	DefaultImageSize = strings.Clone(openai.CreateImageSize256x256)
+
+	ErrMissingAPIKey    = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
+	ErrChatNotSupported = errors.New("chat is not supported with this model")
 )
+
+var SupportedModels = []string{
+	openai.GPT4,
+	openai.GPT40314,
+	openai.GPT432K,
+	openai.GPT432K0314,
+	openai.GPT3Dot5Turbo0301,
+	openai.GPT3Dot5Turbo,
+	openai.GPT3TextDavinci003,
+	openai.GPT3TextDavinci002,
+	openai.GPT3TextCurie001,
+	openai.GPT3TextBabbage001,
+	openai.GPT3TextAda001,
+	openai.GPT3TextDavinci001,
+	openai.GPT3DavinciInstructBeta,
+	openai.GPT3Davinci,
+	openai.GPT3CurieInstructBeta,
+	openai.GPT3Curie,
+	openai.GPT3Ada,
+	openai.GPT3Babbage,
+}
 
 type Client struct {
 	api *openai.Client
@@ -38,8 +62,9 @@ type CompletionOptions struct {
 }
 
 type ImageOptions struct {
-	Count int
-	Size  string
+	Count          int
+	Size           string
+	ResponseFormat string
 }
 
 func CreateClient() (*Client, error) {
@@ -52,16 +77,6 @@ func CreateClient() (*Client, error) {
 		api: openai.NewClient(apiKey),
 	}
 	return client, nil
-}
-
-// CreateAPIClient is deprecated, use CreateClient instead.
-func CreateAPIClient() (*openai.Client, error) {
-	// Check, if api key was set
-	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
-	if !exists {
-		return nil, ErrMissingAPIKey
-	}
-	return openai.NewClient(apiKey), nil
 }
 
 func (c *Client) validateCompletionOptions(options CompletionOptions) error {
@@ -78,26 +93,11 @@ func (c *Client) validateCompletionOptions(options CompletionOptions) error {
 }
 
 func (c *Client) GetCompletion(ctx context.Context, options CompletionOptions, prompt string) (string, error) {
-	var err error
-	if err = c.validateCompletionOptions(options); err != nil {
+	if err := c.validateCompletionOptions(options); err != nil {
 		return "", err
 	}
-	// Add modifier
-	var modifierPrompt string
-	switch options.Modifier {
-	case modifier.Shell:
-		modifierPrompt, err = c.completeShellModifier(modifier.CompletionModifierTemplate[modifier.Shell])
-	case modifier.Code:
-		modifierPrompt, err = modifier.CompletionModifierTemplate[modifier.Code], nil
-	case modifier.Nil:
-		modifierPrompt, err = "", nil
-	default:
-		return "", ErrUnsupportedModifier
-	}
-	if err != nil {
-		return "", err
-	}
-
+	// TODO: handle this error
+	modifierPrompt, _ := modifier.GetModifier(options.Modifier)
 	// Do request
 	req := openai.CompletionRequest{
 		Prompt:      modifierPrompt + prompt,
@@ -106,8 +106,7 @@ func (c *Client) GetCompletion(ctx context.Context, options CompletionOptions, p
 		Temperature: options.Temperature,
 		TopP:        options.TopP,
 	}
-	var resp openai.CompletionResponse
-	resp, err = c.api.CreateCompletion(ctx, req)
+	resp, err := c.api.CreateCompletion(ctx, req)
 	if err != nil {
 		return "", err
 	}
@@ -118,9 +117,11 @@ func (c *Client) GetChatCompletion(ctx context.Context, options CompletionOption
 	var err error
 	var messages []openai.ChatCompletionMessage
 
-	// Load existing chat messages
+	// Evaluate base decision factors
 	isChat := options.ChatSession != ""
 	chatExists := false
+
+	// Load existing chat messages
 	if isChat {
 		chatExists, err = chat.SessionExists(options.ChatSession)
 		if err != nil {
@@ -141,21 +142,8 @@ func (c *Client) GetChatCompletion(ctx context.Context, options CompletionOption
 	// if this is the initial message of a chat,
 	// then add modifier message
 	if !isChat || (isChat && !chatExists) {
-		var modifierPrompt string
-		switch options.Modifier {
-		case modifier.Shell:
-			modifierPrompt, err = c.completeShellModifier(modifier.ChatCompletionModifierTemplate[modifier.Shell])
-		case modifier.Code:
-			modifierPrompt, err = modifier.ChatCompletionModifierTemplate[modifier.Code], nil
-		case modifier.Nil:
-			modifierPrompt, err = "", nil
-		default:
-			return "", ErrUnsupportedModifier
-		}
-		if err != nil {
-			return "", err
-		}
-
+		// TODO: handle this error
+		modifierPrompt, _ := modifier.GetChatModifier(options.Modifier)
 		if modifierPrompt != "" {
 			messages = append(messages, openai.ChatCompletionMessage{
 				Role:    openai.ChatMessageRoleSystem,
@@ -197,7 +185,18 @@ func (c *Client) GetChatCompletion(ctx context.Context, options CompletionOption
 	return receivedMessage.Content, nil
 }
 
-func (c *Client) GetImage(ctx context.Context, options ImageOptions, prompt, responseFormat string) ([]string, error) {
+// GetImage creates an image via the DALLE API. It either returns a URL to the image or the image data based on the
+// provided ResponseFormat in the options.
+func (c *Client) GetImage(ctx context.Context, options ImageOptions, prompt string) ([]string, error) {
+	var responseFormat string
+	switch options.ResponseFormat {
+	case ImageData:
+		responseFormat = openai.CreateImageResponseFormatB64JSON
+	case ImageURL:
+	default: // defaulting to URL
+		responseFormat = openai.CreateImageResponseFormatURL
+	}
+
 	req := openai.ImageRequest{
 		Prompt:         prompt,
 		N:              options.Count,
@@ -220,20 +219,9 @@ func (c *Client) GetImage(ctx context.Context, options ImageOptions, prompt, res
 	return imageData, nil
 }
 
-func (c *Client) completeShellModifier(template string) (string, error) {
-	operatingSystem := runtime.GOOS
-	shell, ok := os.LookupEnv(envKeyShell)
-	// fallback to manually set shell
-	if !ok {
-		if operatingSystem == "windows" {
-			shell = "powershell"
-		} else if operatingSystem == "linux" {
-			shell = "bash"
-		} else if operatingSystem == "darwin" {
-			shell = "zsh"
-		} else {
-			return "", fmt.Errorf("unsupported os %s", operatingSystem)
-		}
+func IsChatModel(model string) bool {
+	if model == openai.GPT3Dot5Turbo || model == openai.GPT3Dot5Turbo0301 {
+		return true
 	}
-	return fmt.Sprintf(template, shell, operatingSystem, shell, operatingSystem, shell), nil
+	return false
 }

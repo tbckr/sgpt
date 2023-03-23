@@ -8,10 +8,9 @@ import (
 	"os/exec"
 	"strings"
 
-	openai "github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
+	"github.com/tbckr/sgpt/client"
 	"github.com/tbckr/sgpt/modifier"
-	sgpt "github.com/tbckr/sgpt/openai"
 	"github.com/tbckr/sgpt/shell"
 )
 
@@ -40,7 +39,7 @@ The supported completion models can be listed via: "sgpt txt --help"
 		Args: cobra.ExactArgs(1),
 	}
 	fs := cmd.Flags()
-	fs.StringVar(&shellArgs.model, "model", openai.GPT3Dot5Turbo, "model name")
+	fs.StringVar(&shellArgs.model, "model", client.DefaultModel, "model name")
 	fs.IntVar(&shellArgs.maxTokens, "max-tokens", 2048, "strict length of output (tokens)")
 	fs.Float64Var(&shellArgs.temperature, "temperature", 0.2, "randomness of generated output")
 	fs.Float64Var(&shellArgs.topP, "top-p", 0.9, "limits highest probable tokens")
@@ -55,7 +54,7 @@ func runShell(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	options := sgpt.CompletionOptions{
+	options := client.CompletionOptions{
 		Model:       shellArgs.model,
 		MaxTokens:   shellArgs.maxTokens,
 		Temperature: float32(shellArgs.temperature),
@@ -63,21 +62,18 @@ func runShell(cmd *cobra.Command, args []string) error {
 		Modifier:    modifier.Shell,
 		ChatSession: shellArgs.chatSession,
 	}
-	if err = sgpt.ValidateCompletionOptions(options); err != nil {
-		return err
-	}
 
-	var client *openai.Client
-	client, err = sgpt.CreateAPIClient()
+	var cli *client.Client
+	cli, err = client.CreateClient()
 	if err != nil {
 		return err
 	}
 
 	var response string
-	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(cmd.Context(), client, options, prompt)
+	if client.IsChatModel(options.Model) {
+		response, err = cli.GetChatCompletion(cmd.Context(), options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(cmd.Context(), client, options, prompt)
+		response, err = cli.GetCompletion(cmd.Context(), options, prompt)
 	}
 	if err != nil {
 		return err

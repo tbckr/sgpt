@@ -4,33 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	openai "github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
+	"github.com/tbckr/sgpt/client"
 	"github.com/tbckr/sgpt/modifier"
-	sgpt "github.com/tbckr/sgpt/openai"
 	"github.com/tbckr/sgpt/shell"
 )
-
-var openaiModels = []string{
-	openai.GPT4,
-	openai.GPT40314,
-	openai.GPT432K,
-	openai.GPT432K0314,
-	openai.GPT3Dot5Turbo0301,
-	openai.GPT3Dot5Turbo,
-	openai.GPT3TextDavinci003,
-	openai.GPT3TextDavinci002,
-	openai.GPT3TextCurie001,
-	openai.GPT3TextBabbage001,
-	openai.GPT3TextAda001,
-	openai.GPT3TextDavinci001,
-	openai.GPT3DavinciInstructBeta,
-	openai.GPT3Davinci,
-	openai.GPT3CurieInstructBeta,
-	openai.GPT3Curie,
-	openai.GPT3Ada,
-	openai.GPT3Babbage,
-}
 
 var textArgs struct {
 	model       string
@@ -46,12 +24,12 @@ func textCmd() *cobra.Command {
 		Short: "Query the different openai models for a text completion",
 		Long: strings.TrimSpace(fmt.Sprintf(`
 Query a openai model for a text completion. The following models are supported: %s.
-`, strings.Join(openaiModels, ", "))),
+`, strings.Join(client.SupportedModels, ", "))),
 		Args: cobra.ExactArgs(1),
 		RunE: runText,
 	}
 	fs := cmd.Flags()
-	fs.StringVarP(&textArgs.model, "model", "m", openai.GPT3Dot5Turbo, "model name to use")
+	fs.StringVarP(&textArgs.model, "model", "m", client.DefaultModel, "model name to use")
 	fs.IntVarP(&textArgs.maxTokens, "max-tokens", "s", 2048, "strict length of output (tokens)")
 	fs.Float64VarP(&textArgs.temperature, "temperature", "t", 1.0, "randomness of generated output")
 	fs.Float64VarP(&textArgs.topP, "top-p", "p", 1.0, "limits highest probable tokens")
@@ -65,7 +43,7 @@ func runText(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	options := sgpt.CompletionOptions{
+	options := client.CompletionOptions{
 		Model:       textArgs.model,
 		MaxTokens:   textArgs.maxTokens,
 		Temperature: float32(textArgs.temperature),
@@ -73,21 +51,18 @@ func runText(cmd *cobra.Command, args []string) error {
 		Modifier:    modifier.Nil,
 		ChatSession: textArgs.chatSession,
 	}
-	if err = sgpt.ValidateCompletionOptions(options); err != nil {
-		return err
-	}
 
-	var client *openai.Client
-	client, err = sgpt.CreateAPIClient()
+	var cli *client.Client
+	cli, err = client.CreateClient()
 	if err != nil {
 		return err
 	}
 
 	var response string
-	if options.Model == openai.GPT3Dot5Turbo || options.Model == openai.GPT3Dot5Turbo0301 {
-		response, err = sgpt.GetChatCompletion(cmd.Context(), client, options, prompt)
+	if client.IsChatModel(options.Model) {
+		response, err = cli.GetChatCompletion(cmd.Context(), options, prompt)
 	} else {
-		response, err = sgpt.GetCompletion(cmd.Context(), client, options, prompt)
+		response, err = cli.GetCompletion(cmd.Context(), options, prompt)
 	}
 	if err != nil {
 		return err

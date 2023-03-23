@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	openai "github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
+	"github.com/tbckr/sgpt/client"
 	"github.com/tbckr/sgpt/file"
-	sgpt "github.com/tbckr/sgpt/openai"
 	"github.com/tbckr/sgpt/shell"
 )
 
@@ -30,7 +29,7 @@ Create an AI generated image with the DALLE API.
 	}
 	fs := cmd.Flags()
 	fs.IntVarP(&imageArgs.count, "count", "c", 1, "number of images to generate")
-	fs.StringVar(&imageArgs.size, "size", openai.CreateImageSize256x256, "image size")
+	fs.StringVar(&imageArgs.size, "size", client.DefaultImageSize, "image size")
 	fs.BoolVarP(&imageArgs.download, "download", "d", false, "download generated images")
 	fs.StringVarP(&imageArgs.filename, "output", "o", "", "filename including path to file - might be used for base name, if multiple images are created")
 	return cmd
@@ -42,26 +41,27 @@ func runImage(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	options := sgpt.ImageOptions{
-		Count: imageArgs.count,
-		Size:  imageArgs.size,
-	}
-
 	var responseFormat string
 	if imageArgs.download {
-		responseFormat = openai.CreateImageResponseFormatB64JSON
+		responseFormat = client.ImageData
 	} else {
-		responseFormat = openai.CreateImageResponseFormatURL
+		responseFormat = client.ImageURL
 	}
 
-	var client *openai.Client
-	client, err = sgpt.CreateAPIClient()
+	options := client.ImageOptions{
+		Count:          imageArgs.count,
+		Size:           imageArgs.size,
+		ResponseFormat: responseFormat,
+	}
+
+	var cli *client.Client
+	cli, err = client.CreateClient()
 	if err != nil {
 		return err
 	}
 
 	var imageData []string
-	imageData, err = sgpt.GetImage(cmd.Context(), client, options, prompt, responseFormat)
+	imageData, err = cli.GetImage(cmd.Context(), options, prompt)
 	if err != nil {
 		return err
 	}

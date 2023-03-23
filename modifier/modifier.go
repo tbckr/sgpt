@@ -1,16 +1,24 @@
 package modifier
 
-import "strings"
+import (
+	"errors"
+	"fmt"
+	"os"
+	"runtime"
+	"strings"
+)
 
 const (
+	envKeyShell = "SHELL"
+
 	Nil   = "NIL_MODIFIER"
 	Code  = "CODE_MODIFIER"
 	Shell = "SHELL_MODIFIER"
 )
 
-// ChatCompletionModifierTemplate uses specific prompts to refine the models answers.
+// chatCompletionModifierTemplate uses specific prompts to refine the models answers.
 // These prompts were inspired by similar open source projects like shell-gpt or yolo-ai-cmdbot.
-var ChatCompletionModifierTemplate = map[string]string{
+var chatCompletionModifierTemplate = map[string]string{
 	Shell: strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
 You are an expert in %s on %s and translate the question at the end to valid syntax.
@@ -54,7 +62,7 @@ You must always follow them. No exceptions.
 `),
 }
 
-var CompletionModifierTemplate = map[string]string{
+var completionModifierTemplate = map[string]string{
 	Shell: strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
 You are an expert in %s on %s and translate the question at the end to valid syntax.
@@ -98,4 +106,50 @@ There are no exceptions to these rules.
 You must always follow them. No exceptions.
 Request: 
 `),
+}
+
+var ErrUnsupportedModifier = errors.New("unsupported modifier")
+
+func GetModifier(modifier string) (string, error) {
+	switch modifier {
+	case Shell:
+		return completeShellModifier(completionModifierTemplate[Shell])
+	case Code:
+		return completionModifierTemplate[Code], nil
+	case Nil:
+		return "", nil
+	default:
+		return "", ErrUnsupportedModifier
+	}
+}
+
+func GetChatModifier(modifier string) (string, error) {
+	switch modifier {
+	case Shell:
+		return completeShellModifier(chatCompletionModifierTemplate[Shell])
+	case Code:
+		return chatCompletionModifierTemplate[Code], nil
+	case Nil:
+		return "", nil
+	default:
+		return "", ErrUnsupportedModifier
+	}
+}
+
+func completeShellModifier(template string) (string, error) {
+	operatingSystem := runtime.GOOS
+	shell, ok := os.LookupEnv(envKeyShell)
+	// fallback to manually set shell
+	if !ok {
+		if operatingSystem == "windows" {
+			shell = "powershell"
+		} else if operatingSystem == "linux" {
+			shell = "bash"
+		} else if operatingSystem == "darwin" {
+			shell = "zsh"
+		} else {
+			return "", fmt.Errorf("unsupported os %s", operatingSystem)
+		}
+	}
+	return fmt.Sprintf(template, shell, operatingSystem, shell, operatingSystem, shell), nil
 }
