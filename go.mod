@@ -3,7 +3,7 @@ module github.com/tbckr/sgpt
 go 1.20
 
 require (
-	github.com/sashabaranov/go-openai v1.5.6
+	github.com/sashabaranov/go-openai v1.5.7
 	github.com/spf13/cobra v1.6.1
 )
 
