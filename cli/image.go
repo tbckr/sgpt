@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/tbckr/sgpt/api"
-	"github.com/tbckr/sgpt/files"
+	"github.com/tbckr/sgpt/filesystem"
 
 	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/image"
@@ -77,12 +77,12 @@ func handleImageURLs(images []string) error {
 	var filename string
 	for _, data := range images {
 		if imageArgs.download {
-			suffix, err := files.CreateRandomSuffix(10)
+			suffix, err := filesystem.CreateRandomFileSuffix(10)
 			if err != nil {
 				return err
 			}
 			filename = fmt.Sprintf("%s-%s%s", imageArgs.filePrefix, suffix, image.DefaultExtension)
-			if err = image.SaveEncodedImage(filename, data); err != nil {
+			if err = image.SaveB64EncodedImage(filename, data); err != nil {
 				return err
 			}
 		} else {

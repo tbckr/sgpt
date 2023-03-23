@@ -11,7 +11,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt/files"
+	"github.com/tbckr/sgpt/filesystem"
 )
 
 const (
@@ -30,7 +30,7 @@ var (
 )
 
 func getFilepathForSession(sessionName string) (string, error) {
-	dir, err := files.GetAppCacheDir(appDirName)
+	dir, err := filesystem.GetAppCacheDir(appDirName)
 	if err != nil {
 		return "", err
 	}
@@ -56,7 +56,7 @@ func SessionExists(sessionName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return files.Exists(filepath)
+	return filesystem.FileExists(filepath)
 }
 
 func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
@@ -73,7 +73,7 @@ func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 
 	// Check, if session exists
 	var exists bool
-	exists, err = files.Exists(filepath)
+	exists, err = filesystem.FileExists(filepath)
 	if err != nil {
 		return nil, err
 	}
@@ -82,15 +82,15 @@ func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 	}
 
 	// Open file
-	var f *os.File
-	f, err = os.Open(filepath)
+	var file *os.File
+	file, err = os.Open(filepath)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer file.Close()
 
 	// Read messages
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
 	var messages []openai.ChatCompletionMessage
@@ -122,27 +122,27 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 
 	// Check, if session exists
 	var exists bool
-	exists, err = files.Exists(filepath)
+	exists, err = filesystem.FileExists(filepath)
 	if err != nil {
 		return err
 	}
 
 	// Open file
-	var f *os.File
+	var file *os.File
 	if exists {
 		// Open and truncate existing file
-		f, err = os.OpenFile(filepath, os.O_WRONLY|os.O_TRUNC, defaultFilePermissions)
+		file, err = os.OpenFile(filepath, os.O_WRONLY|os.O_TRUNC, defaultFilePermissions)
 		if err != nil {
 			return err
 		}
 	} else {
 		// Create file
-		f, err = os.Create(filepath)
+		file, err = os.Create(filepath)
 		if err != nil {
 			return err
 		}
 	}
-	defer f.Close()
+	defer file.Close()
 
 	// Save messages to file
 	var data []byte
@@ -151,7 +151,7 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 		if err != nil {
 			return err
 		}
-		_, err = f.WriteString(string(data) + "\n")
+		_, err = file.WriteString(string(data) + "\n")
 		if err != nil {
 			return err
 		}
@@ -160,20 +160,20 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 }
 
 func ListSessions() ([]string, error) {
-	dir, err := files.GetAppCacheDir(appDirName)
+	dir, err := filesystem.GetAppCacheDir(appDirName)
 	if err != nil {
 		return nil, err
 	}
-	var filesInDir []os.DirEntry
-	filesInDir, err = os.ReadDir(dir)
+	var dirFiles []os.DirEntry
+	dirFiles, err = os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
-	var fileList []string
-	for _, file := range filesInDir {
-		fileList = append(fileList, file.Name())
+	var files []string
+	for _, file := range dirFiles {
+		files = append(files, file.Name())
 	}
-	return fileList, nil
+	return files, nil
 }
 
 func DeleteSession(sessionName string) error {
@@ -182,7 +182,7 @@ func DeleteSession(sessionName string) error {
 		return err
 	}
 	var exists bool
-	exists, err = files.Exists(filepath)
+	exists, err = filesystem.FileExists(filepath)
 	if err != nil {
 		return err
 	}

@@ -7,10 +7,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/sashabaranov/go-openai"
 	"github.com/tbckr/sgpt/chat"
 	"github.com/tbckr/sgpt/modifiers"
-
-	openai "github.com/sashabaranov/go-openai"
 )
 
 const (
