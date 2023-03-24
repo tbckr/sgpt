@@ -25,26 +25,22 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
-)
-
-const (
-	resetFormat = "\033[0m"
+	jww "github.com/spf13/jwalterweatherman"
 )
 
 var (
 	stdout io.Writer = os.Stdout
 	stderr io.Writer = os.Stderr
-
-	rootCmd *cobra.Command
 )
 
-//var rootArgs struct {
-//	debug bool
-//}
+var rootCmd *cobra.Command
+
+var rootArgs struct {
+	debug bool
+}
 
 // Run runs the CLI. The args do not include the binary name.
 func Run(args []string) {
@@ -54,12 +50,13 @@ func Run(args []string) {
 		DisableFlagsInUseLine: true,
 		SilenceUsage:          true,
 		SilenceErrors:         true,
-		//PersistentPreRun: func(_ *cobra.Command, _ []string) {
-		//	if rootArgs.debug {
-		//		log.SetOutput(stdout)
-		//		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		//	}
-		//},
+		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+			if rootArgs.debug {
+				jww.SetStdoutThreshold(jww.LevelDebug)
+			} else {
+				jww.SetStdoutThreshold(jww.LevelCritical)
+			}
+		},
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()
 		},
@@ -74,14 +71,17 @@ func Run(args []string) {
 		licensesCmd(),
 		manCmd(),
 	)
-	//persistentFs := rootCmd.PersistentFlags()
-	//persistentFs.BoolVarP(&rootArgs.debug, "verbose", "v", false,
-	//	"enable more verbose output for debugging")
+	persistentFs := rootCmd.PersistentFlags()
+	persistentFs.BoolVarP(&rootArgs.debug, "verbose", "v", false,
+		"enable more verbose output for debugging")
 
 	rootCmd.SetArgs(args)
 	if err := rootCmd.ExecuteContext(context.Background()); err != nil {
+		if rootArgs.debug {
+			jww.ERROR.Println(err)
+		}
 		if _, err = fmt.Fprintln(stderr, err); err != nil {
-			log.Fatal(err)
+			jww.ERROR.Println(err)
 		}
 		os.Exit(1)
 	}

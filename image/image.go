@@ -29,14 +29,19 @@ import (
 	"image/png"
 	"os"
 
+	jww "github.com/spf13/jwalterweatherman"
+
 	"github.com/tbckr/sgpt/filesystem"
 )
 
 const DefaultExtension = ".png"
 
+var ErrFileAlreadyExists = errors.New("file already exists")
+
 func SaveB64EncodedImage(filename, imageData string) error {
 	imgBytes, err := base64.StdEncoding.DecodeString(imageData)
 	if err != nil {
+		jww.ERROR.Printf("error decoding image data from base64: %s", err)
 		return err
 	}
 
@@ -44,6 +49,7 @@ func SaveB64EncodedImage(filename, imageData string) error {
 	var img image.Image
 	img, err = png.Decode(reader)
 	if err != nil {
+		jww.ERROR.Printf("error decoding image: %s", err)
 		return err
 	}
 
@@ -53,15 +59,22 @@ func SaveB64EncodedImage(filename, imageData string) error {
 		return err
 	}
 	if exists {
-		return errors.New("file already exists")
+		jww.ERROR.Println("file already exists")
+		return ErrFileAlreadyExists
 	}
 
 	var file *os.File
 	file, err = os.Create(filename)
 	if err != nil {
+		jww.ERROR.Printf("error creating file: %s\n", err)
 		return err
 	}
 	defer file.Close()
 
-	return png.Encode(file, img)
+	err = png.Encode(file, img)
+	if err != nil {
+		jww.ERROR.Printf("error encoding image: %s\n", err)
+		return err
+	}
+	return nil
 }
