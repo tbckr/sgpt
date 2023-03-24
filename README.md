@@ -12,46 +12,68 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
 - [Features](#features)
 - [Installation](#installation)
-  - [For Homebrew Users (macOS, Linux)](#for-homebrew-users-macos-linux)
-  - [For Scoop Users on Windows](#for-scoop-users-on-windows)
-  - [Using Go](#using-go)
-  - [Other platforms](#other-platforms)
+    - [For Homebrew Users (macOS, Linux)](#for-homebrew-users-macos-linux)
+    - [For Scoop Users on Windows](#for-scoop-users-on-windows)
+    - [Using Go](#using-go)
+    - [Other platforms](#other-platforms)
 - [Usage Guide](#usage-guide)
-  - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
-  - [Querying OpenAI Models](#querying-openai-models)
-  - [Chat Capabilities](#chat-capabilities)
-  - [Running Queries with Docker](#running-queries-with-docker)
-  - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
-  - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
-  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
-  - [Code Generation Capabilities](#code-generation-capabilities)
-  - [Transforming Text to Images](#transforming-text-to-images)
+    - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
+    - [Querying OpenAI Models](#querying-openai-models)
+    - [Chat Capabilities](#chat-capabilities)
+    - [Running Queries with Docker](#running-queries-with-docker)
+    - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
+    - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
+    - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
+    - [Code Generation Capabilities](#code-generation-capabilities)
+    - [Transforming Text to Images](#transforming-text-to-images)
 - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Features
 
-- Ask simple questions to get an answer immediately in the shell
-- Generate shell commands and execute them
-- Produce code in any programming language
-- Use ChatGPT chat capabilities to further refine your prompts
-- Create images from prompts with DALLE
-- Use the responses in bash functions and aliases to improve and optimize your workflows
+- Instant Answers: Obtain quick and accurate responses to simple questions directly in your shell, streamlining your
+  workflow.
+- Shell Commands Generation: Effortlessly generate and execute shell commands, simplifying complex tasks and enhancing
+  productivity.
+- Code Production: Generate code snippets in various programming languages, making it easier to learn new languages or
+  find solutions to coding problems.
+- ChatGPT Integration: Utilize ChatGPT's interactive chat capabilities to refine your prompts and achieve more precise
+  results, benefiting from the powerful language model.
+- Image Generation with DALLE: Create images from textual prompts using the DALLE API, expanding the range of tasks you
+  can accomplish with the tool.
+- Bash Functions and Aliases: Seamlessly integrate SGPT responses into custom bash functions and aliases, optimizing
+  your workflows and making your daily tasks more efficient.
+
+By offering these versatile features, SGPT serves as a powerful tool to enhance your overall productivity, streamline
+your workflow, and simplify complex tasks.
 
 ## Installation
 
-### For Homebrew Users (macOS, Linux)
+### Linux
 
-Execute the following command in your terminal:
+SGPT has been tested on Ubuntu LTS releases and is expected to be compatible with the following Linux
+distributions:
+
+- Debian
+- Ubuntu
+- Arch Linux
+- Fedora
+
+To install, download the latest release from the [release page](https://github.com/tbckr/sgpt/releases) and use the
+package manager specific to your distribution.
+
+### macOS
+
+For users with Homebrew as their package manager, run the following command in the terminal:
 
 ```shell
 brew install tbckr/tap/sgpt
 ```
 
-### For Scoop Users on Windows
+### Windows
 
-Run these commands in your PowerShell:
+For users with Scoop as their package manager, execute these commands in PowerShell:
 
 ```shell
 scoop bucket add tbckr https://github.com/tbckr/scoop-bucket.git
@@ -60,16 +82,26 @@ scoop install tbckr/sgpt
 
 ### Using Go
 
-If you have Go installed on your system, use this command:
+To install SGPT with Go, based on the git tag, use this command:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@v1.9.0
+go install github.com/tbckr/sgpt/cmd/sgpt@1.10.0
 ```
+
+### Docker
+
+To run SGPT with Docker, use the following command to pull the latest image:
+
+```shell
+docker pull ghcr.io/tbckr/sgpt:latest
+```
+
+Examples on how to use SGPT with Docker can be found [here](#running-queries-with-docker).
 
 ### Other platforms
 
-Visit the GitHub [release page](https://github.com/tbckr/sgpt/releases) and download the latest release for your
-platform.
+For other platforms, visit the GitHub [release page](https://github.com/tbckr/sgpt/releases) and download the latest
+release suitable for your system.
 
 ## Usage Guide
 
