@@ -34,6 +34,7 @@ import (
 
 const (
 	chatRoleFormat = "\033[1m"
+	resetFormat    = "\033[0m"
 )
 
 var (

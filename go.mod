@@ -7,6 +7,7 @@ require (
 	github.com/muesli/roff v0.1.0
 	github.com/sashabaranov/go-openai v1.5.7
 	github.com/spf13/cobra v1.6.1
+	github.com/spf13/jwalterweatherman v1.1.0
 )
 
 require (

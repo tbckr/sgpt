@@ -27,6 +27,8 @@ import (
 	"os"
 	"runtime"
 	"strings"
+
+	jww "github.com/spf13/jwalterweatherman"
 )
 
 const (
@@ -129,17 +131,24 @@ Request:
 `),
 }
 
-var ErrUnsupportedModifier = errors.New("unsupported modifier")
+var (
+	ErrUnsupportedModifier = errors.New("unsupported modifier")
+	ErrUnsupportedOS       = errors.New("unsupported operating system")
+)
 
 func GetModifier(modifier string) (string, error) {
 	switch modifier {
 	case Shell:
 		return completeShellModifier(completionModifierTemplate[Shell])
 	case Code:
-		return completionModifierTemplate[Code], nil
+		codeModifier := completionModifierTemplate[Code]
+		jww.DEBUG.Println("code modifier: ", codeModifier)
+		return codeModifier, nil
 	case Nil:
+		jww.DEBUG.Println("nil modifier")
 		return "", nil
 	default:
+		jww.ERROR.Println(ErrUnsupportedModifier)
 		return "", ErrUnsupportedModifier
 	}
 }
@@ -149,10 +158,14 @@ func GetChatModifier(modifier string) (string, error) {
 	case Shell:
 		return completeShellModifier(chatCompletionModifierTemplate[Shell])
 	case Code:
-		return chatCompletionModifierTemplate[Code], nil
+		codeModifier := chatCompletionModifierTemplate[Code]
+		jww.DEBUG.Println("code modifier: ", codeModifier)
+		return codeModifier, nil
 	case Nil:
+		jww.DEBUG.Println("nil modifier")
 		return "", nil
 	default:
+		jww.ERROR.Println(ErrUnsupportedModifier)
 		return "", ErrUnsupportedModifier
 	}
 }
@@ -162,15 +175,22 @@ func completeShellModifier(template string) (string, error) {
 	shell, ok := os.LookupEnv(envKeyShell)
 	// fallback to manually set shell
 	if !ok {
+		jww.DEBUG.Printf("environment variable %s not set, falling back to manual shell detection", envKeyShell)
 		if operatingSystem == "windows" {
+			jww.DEBUG.Println("detected windows operating system, using powershell")
 			shell = "powershell"
 		} else if operatingSystem == "linux" {
+			jww.DEBUG.Println("detected linux operating system, using bash")
 			shell = "bash"
 		} else if operatingSystem == "darwin" {
+			jww.DEBUG.Println("detected darwin operating system, using zsh")
 			shell = "zsh"
 		} else {
-			return "", fmt.Errorf("unsupported os %s", operatingSystem)
+			jww.ERROR.Printf("%s, OS: %s", ErrUnsupportedOS, operatingSystem)
+			return "", ErrUnsupportedOS
 		}
 	}
-	return fmt.Sprintf(template, shell, operatingSystem, shell, operatingSystem, shell), nil
+	shellModifier := fmt.Sprintf(template, shell, operatingSystem, shell, operatingSystem, shell)
+	jww.DEBUG.Println("shell modifier: ", shellModifier)
+	return shellModifier, nil
 }
