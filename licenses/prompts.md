@@ -5,7 +5,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
 
-- [Default shell and code modifier prompts](#default-shell-and-code-modifier-prompts)
+- [Details](#details)
+  - [Default shell and code modifier prompts](#default-shell-and-code-modifier-prompts)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 ## Details
