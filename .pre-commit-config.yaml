@@ -23,11 +23,22 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
-    -   id: check-added-large-files
+    - id: check-added-large-files
 
 -   repo: local
     hooks:
-    -   id: license-header
-        name: Add license header to files
-        entry: ./scripts/license-header.sh
-        language: script
+    - id: license-header
+      name: Add license header to files
+      entry: ./scripts/license-header.sh
+      language: script
+
+-   repo: local
+    hooks:
+    - id: golangci-lint
+      name: golangci-lint
+      description: Fast linters runner for Go.
+      entry: golangci-lint run --new-from-rev HEAD --fix
+      types: [go]
+      language: golang
+      require_serial: true
+      pass_filenames: false
