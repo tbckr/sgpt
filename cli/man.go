@@ -22,63 +22,31 @@
 package cli
 
 import (
-	"context"
-	"errors"
-	"flag"
 	"fmt"
-	"io"
-	"log"
-	"os"
 
+	mcoral "github.com/muesli/mango-cobra"
+	"github.com/muesli/roff"
 	"github.com/spf13/cobra"
 )
 
-const (
-	resetFormat = "\033[0m"
-)
-
-var (
-	stdout io.Writer = os.Stdout
-	stderr io.Writer = os.Stderr
-
-	rootCmd *cobra.Command
-)
-
-var rootArgs struct {
-	debug bool
-}
-
-// Run runs the CLI. The args do not include the binary name.
-func Run(args []string) {
-	rootCmd = &cobra.Command{
-		Use:   "sgpt",
-		Short: "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			return cmd.Help()
+func manCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                   "man",
+		Short:                 "Generate SGPT's command line reference manual",
+		SilenceUsage:          true,
+		DisableFlagsInUseLine: true,
+		Hidden:                true,
+		Args:                  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			manPage, err := mcoral.NewManPage(1, rootCmd)
+			if err != nil {
+				return err
+			}
+			manPage = manPage.WithSection("Copyright", "(C) 2023 Tim <tbckr>\n"+
+				"Released under the MIT license.")
+			_, err = fmt.Fprintln(stdout, manPage.Build(roff.NewDocument()))
+			return err
 		},
 	}
-	rootCmd.AddCommand(
-		textCmd(),
-		shellCmd(),
-		codeCmd(),
-		imageCmd(),
-		chatCmd(),
-		versionCmd(),
-		licensesCmd(),
-		manCmd(),
-	)
-	persistentFs := rootCmd.PersistentFlags()
-	persistentFs.BoolVarP(&rootArgs.debug, "verbose", "v", false,
-		"enable more verbose output for debugging")
-
-	rootCmd.SetArgs(args)
-	if err := rootCmd.ExecuteContext(context.Background()); err != nil {
-		if errors.Is(err, flag.ErrHelp) {
-			return
-		}
-		if _, err = fmt.Fprintln(stderr, err); err != nil {
-			log.Fatal(err)
-		}
-		os.Exit(1)
-	}
+	return cmd
 }

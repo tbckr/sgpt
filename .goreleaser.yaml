@@ -24,6 +24,7 @@ before:
     # You may remove this if you don't use go modules.
     - go mod tidy
     - ./scripts/completions.sh
+    - ./scripts/manpages.sh
 
 env:
   - GITHUB_USER=tbckr
@@ -80,9 +81,8 @@ archives:
     files:
       - README.md
       - LICENSE.md
-      - licenses/3RDPARTY.md
-      - licenses/licenses.md
       - completions/*
+      - manpages/*
 
 sboms:
   - artifacts: archive
@@ -278,6 +278,7 @@ brews:
       bash_completion.install "completions/sgpt.bash" => "sgpt"
       zsh_completion.install "completions/sgpt.zsh" => "_sgpt"
       fish_completion.install "completions/sgpt.fish"
+      man1.install "manpages/sgpt.1.gz"
 
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
