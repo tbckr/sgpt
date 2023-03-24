@@ -35,7 +35,7 @@ repos:
       name: Check goreleaser config
       entry: bash -c "goreleaser check"
       language: system
-      files: .goreleaser.yaml
+      files: ^\.goreleaser\.yaml$
     - id: golangci-lint
       name: golangci-lint
       description: Fast linters runner for Go.
