@@ -88,8 +88,12 @@ func SessionExists(sessionName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	jww.DEBUG.Println("session exists")
-	return exists, err
+	if exists {
+		jww.DEBUG.Println("session exists")
+		return true, nil
+	}
+	jww.DEBUG.Println("session does not exist")
+	return false, nil
 }
 
 func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
@@ -242,5 +246,6 @@ func DeleteSession(sessionName string) error {
 		jww.ERROR.Println("could not remove file")
 		return err
 	}
+	jww.DEBUG.Println("session deleted")
 	return nil
 }
