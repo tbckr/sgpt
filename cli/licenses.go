@@ -23,9 +23,8 @@ package cli
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
-
-	"github.com/tbckr/sgpt/licenses"
 
 	"github.com/spf13/cobra"
 )
@@ -33,9 +32,9 @@ import (
 func licensesCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "licenses",
-		Short: "List the open source licenses",
+		Short: "List the open source licenses used in this software",
 		Long: strings.TrimSpace(`
-Get the open source licenses SGPT uses in markdown format.
+List the open source licenses used in this software.
 `),
 		RunE: runLicenses,
 		Args: cobra.NoArgs,
@@ -44,6 +43,18 @@ Get the open source licenses SGPT uses in markdown format.
 }
 
 func runLicenses(_ *cobra.Command, _ []string) error {
-	_, err := fmt.Fprintln(stdout, licenses.All())
+	licenses := licensesURL()
+	_, err := fmt.Fprintln(stdout, `To see the open source packages included in SGPT and
+their respective license information, visit:
+
+`+licenses)
 	return err
+}
+
+// licensesURL returns the absolute URL containing open source license information for the current platform.
+func licensesURL() string {
+	switch runtime.GOOS {
+	default:
+		return "https://github.com/tbckr/sgpt/blob/main/licenses/oss-licenses.md"
+	}
 }

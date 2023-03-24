@@ -20,8 +20,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-addlicense -c "Tim <tbckr>" -l MIT -s -check \
-  -ignore ".idea/**" \
-  -ignore "licenses/3RDPARTY.md" \
-  -ignore "licenses/licenses.md" \
-  .
+[ -d licenses ] || mkdir -p licenses
+
+if ! command -v "go-licenses" >/dev/null 2>&1; then
+  echo "go-licenses not found. Install via golang: go install github.com/google/go-licenses@latest"
+  exit 1
+fi
+
+go-licenses report github.com/tbckr/sgpt/cmd/sgpt \
+  --ignore github.com/tbckr/sgpt \
+  --template .github/licenses.tmpl >licenses/oss-licenses.md

@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright (c) 2023 Tim <tbckr>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -20,6 +19,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: check-added-large-files
 
-go-licenses report github.com/tbckr/sgpt/cmd/sgpt \
-  --template .github/licenses.tmpl >licenses/licenses.md
+-   repo: local
+    hooks:
+    -   id: license-header
+        name: Add license header to files
+        entry: ./scripts/set-license-header.sh
+        language: script

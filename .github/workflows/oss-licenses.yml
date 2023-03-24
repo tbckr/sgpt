@@ -30,7 +30,7 @@ on:
     paths:
       - go.mod
       - .github/licenses.tmpl
-      - .github/workflows/licenses.yml
+      - .github/workflows/oss-licenses.yml
   workflow_dispatch:
 
 concurrency:
@@ -49,30 +49,14 @@ jobs:
           go-version-file: go.mod
       - name: Install go-licenses
         run: |
-          go install github.com/google/go-licenses@v1.2.2-0.20220825154955-5eedde1c6584
+          go install github.com/google/go-licenses@latest
       - name: Run go-licenses
         env:
           # include all build tags to include platform-specific dependencies
           GOFLAGS: "-tags=darwin,linux,windows"
         run: |
-          [ -d licenses ] || mkdir -p licenses
-          ./scripts/generate-licenses.sh
-          git config --global user.name 'Tim'
+          ./scripts/oss-licenses.sh
+          git config --global user.name 'tbckr'
           git config --global user.email '11543666+tbckr@users.noreply.github.com'
-          git commit -am "chore: update licenses/licenses.md file"
+          git commit -am "chore: update licenses/oss-licenses.md file"
           git push
-  check-license-header:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version-file: go.mod
-      - name: Install go-licenses
-        run: |
-          go install github.com/google/addlicense@latest
-      - name: Run addlicense check
-        run: |
-          ./scripts/check-license-header.sh

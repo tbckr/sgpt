@@ -2,24 +2,55 @@
 
 The following open source dependencies are used to build the SGPT command.
 
+<!--- Start manually added -->
+## Prompt Modifiers
+
+* Name: shell_gpt
+* Version: caa4fbfb8e8d9bc50ef337510f33eb6eb94238eb
+* License: [MIT](https://github.com/TheR1D/shell_gpt/blob/caa4fbfb8e8d9bc50ef337510f33eb6eb94238eb/LICENSE)
+
+```
+MIT License
+
+Copyright (c) 2023 Farkhod Sadykov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+<!--- End manually added -->
+
 ## Go Packages
 
 Some packages may only be included on certain architectures or operating systems.
 
 ### Overview
 
-- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.6/LICENSE))
-- [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt))
-- [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
-- [github.com/tbckr/sgpt](https://pkg.go.dev/github.com/tbckr/sgpt) ([MIT](https://github.com/tbckr/sgpt/blob/HEAD/LICENSE.md))
+ - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE))
+ - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt))
+ - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
 
 ### Details
 
 #### github.com/sashabaranov/go-openai
 
 * Name: github.com/sashabaranov/go-openai
-* Version: v1.5.6
-* License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.6/LICENSE)
+* Version: v1.5.7
+* License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE)
 
 ```
                                  Apache License
@@ -445,153 +476,6 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-```
-
-#### github.com/tbckr/sgpt
-
-* Name: github.com/tbckr/sgpt
-* Version: Unknown
-* License: [MIT](https://github.com/tbckr/sgpt/blob/HEAD/LICENSE.md)
-
-```
-MIT License
-
-Copyright (c) 2023 Tim
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-```
-
-#### github.com/tbckr/sgpt/cli
-
-* Name: github.com/tbckr/sgpt/cli
-* Version: Unknown
-* License: [MIT](https://github.com/tbckr/sgpt/blob/HEAD/cli/licenses.go)
-
-```
-// Copyright (c) 2023 Tim <tbckr>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// the Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// SPDX-License-Identifier: MIT
-
-package cli
-
-import (
-	"fmt"
-	"strings"
-
-	"github.com/tbckr/sgpt/licenses"
-
-	"github.com/spf13/cobra"
-)
-
-func licensesCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "licenses",
-		Short: "List the open source licenses",
-		Long: strings.TrimSpace(`
-Get the open source licenses SGPT uses in markdown format.
-`),
-		RunE: runLicenses,
-		Args: cobra.NoArgs,
-	}
-	return cmd
-}
-
-func runLicenses(_ *cobra.Command, _ []string) error {
-	_, err := fmt.Fprintln(stdout, licenses.All())
-	return err
-}
-
-```
-
-#### github.com/tbckr/sgpt/licenses
-
-* Name: github.com/tbckr/sgpt/licenses
-* Version: Unknown
-* License: [MIT](https://github.com/tbckr/sgpt/blob/HEAD/licenses/licenses.go)
-
-```
-// Copyright (c) 2023 Tim <tbckr>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// the Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// SPDX-License-Identifier: MIT
-
-package licenses
-
-import (
-	// revive:disable:blank-imports
-	_ "embed"
-	// revive:enable:blank-imports
-	"fmt"
-)
-
-//go:embed licenses.md
-var licenses string
-
-//go:embed 3RDPARTY.md
-var thirdParty string
-
-func Licenses() string {
-	return licenses
-}
-
-func ThirdParty() string {
-	return thirdParty
-}
-
-func All() string {
-	return fmt.Sprintln("# 3rd Party\n\n", ThirdParty(), "\n\n", Licenses())
-}
 
 ```
 
