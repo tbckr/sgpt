@@ -90,12 +90,7 @@ var (
 func GetChatModifier(modifier string) (string, error) {
 	switch modifier {
 	case Shell:
-		shellModifier, err := completeShellModifier(defaultShellTemplateModifier)
-		if err != nil {
-			return "", err
-		}
-		jww.DEBUG.Println("shell modifier: ", shellModifier)
-		return shellModifier, nil
+		return completeShellModifier(defaultShellTemplateModifier)
 	case Code:
 		jww.DEBUG.Println("code modifier: ", defaultCodeModifier)
 		return defaultCodeModifier, nil
