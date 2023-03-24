@@ -24,11 +24,12 @@ package cli
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/spf13/pflag"
 
 	"github.com/spf13/cobra"
 )
@@ -51,8 +52,15 @@ var rootArgs struct {
 // Run runs the CLI. The args do not include the binary name.
 func Run(args []string) {
 	rootCmd = &cobra.Command{
-		Use:   "sgpt",
-		Short: "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
+		Use:                   "sgpt",
+		Short:                 "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
+		DisableFlagsInUseLine: true,
+		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+			if rootArgs.debug {
+				log.SetOutput(stdout)
+				log.SetFlags(log.LstdFlags | log.Lshortfile)
+			}
+		},
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()
 		},
@@ -73,7 +81,7 @@ func Run(args []string) {
 
 	rootCmd.SetArgs(args)
 	if err := rootCmd.ExecuteContext(context.Background()); err != nil {
-		if errors.Is(err, flag.ErrHelp) {
+		if errors.Is(err, pflag.ErrHelp) {
 			return
 		}
 		if _, err = fmt.Fprintln(stderr, err); err != nil {

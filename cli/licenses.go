@@ -36,8 +36,9 @@ func licensesCmd() *cobra.Command {
 		Long: strings.TrimSpace(`
 List the open source licenses used in this software.
 `),
-		RunE: runLicenses,
-		Args: cobra.NoArgs,
+		DisableFlagsInUseLine: true,
+		RunE:                  runLicenses,
+		Args:                  cobra.NoArgs,
 	}
 	return cmd
 }

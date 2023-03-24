@@ -52,6 +52,7 @@ func chatCmd() *cobra.Command {
 		Long: strings.TrimSpace(`
 Manage all open chat sessions - list, show, and delete chat sessions.
 `),
+		DisableFlagsInUseLine: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()
 		},
@@ -64,8 +65,9 @@ Manage all open chat sessions - list, show, and delete chat sessions.
 		Long: strings.TrimSpace(`
 List all chat sessions.
 `),
-		RunE: runChatLsCmd,
-		Args: cobra.NoArgs,
+		DisableFlagsInUseLine: true,
+		RunE:                  runChatLsCmd,
+		Args:                  cobra.NoArgs,
 	}
 
 	showCmd := &cobra.Command{
@@ -75,19 +77,19 @@ List all chat sessions.
 		Long: strings.TrimSpace(`
 Show the conversation for the given chat session.
 `),
-		RunE: runChatShowCmd,
-		Args: cobra.ExactArgs(1),
+		DisableFlagsInUseLine: true,
+		RunE:                  runChatShowCmd,
+		Args:                  cobra.ExactArgs(1),
 	}
 
 	rmCmd := &cobra.Command{
-		Use:   "rm <session name>",
+		Use:   "rm [session name]",
 		Short: "Remove the specified chat session",
 		Long: strings.TrimSpace(`
 Remove the specified chat session. The --all flag removes all chat sessions.
 `),
-		DisableFlagsInUseLine: true,
-		RunE:                  runChatRmCmd,
-		Args:                  cobra.RangeArgs(0, 1),
+		RunE: runChatRmCmd,
+		Args: cobra.RangeArgs(0, 1),
 	}
 	rmFs := rmCmd.Flags()
 	rmFs.BoolVarP(&chatRmArgs.deleteAll, "all", "a", false, "remove all chat sessions")
