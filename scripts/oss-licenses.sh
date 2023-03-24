@@ -20,10 +20,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Help to evaluate licenses and compability: https://dwheeler.com/essays/floss-license-slide.html
+
 [ -d licenses ] || mkdir -p licenses
 
 if ! command -v "go-licenses" >/dev/null 2>&1; then
-  echo "go-licenses not found. Install via golang: go install github.com/google/go-licenses@latest"
+  echo "go-licenses not found. Install via golang: go install github.com/google/go-licenses@v1.6.0"
   exit 1
 fi
 

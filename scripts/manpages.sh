@@ -20,22 +20,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-if ! command -v "addlicense" >/dev/null 2>&1; then
-  echo "addlicense not found. Install via golang: go install github.com/google/addlicense@latest"
-  exit 1
-fi
-
-addlicense -c "Tim <tbckr>" -l MIT -s -v \
-  -ignore ".idea/**" \
-  -ignore "dist/**" \
-  -ignore ".github/licenses.tmpl" \
-  -ignore "licenses/oss-licenses.md" \
-  .
-
-# to check if all files have the correct license header:
-# addlicense -c "Tim <tbckr>" -l MIT -s -check \
-#   -ignore ".idea/**" \
-#   -ignore "dist/" \
-#   -ignore ".github/licenses.tmpl" \
-#   -ignore "licenses/oss-licenses.md" \
-#   .
+set -e
+rm -rf manpages
+mkdir manpages
+go run cmd/sgpt/main.go man | gzip -c -9 >manpages/sgpt.1.gz
