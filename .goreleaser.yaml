@@ -246,6 +246,48 @@ changelog:
     - title: Other work
       order: 9999
 
+nfpms:
+  - file_name_template: '{{ .ConventionalFileName }}'
+    id: packages
+    description: |-
+     SGPT is a command-line tool that provides a convenient way to interact with OpenAI models,
+     enabling users to run queries, generate shell commands, produce code,
+     and create images from text directly from the terminal.
+    maintainer: tbckr
+    license: MIT
+    vendor: SGPT
+    bindir: /usr/bin
+    section: utils
+    contents:
+      - src: ./completions/sgpt.bash
+        dst: /usr/share/bash-completion/completions/sgpt
+        file_info:
+          mode: 0644
+      - src: ./completions/sgpt.fish
+        dst: /usr/share/fish/vendor_completions.d/sgpt.fish
+        file_info:
+          mode: 0644
+      - src: ./completions/sgpt.zsh
+        dst:  /usr/share/zsh/vendor-completions/_sgpt
+        file_info:
+          mode: 0644
+      - src: ./manpages/sgpt.1.gz
+        dst: /usr/share/man/man1/sgpt.1.gz
+        file_info:
+          mode: 0644
+      - src: ./LICENSE.md
+        dst: /usr/share/doc/goreleaser/copyright
+        file_info:
+          mode: 0644
+    formats:
+    - deb
+    - rpm
+    - archlinux
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+
 scoop:
   bucket:
     owner: "{{ .Env.GITHUB_USER }}"
@@ -255,7 +297,10 @@ scoop:
     name: "goreleaserbot"
     email: "11543666+tbckr@users.noreply.github.com"
   commit_msg_template: "chore: Scoop update for {{ .ProjectName }} version {{ .Tag }}"
-  description: "SGPT is a command-line tool that provides a convenient way to interact with OpenAI models, enabling users to run queries, generate shell commands, produce code, and create images from text directly from the terminal."
+  description: |-
+   SGPT is a command-line tool that provides a convenient way to interact with OpenAI models,
+   enabling users to run queries, generate shell commands, produce code,
+   and create images from text directly from the terminal.
   license: MIT
 
 brews:
@@ -268,7 +313,10 @@ brews:
       email: "11543666+tbckr@users.noreply.github.com"
     commit_msg_template: "chore: Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     folder: Formula
-    description: "SGPT is a command-line tool that provides a convenient way to interact with OpenAI models, enabling users to run queries, generate shell commands, produce code, and create images from text directly from the terminal."
+    description: |-
+     SGPT is a command-line tool that provides a convenient way to interact with OpenAI models,
+     enabling users to run queries, generate shell commands, produce code,
+     and create images from text directly from the terminal.
     license: MIT
     dependencies:
     - name: go
