@@ -1,7 +1,11 @@
 # Prompt Modifiers
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
+
+- [Default shell and code modifier prompts](#default-shell-and-code-modifier-prompts)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Default shell and code modifier prompts
