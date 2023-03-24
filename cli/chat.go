@@ -26,6 +26,8 @@ import (
 	"fmt"
 	"strings"
 
+	jww "github.com/spf13/jwalterweatherman"
+
 	"github.com/tbckr/sgpt/chat"
 
 	"github.com/sashabaranov/go-openai"
@@ -118,6 +120,7 @@ func runChatLsCmd(_ *cobra.Command, _ []string) error {
 
 func runChatShowCmd(_ *cobra.Command, args []string) error {
 	if len(args) != 1 {
+		jww.ERROR.Println("No chat session name provided")
 		return ErrMissingChatSession
 	}
 	sessionName := args[0]
@@ -133,6 +136,7 @@ func runChatShowCmd(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	jww.DEBUG.Println("showing conversation")
 	return showConversation(messages)
 }
 
@@ -150,6 +154,7 @@ func runChatRmCmd(_ *cobra.Command, args []string) error {
 	// Get session/s
 	var chatSessions []string
 	if chatRmArgs.deleteAll {
+		jww.DEBUG.Println("deleting all chat sessions")
 		retrievedSessions, err := chat.ListSessions()
 		if err != nil {
 			return err
@@ -157,9 +162,11 @@ func runChatRmCmd(_ *cobra.Command, args []string) error {
 		chatSessions = append(chatSessions, retrievedSessions...)
 	} else {
 		if len(args) != 1 {
+			jww.ERROR.Println("No chat session name provided")
 			return ErrMissingChatSession
 		}
 		sessionName := args[0]
+		jww.DEBUG.Println("deleting chat session ", sessionName)
 		chatSessions = append(chatSessions, sessionName)
 	}
 	return deleteChatSessions(chatSessions)
