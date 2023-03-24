@@ -53,6 +53,8 @@ func Run(args []string) {
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
 			if rootArgs.debug {
 				jww.SetStdoutThreshold(jww.LevelDebug)
+			} else {
+				jww.SetStdoutThreshold(jww.LevelCritical)
 			}
 		},
 		RunE: func(cmd *cobra.Command, _ []string) error {
@@ -75,7 +77,9 @@ func Run(args []string) {
 
 	rootCmd.SetArgs(args)
 	if err := rootCmd.ExecuteContext(context.Background()); err != nil {
-		jww.ERROR.Println(err)
+		if rootArgs.debug {
+			jww.ERROR.Println(err)
+		}
 		if _, err = fmt.Fprintln(stderr, err); err != nil {
 			jww.ERROR.Println(err)
 		}
