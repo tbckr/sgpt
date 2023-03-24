@@ -42,6 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -51,14 +52,23 @@ jobs:
           go-version-file: go.mod
       - name: Install go-licenses
         run: |
-          go install github.com/google/go-licenses@latest
+          go install github.com/google/go-licenses@5348b744d0983d85713295ea08a20cca1654a45e # v1.6.0
       - name: Run go-licenses
         env:
           # include all build tags to include platform-specific dependencies
           GOFLAGS: "-tags=darwin,linux,windows"
         run: |
           ./scripts/oss-licenses.sh
-          git config --global user.name 'tbckr'
-          git config --global user.email '11543666+tbckr@users.noreply.github.com'
-          git commit -am "chore: update licenses/oss-licenses.md file"
-          git push
+      - name: Send pull request
+        uses: peter-evans/create-pull-request@38e0b6e68b4c852a5500a94740f0e535e0d7ba54 # v4.2.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          author: License Updater <11543666+tbckr@users.noreply.github.com>
+          committer: License Updater <11543666+tbckr@users.noreply.github.com>
+          branch: licenses/oss-licenses
+          commit-message: "chore(licenses): update oss licenses"
+          title: "licenses: update oss licenses"
+          body: Triggered by ${{ github.repository }}@${{ github.sha }}
+          signoff: true
+          delete-branch: true
+          reviewers: tbckr
