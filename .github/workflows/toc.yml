@@ -28,6 +28,7 @@ on:
     paths:
       - 'README.md'
       - 'DEVELOPMENT.md'
+      - 'licenses/prompts.md'
 
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
@@ -44,4 +45,4 @@ jobs:
         uses: technote-space/toc-generator@v4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_PATHS: "README.md,DEVELOPMENT.md"
+          TARGET_PATHS: "README.md,DEVELOPMENT.md,licenses/prompts.md"

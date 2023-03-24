@@ -29,7 +29,7 @@ addlicense -c "Tim <tbckr>" -l MIT -s -v \
   -ignore ".idea/**" \
   -ignore "dist/**" \
   -ignore ".github/licenses.tmpl" \
-  -ignore "licenses/oss-licenses.md" \
+  -ignore "licenses/*" \
   .
 
 # to check if all files have the correct license header:
@@ -37,5 +37,5 @@ addlicense -c "Tim <tbckr>" -l MIT -s -v \
 #   -ignore ".idea/**" \
 #   -ignore "dist/" \
 #   -ignore ".github/licenses.tmpl" \
-#   -ignore "licenses/oss-licenses.md" \
+#   -ignore "licenses/*" \
 #   .
