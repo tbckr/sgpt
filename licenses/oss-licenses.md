@@ -3,7 +3,7 @@
 The following open source dependencies are used to build the SGPT command.
 Some packages may only be included on certain architectures or operating systems.
 
-### Overview
+## Overview
 
  - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.0.1/LICENSE))
  - [github.com/muesli/mango](https://pkg.go.dev/github.com/muesli/mango) ([MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE))
@@ -15,9 +15,9 @@ Some packages may only be included on certain architectures or operating systems
  - [github.com/spf13/jwalterweatherman](https://pkg.go.dev/github.com/spf13/jwalterweatherman) ([MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE))
  - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
 
-### Details
+## Details
 
-#### github.com/inconshreveable/mousetrap
+### github.com/inconshreveable/mousetrap
 
 * Name: github.com/inconshreveable/mousetrap
 * Version: v1.0.1
@@ -228,7 +228,7 @@ Some packages may only be included on certain architectures or operating systems
 
 ```
 
-#### github.com/muesli/mango
+### github.com/muesli/mango
 
 * Name: github.com/muesli/mango
 * Version: v0.1.0
@@ -259,7 +259,7 @@ SOFTWARE.
 
 ```
 
-#### github.com/muesli/mango-cobra
+### github.com/muesli/mango-cobra
 
 * Name: github.com/muesli/mango-cobra
 * Version: v1.2.0
@@ -290,7 +290,7 @@ SOFTWARE.
 
 ```
 
-#### github.com/muesli/mango-pflag
+### github.com/muesli/mango-pflag
 
 * Name: github.com/muesli/mango-pflag
 * Version: v0.1.0
@@ -321,7 +321,7 @@ SOFTWARE.
 
 ```
 
-#### github.com/muesli/roff
+### github.com/muesli/roff
 
 * Name: github.com/muesli/roff
 * Version: v0.1.0
@@ -352,7 +352,7 @@ SOFTWARE.
 
 ```
 
-#### github.com/sashabaranov/go-openai
+### github.com/sashabaranov/go-openai
 
 * Name: github.com/sashabaranov/go-openai
 * Version: v1.5.7
@@ -563,7 +563,7 @@ SOFTWARE.
 
 ```
 
-#### github.com/spf13/cobra
+### github.com/spf13/cobra
 
 * Name: github.com/spf13/cobra
 * Version: v1.6.1
@@ -747,7 +747,7 @@ SOFTWARE.
 
 ```
 
-#### github.com/spf13/jwalterweatherman
+### github.com/spf13/jwalterweatherman
 
 * Name: github.com/spf13/jwalterweatherman
 * Version: v1.1.0
@@ -777,7 +777,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-#### github.com/spf13/pflag
+### github.com/spf13/pflag
 
 * Name: github.com/spf13/pflag
 * Version: v1.0.5
