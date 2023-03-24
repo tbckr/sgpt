@@ -45,9 +45,10 @@ var (
 	DefaultModel     = strings.Clone(openai.GPT3Dot5Turbo)
 	DefaultImageSize = strings.Clone(openai.CreateImageSize256x256)
 
-	ErrMissingAPIKey    = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
-	ErrChatNotSupported = errors.New("chat is not supported for this model")
-	ErrModelCurieSize   = fmt.Errorf("model %s must not have more than 1024 in total", openai.GPT3TextCurie001)
+	ErrMissingAPIKey        = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
+	ErrModelCurieSize       = fmt.Errorf("model %s must not have more than 1024 in total", openai.GPT3TextCurie001)
+	ErrChatNotSupported     = errors.New("chat is not supported for this model")
+	ErrModifierNotSupported = errors.New("modifier is not supported for this model")
 )
 
 var SupportedModels = []string{
@@ -112,8 +113,13 @@ func (c *Client) validateCompletionOptions(options CompletionOptions) error {
 	}
 	// A completion does not support chat
 	if options.ChatSession != "" {
-		jww.ERROR.Printf("Chat with model %s is not supported", options.Model)
+		jww.ERROR.Printf("Chat with model %s is not supported\n", options.Model)
 		return ErrChatNotSupported
+	}
+	// A completion does not support modifiers
+	if options.Modifier != "" {
+		jww.ERROR.Println("Modifiers are not supported for not chat based models")
+		return ErrModifierNotSupported
 	}
 	jww.DEBUG.Println("Completion options are valid")
 	return nil
@@ -123,13 +129,9 @@ func (c *Client) GetCompletion(ctx context.Context, options CompletionOptions, p
 	if err := c.validateCompletionOptions(options); err != nil {
 		return "", err
 	}
-	modifierPrompt, err := modifiers.GetModifier(options.Modifier)
-	if err != nil {
-		return "", err
-	}
 	// Do request
 	req := openai.CompletionRequest{
-		Prompt:      modifierPrompt + prompt,
+		Prompt:      prompt,
 		Model:       options.Model,
 		MaxTokens:   options.MaxTokens,
 		Temperature: options.Temperature,
