@@ -49,6 +49,7 @@ Some packages may only be included on certain architectures or operating systems
  - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
  - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE))
  - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt))
+ - [github.com/spf13/jwalterweatherman](https://pkg.go.dev/github.com/spf13/jwalterweatherman) ([MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE))
  - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
 
 ### Details
@@ -781,6 +782,36 @@ SOFTWARE.
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
+```
+
+#### github.com/spf13/jwalterweatherman
+
+* Name: github.com/spf13/jwalterweatherman
+* Version: v1.1.0
+* License: [MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE)
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2014 Steve Francia
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 #### github.com/spf13/pflag
