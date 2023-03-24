@@ -5,8 +5,10 @@ The following open source dependencies are used to build the SGPT command.
 <!--- Start manually added -->
 ## Prompt Modifiers
 
-* Name: shell_gpt
-* Version: caa4fbfb8e8d9bc50ef337510f33eb6eb94238eb
+### github.com/TheR1D/shell_gpt
+
+* Name: github.com/TheR1D/shell_gpt
+* Version: caa4fbfb8e8d9bc50ef337510f33eb6eb94238eb (git revision)
 * License: [MIT](https://github.com/TheR1D/shell_gpt/blob/caa4fbfb8e8d9bc50ef337510f33eb6eb94238eb/LICENSE)
 
 ```
