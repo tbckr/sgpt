@@ -47,12 +47,13 @@ concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   golangci:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
     name: golangci-lint
     steps:
       # Checkout repo
@@ -70,9 +71,6 @@ jobs:
 
   goreleaser:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
     name: goreleaser-check
     steps:
       # Checkout repo
