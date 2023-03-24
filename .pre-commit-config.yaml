@@ -31,9 +31,6 @@ repos:
       name: Add license header to files
       entry: ./scripts/license-header.sh
       language: script
-
--   repo: local
-    hooks:
     - id: golangci-lint
       name: golangci-lint
       description: Fast linters runner for Go.
