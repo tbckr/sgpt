@@ -31,6 +31,8 @@ import (
 	"regexp"
 	"unicode/utf8"
 
+	jww "github.com/spf13/jwalterweatherman"
+
 	"github.com/sashabaranov/go-openai"
 	"github.com/tbckr/sgpt/filesystem"
 )
@@ -56,16 +58,20 @@ func getFilepathForSession(sessionName string) (string, error) {
 		return "", err
 	}
 	filePath := path.Join(dir, sessionName)
+	jww.DEBUG.Printf("file path for session %s: %s", sessionName, filePath)
 	return filePath, nil
 }
 
 func validateSession(sessionName string) error {
 	if !sessionNameMatcher.Match([]byte(sessionName)) {
+		jww.ERROR.Printf("session name %s does not match regex %s", sessionName, sessionNameRegex)
 		return ErrChatSessionNameInvalid
 	}
 	if utf8.RuneCountInString(sessionName) > sessionNameMaxLength {
+		jww.ERROR.Printf("session name is too long (max length is %d)", sessionNameMaxLength)
 		return ErrChatSessionNameTooLong
 	}
+	jww.DEBUG.Println("session name is valid")
 	return nil
 }
 
@@ -77,7 +83,13 @@ func SessionExists(sessionName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return filesystem.FileExists(filepath)
+	var exists bool
+	exists, err = filesystem.FileExists(filepath)
+	if err != nil {
+		return false, err
+	}
+	jww.DEBUG.Println("session exists")
+	return exists, err
 }
 
 func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
@@ -106,6 +118,7 @@ func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 	var file *os.File
 	file, err = os.Open(filepath)
 	if err != nil {
+		jww.ERROR.Println("could not open file")
 		return nil, err
 	}
 	defer file.Close()
@@ -122,8 +135,10 @@ func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 		data = scanner.Bytes()
 		readMessage = openai.ChatCompletionMessage{}
 		if err = json.Unmarshal(data, &readMessage); err != nil {
+			jww.ERROR.Println("could not unmarshal message")
 			return nil, err
 		}
+		jww.DEBUG.Printf("read message: %+v\n", readMessage)
 		messages = append(messages, readMessage)
 	}
 	return messages, nil
@@ -151,15 +166,19 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 	// Open file
 	var file *os.File
 	if exists {
+		jww.DEBUG.Println("session already exists, opening file for truncation")
 		// Open and truncate existing file
 		file, err = os.OpenFile(filepath, os.O_WRONLY|os.O_TRUNC, defaultFilePermissions)
 		if err != nil {
+			jww.ERROR.Println("could not open file for truncation")
 			return err
 		}
 	} else {
+		jww.DEBUG.Println("session does not exist, creating file")
 		// Create file
 		file, err = os.Create(filepath)
 		if err != nil {
+			jww.ERROR.Println("could not create file")
 			return err
 		}
 	}
@@ -168,15 +187,19 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 	// Save messages to file
 	var data []byte
 	for _, message := range messages {
+		jww.DEBUG.Printf("writing following message to file: %+v\n", message)
 		data, err = json.Marshal(message)
 		if err != nil {
+			jww.ERROR.Println("could not marshal message")
 			return err
 		}
 		_, err = file.WriteString(string(data) + "\n")
 		if err != nil {
+			jww.ERROR.Println("could not write message to file")
 			return err
 		}
 	}
+	jww.DEBUG.Println("session saved")
 	return nil
 }
 
@@ -188,10 +211,12 @@ func ListSessions() ([]string, error) {
 	var dirFiles []os.DirEntry
 	dirFiles, err = os.ReadDir(dir)
 	if err != nil {
+		jww.ERROR.Println("could not read directory")
 		return nil, err
 	}
 	var files []string
 	for _, file := range dirFiles {
+		jww.DEBUG.Printf("found file: %s\n", file.Name())
 		files = append(files, file.Name())
 	}
 	return files, nil
@@ -208,7 +233,13 @@ func DeleteSession(sessionName string) error {
 		return err
 	}
 	if !exists {
+		jww.DEBUG.Println("session does not exist, skipping deletion")
 		return nil
 	}
-	return os.Remove(filepath)
+	err = os.Remove(filepath)
+	if err != nil {
+		jww.ERROR.Println("could not remove file")
+		return err
+	}
+	return nil
 }
