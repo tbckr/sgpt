@@ -214,6 +214,7 @@ func ListSessions() ([]string, error) {
 		jww.ERROR.Println("could not read directory")
 		return nil, err
 	}
+	jww.DEBUG.Println("listing sessions")
 	var files []string
 	for _, file := range dirFiles {
 		jww.DEBUG.Printf("found file: %s\n", file.Name())
