@@ -19,7 +19,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: go-licenses
+name: oss-licenses
 
 on:
   # run action when a change lands in the main branch which updates go.mod or

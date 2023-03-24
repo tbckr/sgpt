@@ -19,7 +19,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Create Github Release
+name: Github Release
 
 on:
   push:
