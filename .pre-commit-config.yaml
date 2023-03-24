@@ -29,5 +29,5 @@ repos:
     hooks:
     -   id: license-header
         name: Add license header to files
-        entry: ./scripts/set-license-header.sh
+        entry: ./scripts/license-header.sh
         language: script
