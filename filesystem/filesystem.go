@@ -26,6 +26,7 @@ import (
 	"encoding/base64"
 	"os"
 	"path"
+	"strings"
 
 	jww "github.com/spf13/jwalterweatherman"
 )
@@ -78,6 +79,7 @@ func CreateRandomFileSuffix(size int) (string, error) {
 	}
 	// Encode the byte slice as a string using base64 encoding
 	randomSuffix := base64.URLEncoding.EncodeToString(b)
+	randomSuffix = strings.TrimSuffix(randomSuffix, "==")
 	jww.DEBUG.Println("Generated random file suffix: ", randomSuffix)
 	return randomSuffix, nil
 }
