@@ -21,6 +21,7 @@
 
 prompts:
   - id: "prompt-generator"
+    source: "https://www.skool.com/chatgpt/promptgenerator?p=1e5ede93"
     messages:
       - role: system
         message: >-
