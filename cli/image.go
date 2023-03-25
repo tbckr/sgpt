@@ -50,7 +50,6 @@ Create an AI generated image with the DALLE API.
 Downloaded images have the filename pattern: <prefix>-<random suffix>.png
 `),
 		RunE: runImage,
-		Args: cobra.ExactArgs(1),
 	}
 	fs := cmd.Flags()
 	fs.IntVarP(&imageArgs.count, "count", "c", 1, "number of images to generate")

@@ -49,7 +49,6 @@ Query a openai model for a shell command. The retrieved command can be executed 
 The supported completion models can be listed via: "sgpt txt --help"
 `),
 		RunE: runShell,
-		Args: cobra.ExactArgs(1),
 	}
 	fs := cmd.Flags()
 	fs.StringVarP(&shellArgs.model, "model", "m", api.DefaultModel, "model name")

@@ -46,7 +46,6 @@ func textCmd() *cobra.Command {
 		Long: strings.TrimSpace(fmt.Sprintf(`
 Query a openai model for a text completion. The following models are supported: %s.
 `, strings.Join(api.SupportedModels, ", "))),
-		Args: cobra.ExactArgs(1),
 		RunE: runText,
 	}
 	fs := cmd.Flags()

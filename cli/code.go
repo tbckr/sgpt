@@ -48,7 +48,6 @@ Query a openai model for code specific questions.
 The supported completion models can be listed via: "sgpt txt --help"
 `),
 		RunE: runCode,
-		Args: cobra.ExactArgs(1),
 	}
 	fs := cmd.Flags()
 	fs.StringVarP(&codeArgs.model, "model", "m", api.DefaultModel, "model name")
