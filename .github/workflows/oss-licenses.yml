@@ -48,10 +48,12 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v4
-        with:
-          go-version-file: go.mod
       - name: Install go-licenses
+        with:
+          cache: true
         run: |
+          go env
+          go mod download
           go install github.com/google/go-licenses@5348b744d0983d85713295ea08a20cca1654a45e # v1.6.0
       - name: Run go-licenses
         env:
@@ -71,4 +73,3 @@ jobs:
           body: Triggered by ${{ github.repository }}@${{ github.sha }}
           signoff: true
           delete-branch: true
-          reviewers: tbckr

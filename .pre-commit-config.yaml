@@ -43,8 +43,6 @@ repos:
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.22.0
     hooks:
-      - id: check-github-actions
-        files: ^\.github/workflows/.*\.ya?ml$
       - id: check-github-workflows
         files: ^\.github/workflows/.*\.ya?ml$
 
