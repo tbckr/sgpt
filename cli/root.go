@@ -62,6 +62,7 @@ func Run(args []string) {
 		},
 	}
 	rootCmd.AddCommand(
+		checkCmd(),
 		textCmd(),
 		shellCmd(),
 		codeCmd(),
