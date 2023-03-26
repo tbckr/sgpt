@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"github.com/tbckr/sgpt/api"
-	"github.com/tbckr/sgpt/filesystem"
+	"github.com/tbckr/sgpt/fs"
 
 	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/image"
@@ -97,7 +97,7 @@ func handleImageURLs(images []string) error {
 	var filename string
 	for _, data := range images {
 		if imageArgs.download {
-			suffix, err := filesystem.CreateRandomFileSuffix(10)
+			suffix, err := fs.CreateRandomFileSuffix(10)
 			if err != nil {
 				return err
 			}

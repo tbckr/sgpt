@@ -19,7 +19,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package filesystem
+package fs
 
 import (
 	"crypto/rand"

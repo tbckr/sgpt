@@ -34,7 +34,7 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt/filesystem"
+	"github.com/tbckr/sgpt/fs"
 )
 
 const (
@@ -53,7 +53,7 @@ var (
 )
 
 func getFilepathForSession(sessionName string) (string, error) {
-	dir, err := filesystem.GetAppCacheDir(appDirName)
+	dir, err := fs.GetAppCacheDir(appDirName)
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +84,7 @@ func SessionExists(sessionName string) (bool, error) {
 		return false, err
 	}
 	var exists bool
-	exists, err = filesystem.FileExists(filepath)
+	exists, err = fs.FileExists(filepath)
 	if err != nil {
 		return false, err
 	}
@@ -110,7 +110,7 @@ func GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 
 	// Check, if session exists
 	var exists bool
-	exists, err = filesystem.FileExists(filepath)
+	exists, err = fs.FileExists(filepath)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 
 	// Check, if session exists
 	var exists bool
-	exists, err = filesystem.FileExists(filepath)
+	exists, err = fs.FileExists(filepath)
 	if err != nil {
 		return err
 	}
@@ -208,7 +208,7 @@ func SaveSession(sessionName string, messages []openai.ChatCompletionMessage) er
 }
 
 func ListSessions() ([]string, error) {
-	dir, err := filesystem.GetAppCacheDir(appDirName)
+	dir, err := fs.GetAppCacheDir(appDirName)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func DeleteSession(sessionName string) error {
 		return err
 	}
 	var exists bool
-	exists, err = filesystem.FileExists(filepath)
+	exists, err = fs.FileExists(filepath)
 	if err != nil {
 		return err
 	}

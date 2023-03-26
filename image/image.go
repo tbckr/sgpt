@@ -31,7 +31,7 @@ import (
 
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/tbckr/sgpt/filesystem"
+	"github.com/tbckr/sgpt/fs"
 )
 
 const DefaultExtension = ".png"
@@ -54,7 +54,7 @@ func SaveB64EncodedImage(filename, imageData string) error {
 	}
 
 	var exists bool
-	exists, err = filesystem.FileExists(filename)
+	exists, err = fs.FileExists(filename)
 	if err != nil {
 		return err
 	}
