@@ -23,7 +23,7 @@ Some packages may only be included on certain architectures or operating systems
 * Version: v1.0.1
 * License: [Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.0.1/LICENSE)
 
-```
+```text
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -234,7 +234,7 @@ Some packages may only be included on certain architectures or operating systems
 * Version: v0.1.0
 * License: [MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE)
 
-```
+```text
 MIT License
 
 Copyright (c) 2022 Christian Muehlhaeuser
@@ -265,7 +265,7 @@ SOFTWARE.
 * Version: v1.2.0
 * License: [MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE)
 
-```
+```text
 MIT License
 
 Copyright (c) 2022 Christian Muehlhaeuser
@@ -296,7 +296,7 @@ SOFTWARE.
 * Version: v0.1.0
 * License: [MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE)
 
-```
+```text
 MIT License
 
 Copyright (c) 2022 Christian Muehlhaeuser
@@ -327,7 +327,7 @@ SOFTWARE.
 * Version: v0.1.0
 * License: [MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE)
 
-```
+```text
 MIT License
 
 Copyright (c) 2022 Christian Muehlhaeuser
@@ -358,7 +358,7 @@ SOFTWARE.
 * Version: v1.5.7
 * License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE)
 
-```
+```text
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -569,7 +569,7 @@ SOFTWARE.
 * Version: v1.6.1
 * License: [Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt)
 
-```
+```text
                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -753,7 +753,7 @@ SOFTWARE.
 * Version: v1.1.0
 * License: [MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE)
 
-```
+```text
 The MIT License (MIT)
 
 Copyright (c) 2014 Steve Francia
@@ -783,7 +783,7 @@ SOFTWARE.
 * Version: v1.0.5
 * License: [BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE)
 
-```
+```text
 Copyright (c) 2012 Alex Ogier. All rights reserved.
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
