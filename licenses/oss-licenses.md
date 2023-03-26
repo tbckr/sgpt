@@ -5,23 +5,23 @@ Some packages may only be included on certain architectures or operating systems
 
 ## Overview
 
- - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.0.1/LICENSE))
- - [github.com/muesli/mango](https://pkg.go.dev/github.com/muesli/mango) ([MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE))
- - [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
- - [github.com/muesli/mango-pflag](https://pkg.go.dev/github.com/muesli/mango-pflag) ([MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE))
- - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
- - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE))
- - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt))
- - [github.com/spf13/jwalterweatherman](https://pkg.go.dev/github.com/spf13/jwalterweatherman) ([MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE))
- - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
+- [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.0.1/LICENSE))
+- [github.com/muesli/mango](https://pkg.go.dev/github.com/muesli/mango) ([MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE))
+- [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
+- [github.com/muesli/mango-pflag](https://pkg.go.dev/github.com/muesli/mango-pflag) ([MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE))
+- [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
+- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE))
+- [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt))
+- [github.com/spf13/jwalterweatherman](https://pkg.go.dev/github.com/spf13/jwalterweatherman) ([MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE))
+- [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
 
 ## Details
 
 ### github.com/inconshreveable/mousetrap
 
-* Name: github.com/inconshreveable/mousetrap
-* Version: v1.0.1
-* License: [Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.0.1/LICENSE)
+- Name: github.com/inconshreveable/mousetrap
+- Version: v1.0.1
+- License: [Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.0.1/LICENSE)
 
 ```text
                                  Apache License
@@ -230,9 +230,9 @@ Some packages may only be included on certain architectures or operating systems
 
 ### github.com/muesli/mango
 
-* Name: github.com/muesli/mango
-* Version: v0.1.0
-* License: [MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE)
+- Name: github.com/muesli/mango
+- Version: v0.1.0
+- License: [MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE)
 
 ```text
 MIT License
@@ -261,9 +261,9 @@ SOFTWARE.
 
 ### github.com/muesli/mango-cobra
 
-* Name: github.com/muesli/mango-cobra
-* Version: v1.2.0
-* License: [MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE)
+- Name: github.com/muesli/mango-cobra
+- Version: v1.2.0
+- License: [MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE)
 
 ```text
 MIT License
@@ -292,9 +292,9 @@ SOFTWARE.
 
 ### github.com/muesli/mango-pflag
 
-* Name: github.com/muesli/mango-pflag
-* Version: v0.1.0
-* License: [MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE)
+- Name: github.com/muesli/mango-pflag
+- Version: v0.1.0
+- License: [MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE)
 
 ```text
 MIT License
@@ -323,9 +323,9 @@ SOFTWARE.
 
 ### github.com/muesli/roff
 
-* Name: github.com/muesli/roff
-* Version: v0.1.0
-* License: [MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE)
+- Name: github.com/muesli/roff
+- Version: v0.1.0
+- License: [MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE)
 
 ```text
 MIT License
@@ -354,9 +354,9 @@ SOFTWARE.
 
 ### github.com/sashabaranov/go-openai
 
-* Name: github.com/sashabaranov/go-openai
-* Version: v1.5.7
-* License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE)
+- Name: github.com/sashabaranov/go-openai
+- Version: v1.5.7
+- License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.5.7/LICENSE)
 
 ```text
                                  Apache License
@@ -565,9 +565,9 @@ SOFTWARE.
 
 ### github.com/spf13/cobra
 
-* Name: github.com/spf13/cobra
-* Version: v1.6.1
-* License: [Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt)
+- Name: github.com/spf13/cobra
+- Version: v1.6.1
+- License: [Apache-2.0](https://github.com/spf13/cobra/blob/v1.6.1/LICENSE.txt)
 
 ```text
                                 Apache License
@@ -749,9 +749,9 @@ SOFTWARE.
 
 ### github.com/spf13/jwalterweatherman
 
-* Name: github.com/spf13/jwalterweatherman
-* Version: v1.1.0
-* License: [MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE)
+- Name: github.com/spf13/jwalterweatherman
+- Version: v1.1.0
+- License: [MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -779,9 +779,9 @@ SOFTWARE.
 
 ### github.com/spf13/pflag
 
-* Name: github.com/spf13/pflag
-* Version: v1.0.5
-* License: [BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE)
+- Name: github.com/spf13/pflag
+- Version: v1.0.5
+- License: [BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE)
 
 ```text
 Copyright (c) 2012 Alex Ogier. All rights reserved.
