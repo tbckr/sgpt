@@ -1,6 +1,7 @@
 # Prompt Modifiers
 
 ## Overview
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
@@ -9,15 +10,16 @@
   - [Default shell and code modifier prompts](#default-shell-and-code-modifier-prompts)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Details
 
 ### Default shell and code modifier prompts
 
-* Name: github.com/TheR1D/shell_gpt
-* Version: 1312526af4ee531be531db035bda22ad88fd9edb (git revision)
-* License: [MIT](https://github.com/TheR1D/shell_gpt/blob/1312526af4ee531be531db035bda22ad88fd9edb/LICENSE)
+- Name: github.com/TheR1D/shell_gpt
+- Version: 1312526af4ee531be531db035bda22ad88fd9edb
+- License: [MIT](https://github.com/TheR1D/shell_gpt/blob/1312526af4ee531be531db035bda22ad88fd9edb/LICENSE)
 
-```
+```text
 MIT License
 
 Copyright (c) 2023 Farkhod Sadykov

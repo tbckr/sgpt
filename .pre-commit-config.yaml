@@ -41,7 +41,7 @@ repos:
 
    # GitHub Actions hooks
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.21.0
+    rev: 0.22.0
     hooks:
       - id: check-github-actions
         files: ^\.github/workflows/.*\.ya?ml$
@@ -51,11 +51,11 @@ repos:
   - repo: local
     hooks:
     - id: license-header
-      name: Add license header to files
+      name: add license header to files
       entry: ./scripts/license-header.sh
       language: script
     - id: goreleaser
-      name: Check goreleaser config
+      name: check goreleaser config
       entry: bash -c "goreleaser check"
       language: system
       files: ^\.goreleaser\.yaml$

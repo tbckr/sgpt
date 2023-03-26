@@ -5,7 +5,6 @@ your terminal. Effortlessly run queries, generate shell commands or code, create
 simple commands. Streamline your workflow and enhance productivity with this powerful and user-friendly CLI tool.
 
 Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
-
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
@@ -117,11 +116,11 @@ To use the OpenAI API, you must first obtain an API key.
 3. On Linux or macOS: Update your `.bashrc` or `.zshrc` file to include the following export statement adding your API
    key as the value:
 
-```shell
-export OPENAI_API_KEY="sk-..."
-```
+  ```shell
+  export OPENAI_API_KEY="sk-..."
+  ```
 
-4. On Windows: [Update your environment variables](https://geekflare.com/system-environment-variables-in-windows/) to
+1. On Windows: [Update your environment variables](https://geekflare.com/system-environment-variables-in-windows/) to
    include the `OPENAI_API_KEY` variable with your API key as the value.
 
 After completing these steps, you'll have an OpenAI API key that can be used to interact with the OpenAI models through
@@ -155,19 +154,17 @@ The example below demonstrates how to fine-tune the model's responses for more t
 
 1. The first command initiates a chat session named `ls-files` and asks the model to "list all files directory":
 
-```shell
-$ sgpt sh --chat ls-files "list all files directory"
-ls
-```
+  ```shell
+  $ sgpt sh --chat ls-files "list all files directory"
+  ls
+  ```
 
-The model responds with the shell command ls, which is used to list all files in a directory.
+1. The second command continues the conversation within the `ls-files` chat session and requests to "sort by name":
 
-2. The second command continues the conversation within the `ls-files` chat session and requests to "sort by name":
-
-```shell
-$ sgpt sh --chat ls-files "sort by name"
-ls | sort
-```
+  ```shell
+  $ sgpt sh --chat ls-files "sort by name"
+  ls | sort
+  ```
 
 The model provides the appropriate shell command `ls | sort`, which lists all files in a directory and sorts them by
 name.
@@ -185,16 +182,16 @@ For users who prefer to use Docker, SGPT provides a Docker image:
 
 1. Pull the latest Docker image:
 
-```shell
-docker pull ghcr.io/tbckr/sgpt:latest
-```
+  ```shell
+  docker pull ghcr.io/tbckr/sgpt:latest
+  ```
 
-2. Run queries using the Docker image:
+1. Run queries using the Docker image:
 
-```shell
-$ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} ghcr.io/tbckr/sgpt:latest txt "mass of sun"
-The mass of the sun is approximately 1.989 x 10^30 kilograms.
-```
+  ```shell
+  $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} ghcr.io/tbckr/sgpt:latest txt "mass of sun"
+  The mass of the sun is approximately 1.989 x 10^30 kilograms.
+  ```
 
 ### Saving Chat Sessions in Docker
 
@@ -206,32 +203,32 @@ To mount a local folder and save chat sessions, follow these steps:
 
 1. Pull the SGPT Docker image:
 
-```shell
-$ docker pull ghcr.io/tbckr/sgpt:latest
-```
+  ```shell
+  docker pull ghcr.io/tbckr/sgpt:latest
+  ```
 
-2. Create a local folder to store your chat sessions, e.g. `sgpt-chat-sessions`:
+1. Create a local folder to store your chat sessions, e.g. `sgpt-chat-sessions`:
 
-```shell
-mkdir sgpt-chat-sessions
-```
+  ```shell
+  mkdir sgpt-chat-sessions
+  ```
 
-3. Change the permissions of the folder to the nonroot user of the Docker image:
+1. Change the permissions of the folder to the nonroot user of the Docker image:
 
-```shell
-sudo chown 65532:65532 sgpt-chat-sessions
-```
+  ```shell
+  sudo chown 65532:65532 sgpt-chat-sessions
+  ```
 
-4. Run the Docker container with the local folder mounted to `/home/nonroot`:
+1. Run the Docker container with the local folder mounted to `/home/nonroot`:
 
-```shell
-$ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "mass of sun"
-The mass of the sun is approximately 1.99 x 10^30 kilograms.
-$ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "convert to earth masses"
-To convert the mass of the sun to earth masses, we need to divide it by the mass of the Earth:
-1.99 x 10^30 kg / 5.97 x 10^24 kg = 333,000 Earth masses (rounded to the nearest thousand) 
-So the mass of the sun is about 333,000 times greater than the mass of the Earth.
-```
+  ```shell
+  $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "mass of sun"
+  The mass of the sun is approximately 1.99 x 10^30 kilograms.
+  $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "convert to earth masses"
+  To convert the mass of the sun to earth masses, we need to divide it by the mass of the Earth:
+  1.99 x 10^30 kg / 5.97 x 10^24 kg = 333,000 Earth masses (rounded to the nearest thousand) 
+  So the mass of the sun is about 333,000 times greater than the mass of the Earth.
+  ```
 
 ### Generating and Executing Shell Commands
 
