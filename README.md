@@ -12,22 +12,22 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 
 - [Features](#features)
 - [Installation](#installation)
-  - [Linux](#linux)
-  - [macOS](#macos)
-  - [Windows](#windows)
-  - [Using Go](#using-go)
-  - [Docker](#docker)
-  - [Other platforms](#other-platforms)
+    - [Linux](#linux)
+    - [macOS](#macos)
+    - [Windows](#windows)
+    - [Using Go](#using-go)
+    - [Docker](#docker)
+    - [Other platforms](#other-platforms)
 - [Usage Guide](#usage-guide)
-  - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
-  - [Querying OpenAI Models](#querying-openai-models)
-  - [Chat Capabilities](#chat-capabilities)
-  - [Running Queries with Docker](#running-queries-with-docker)
-  - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
-  - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
-  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
-  - [Code Generation Capabilities](#code-generation-capabilities)
-  - [Transforming Text to Images](#transforming-text-to-images)
+    - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
+    - [Querying OpenAI Models](#querying-openai-models)
+    - [Chat Capabilities](#chat-capabilities)
+    - [Running Queries with Docker](#running-queries-with-docker)
+    - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
+    - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
+    - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
+    - [Code Generation Capabilities](#code-generation-capabilities)
+    - [Transforming Text to Images](#transforming-text-to-images)
 - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -114,7 +114,8 @@ To use the OpenAI API, you must first obtain an API key.
 1. Visit [https://platform.openai.com/overview](https://platform.openai.com/overview) and sign up for an account.
 2. Navigate to [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) and generate
    a new API key.
-3. On Linux or macOS: Update your `.bashrc` or `.zshrc` file to include the following export statement:
+3. On Linux or macOS: Update your `.bashrc` or `.zshrc` file to include the following export statement adding your API
+   key as the value:
 
 ```shell
 export OPENAI_API_KEY="sk-..."
