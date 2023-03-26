@@ -39,6 +39,8 @@ const (
 	Shell = "SHELL_MODIFIER"
 )
 
+// TODO: use go templating engine to set environment specific vars in the prompts (e.g. os, shell, etc.)
+
 var defaultShellTemplateModifier = strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
 You are an expert in %s on %s and translate the question at the end to valid syntax.
