@@ -40,6 +40,8 @@ const (
 )
 
 // TODO: use go templating engine to set environment specific vars in the prompts (e.g. os, shell, etc.)
+// TODO: load modifiers from prompts.yml file
+// TODO: read custom modifiers from os app config dir
 
 var defaultShellTemplateModifier = strings.TrimSpace(`
 Act as a natural language to %s command translation engine on %s.
