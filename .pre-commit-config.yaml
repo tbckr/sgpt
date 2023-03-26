@@ -19,13 +19,36 @@
 #
 # SPDX-License-Identifier: MIT
 
+default_language_version:
+  # force all unspecified python hooks to run python3
+  python: python3
+
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
     hooks:
     - id: check-added-large-files
+    - id: check-executables-have-shebangs
 
--   repo: local
+  # Text file hooks
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.33.0
+    hooks:
+      - id: markdownlint
+        args:
+          - --config=.mdl_config.yaml
+        files: \.(md|markdown)$
+
+   # GitHub Actions hooks
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.21.0
+    hooks:
+      - id: check-github-actions
+        files: ^\.github/workflows/.*\.ya?ml$
+      - id: check-github-workflows
+        files: ^\.github/workflows/.*\.ya?ml$
+
+  - repo: local
     hooks:
     - id: license-header
       name: Add license header to files
