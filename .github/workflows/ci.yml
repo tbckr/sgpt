@@ -52,9 +52,9 @@ permissions:
   pull-requests: read
 
 jobs:
-  golangci:
+  test:
     runs-on: ubuntu-latest
-    name: golangci-lint
+    name: build
     steps:
       # Checkout repo
       - uses: actions/checkout@v3
@@ -68,18 +68,6 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           args: --timeout=5m
-
-  goreleaser:
-    runs-on: ubuntu-latest
-    name: goreleaser-check
-    steps:
-      # Checkout repo
-      - uses: actions/checkout@v3
-      # Install necessary tools
-      - uses: actions/setup-go@v4
-        with:
-          go-version: '>=1.20'
-          cache: true
       # Check goreleaser config
       - uses: goreleaser/goreleaser-action@v4
         with:
@@ -98,7 +86,7 @@ jobs:
         with:
           cache: true
           go-version: '>=1.20'
-      - name: Install `govulncheck`
-        run: go install golang.org/x/vuln/cmd/govulncheck@latest
-      - name: Run `govulncheck`
-        run: govulncheck ./...
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...

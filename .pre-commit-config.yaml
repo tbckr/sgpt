@@ -66,3 +66,11 @@ repos:
       language: golang
       require_serial: true
       pass_filenames: false
+    - id: govulncheck
+      name: govulncheck
+      description: Check for vulnerable dependencies
+      entry: govulncheck ./...
+      types: [go]
+      language: golang
+      require_serial: true
+      pass_filenames: false
