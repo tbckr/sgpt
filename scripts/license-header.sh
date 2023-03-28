@@ -26,16 +26,18 @@ if ! command -v "addlicense" >/dev/null 2>&1; then
 fi
 
 addlicense -c "Tim <tbckr>" -l MIT -s -v \
-  -ignore ".idea/**" \
   -ignore "dist/**" \
+  -ignore ".idea/**" \
+  -ignore ".task/**" \
   -ignore ".github/licenses.tmpl" \
   -ignore "licenses/*" \
   .
 
 # to check if all files have the correct license header:
 # addlicense -c "Tim <tbckr>" -l MIT -s -check \
-#   -ignore ".idea/**" \
 #   -ignore "dist/" \
+#   -ignore ".idea/**" \
+#   -ignore ".task/**" \
 #   -ignore ".github/licenses.tmpl" \
 #   -ignore "licenses/*" \
 #   .
