@@ -10,6 +10,11 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Preqrequisites
+
+We use Task to manage our build and development tasks. To install Task, follow the instructions on
+the [Task website](https://taskfile.dev/installation/). Please make sure you have task installed before you begin.
+
 ## Source Build
 
 ### Go Build
@@ -29,30 +34,24 @@ To build SGPT from the source code using Go, follow these steps:
   cd sgpt
   ```
 
-1. Build the SGPT executable using Go:
+1. Build the SGPT executable using task:
 
   ```shell
-  go build -o sgpt cmd/sgpt/main.go
+  task build
   ```
 
 This will create an executable named sgpt in the current directory.
 
 ### Build Docker Image
 
-To build a Docker image for SGPT, use the `docker-build.sh` script located in the `bin` folder:
+To build a Docker image for SGPT, use the task target `docker:build`:
 
 1. Make sure you are in the root of the cloned SGPT repository.
-2. Make the `docker-build.sh` script executable:
+2. Run the `docker:build` task:
 
   ```shell
-  chmod +x bin/docker-build.sh
+  task docker:build
   ```
 
-1. Run the `docker-build.sh` script to build the Docker image:
-
-  ```shell
-  bin/docker-build.sh
-  ```
-
-The script will build the Docker image for the `linux/amd64` platform with the tag `sgpt:latest`. Change the platform,
-build args or tag according to your needs. For more information, have a look at the script.
+This will build the Docker image for the `linux/amd64` and `linux/arm64` platform with the tag `sgpt:latest`. To build a
+docker image for specific platform either use `docker:build:linux-amd64` or `docker:build:linux-arm64` task targets.

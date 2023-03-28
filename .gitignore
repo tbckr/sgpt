@@ -171,3 +171,6 @@ Temporary Items
 dist/
 manpages/
 completions/
+.task/
+coverage.txt
+sgpt

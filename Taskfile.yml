@@ -1,0 +1,209 @@
+# Copyright (c) 2023 Tim <tbckr>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+# https://taskfile.dev
+
+version: '3'
+
+env:
+  GO111MODULE: on
+  GOPROXY: https://proxy.golang.org,direct
+  GOSUMDB: sum.golang.org
+
+vars:
+  DOCKER: '{{default "docker" .DOCKER}}'
+
+tasks:
+  dev:
+    desc: Setup git hooks
+    preconditions:
+      - which python3
+    cmds:
+      - python3 -m pip install --upgrade --user pre-commit
+
+  clean:
+    desc: Clean up
+    cmds:
+      - rm -rf dist/
+      - rm -rf coverage.txt
+      - rm -rf sgpt
+
+  setup:
+    desc: Install dependencies
+    cmds:
+      - go mod tidy
+
+  build:
+    desc: Build the binary
+    sources:
+      - ./**/*.go
+    generates:
+      - ./sgpt
+    cmds:
+      - go build -o sgpt cmd/sgpt/main.go
+
+  test:
+    desc: Run tests
+    env:
+      LC_ALL: C
+    vars:
+      TEST_OPTIONS: '{{default "" .TEST_OPTIONS}}'
+      SOURCE_FILES: '{{default "./..." .SOURCE_FILES}}'
+      TEST_PATTERN: '{{default "." .TEST_PATTERN}}'
+    cmds:
+      - go test {{.TEST_OPTIONS}} -failfast -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.txt {{.SOURCE_FILES}} -run {{.TEST_PATTERN}} -timeout=5m
+
+  cover:
+    desc: Open the cover tool
+    cmds:
+      - go tool cover -html=coverage.txt
+
+  fmt:
+    desc: gofumpt all code
+    cmds:
+      - gofumpt -w -l .
+
+  lint:
+    desc: Lint the code with golangci-lint
+    cmds:
+      - golangci-lint run ./...
+
+  ci:
+    desc: Run all CI steps
+    cmds:
+      - task: setup
+      - task: build
+      - task: test
+
+  default:
+    desc: Runs the default tasks
+    cmds:
+      - task: ci
+
+  docker:build:base:
+    desc: Build a docker image
+    internal: true
+    cmds:
+      - "{{.DOCKER}} build --pull --platform {{.OS}}/{{.Platform}} --build-arg TARGETOS={{.OS}} --build-arg TARGETARCH={{.Platform}}{{with .Variant}} --build-arg TARGETVARIANT={{.}}{{end}} -t sgpt:latest ."
+
+  docker:build:linux-amd64:
+    desc: Build the linux/amd64 docker image
+    cmds:
+      - task: docker:build:base
+        vars:
+          OS: 'linux'
+          Platform: 'amd64'
+
+  docker:build:
+    desc: Build docker image
+    cmds:
+      - task: docker:build:linux-amd64
+
+  release:
+    desc: Create a new tag
+    vars:
+      NEXT:
+        sh: svu n
+    cmds:
+      - git tag {{.NEXT}}
+      - echo {{.NEXT}}
+      - git push origin --tags
+
+  sgpt:test:pkg:
+    desc: Test a package
+    internal: true
+    cmds:
+      - "docker run --platform linux/{{.Platform}} --rm --workdir /tmp -v $PWD/dist:/tmp {{.Image}} sh -c '{{.Cmd}} && sgpt version'"
+
+  sgpt:test:rpm:
+    desc: Tests rpm packages
+    vars:
+      rpm: 'rpm --nodeps -ivh'
+    cmds:
+      - task: sgpt:test:pkg
+        vars:
+          Platform: '386'
+          Image: centos:centos7
+          Cmd: '{{.rpm}} sgpt-*.i386.rpm'
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'amd64'
+          Image: fedora
+          Cmd: '{{.rpm}} sgpt-*.x86_64.rpm'
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'arm64'
+          Image: fedora
+          Cmd: '{{.rpm}} sgpt-*.aarch64.rpm'
+
+  sgpt:test:deb:
+    desc: Tests deb packages
+    vars:
+      dpkg: 'dpkg -i'
+    cmds:
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'amd64'
+          Image: ubuntu
+          Cmd: '{{.dpkg}} sgpt*_amd64.deb'
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'arm64'
+          Image: ubuntu
+          Cmd: '{{.dpkg}} sgpt*_arm64.deb'
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'arm/7'
+          Image: ubuntu
+          Cmd: '{{.dpkg}} sgpt*_armhf.deb'
+
+  sgpt:test:apk:
+    desc: Tests apk packages
+    vars:
+      apk: 'apk add --allow-untrusted -U'
+    cmds:
+      - task: sgpt:test:pkg
+        vars:
+          Platform: '386'
+          Image: alpine
+          Cmd: '{{.apk}} sgpt*_x86.apk'
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'amd64'
+          Image: alpine
+          Cmd: '{{.apk}} sgpt*_x86_64.apk'
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'arm64'
+          Image: alpine
+          Cmd: '{{.apk}} sgpt*_aarch64.apk'
+      - task: sgpt:test:pkg
+        vars:
+          Platform: 'arm/7'
+          Image: alpine
+          Cmd: '{{.apk}} sgpt*_armv7.apk'
+
+  sgpt:test:
+    desc: Test built linux packages
+    cmds:
+      - task: sgpt:test:apk
+      - task: sgpt:test:deb
+      - task: sgpt:test:rpm

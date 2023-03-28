@@ -20,16 +20,10 @@
 #
 # SPDX-License-Identifier: MIT
 
+set -o pipefail && TEST_OPTIONS="-json" task test | tee output.json | tparse -follow
+success=$?
 
-docker build \
-  --pull \
-  --platform=linux/amd64 \
-  --label=org.opencontainers.image.title=sgpt \
-  --label=org.opencontainers.image.description=sgpt \
-  --label=org.opencontainers.image.url=https://github.com/tbckr/sgpt \
-  --label=org.opencontainers.image.source=https://github.com/tbckr/sgpt \
-  --label=org.opencontainers.image.licenses=MIT \
-  --build-arg TARGETOS=linux \
-  --build-arg TARGETARCH=amd64 \
-  -t sgpt:latest \
-  .
+set -e
+NO_COLOR=1 tparse -format markdown -slow 10 -file output.json >"$GITHUB_STEP_SUMMARY"
+
+exit $success
