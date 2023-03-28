@@ -4,6 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
 
+- [Preqrequisites](#preqrequisites)
 - [Source Build](#source-build)
   - [Go Build](#go-build)
   - [Build Docker Image](#build-docker-image)
