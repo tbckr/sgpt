@@ -1,8 +1,9 @@
 # SGPT
 
-SGPT is a powerful command-line interface (CLI) tool designed for seamless interaction with OpenAI models directly from
-your terminal. Effortlessly run queries, generate shell commands or code, create images from text, and more, using
-simple commands. Streamline your workflow and enhance productivity with this powerful and user-friendly CLI tool.
+SGPT (*aka shell-gpt*) is a powerful command-line interface (CLI) tool designed for seamless interaction with OpenAI
+models directly from your terminal. Effortlessly run queries, generate shell commands or code, create images from text,
+and more, using simple commands. Streamline your workflow and enhance productivity with this powerful and user-friendly
+CLI tool.
 
 Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
