@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/muesli/mango-cobra v1.2.0
 	github.com/muesli/roff v0.1.0
-	github.com/sashabaranov/go-openai v1.5.8
+	github.com/sashabaranov/go-openai v1.6.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/jwalterweatherman v1.1.0
 )
