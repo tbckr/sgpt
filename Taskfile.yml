@@ -46,7 +46,7 @@ tasks:
       - rm -rf coverage.txt
       - rm -rf sgpt
 
-  setup:
+  prepare:
     desc: Install dependencies
     cmds:
       - go mod tidy

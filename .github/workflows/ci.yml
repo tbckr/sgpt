@@ -78,7 +78,7 @@ jobs:
       - name: Build
         run: |
           task clean
-          task setup
+          task prepare
           task build
       # Run tests
       - name: test
