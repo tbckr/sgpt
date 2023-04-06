@@ -32,12 +32,27 @@ vars:
   DOCKER: '{{default "docker" .DOCKER}}'
 
 tasks:
-  dev:
+  setup:precommit:
     desc: Setup git hooks
     preconditions:
       - which python3
     cmds:
       - python3 -m pip install --upgrade --user pre-commit
+      - pre-commit install
+
+  setup:tools:
+    desc: Install tools
+    preconditions:
+      - which go
+    cmds:
+      - go install github.com/google/addlicense@latest
+      # - go install github.com/terraform-linters/tflint@latest
+
+  setup:
+    desc: Setup development environment
+    cmds:
+      - task: dev-setup:precommit
+      - task: dev-setup:tools
 
   clean:
     desc: Clean up
