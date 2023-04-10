@@ -50,7 +50,7 @@ jobs:
       # Install necessary tools
       - uses: actions/setup-go@v4
         with:
-          go-version: '>=1.20'
+          go-version: '>=1.20.3'
           cache: true
       - uses: docker/setup-buildx-action@v2
       - uses: anchore/sbom-action/download-syft@v0.14.1

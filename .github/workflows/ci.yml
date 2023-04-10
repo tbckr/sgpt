@@ -69,7 +69,7 @@ jobs:
       # Install various tools
       - uses: actions/setup-go@v4
         with:
-          go-version: '>=1.20'
+          go-version: '>=1.20.3'
           cache: true
       - name: setup-tparse
         run: |
@@ -104,7 +104,7 @@ jobs:
       # Install Go
       - uses: actions/setup-go@v4
         with:
-          go-version: '>=1.20'
+          go-version: '>=1.20.3'
           cache: true
       # Run linter
       - name: golangci-lint
