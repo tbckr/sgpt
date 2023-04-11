@@ -40,7 +40,7 @@ tasks:
       - python3 -m pip install --upgrade --user pre-commit
       - pre-commit install
 
-  setup:tools:
+  setup:go-tools:
     desc: Install tools
     preconditions:
       - which go
@@ -51,8 +51,8 @@ tasks:
   setup:
     desc: Setup development environment
     cmds:
-      - task: dev-setup:precommit
-      - task: dev-setup:tools
+      - task: setup:precommit
+      - task: setup:go-tools
 
   clean:
     desc: Clean up
