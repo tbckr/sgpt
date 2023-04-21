@@ -139,8 +139,7 @@ tasks:
         sh: svu n
     cmds:
       - git tag {{.NEXT}}
-      - echo {{.NEXT}}
-      - git push origin --tags
+      - git push --tags
 
   sgpt:test:pkg:
     desc: Test a package
