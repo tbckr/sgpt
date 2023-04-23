@@ -46,13 +46,24 @@ tasks:
       - which go
     cmds:
       - go install github.com/google/addlicense@latest
-      # - go install github.com/terraform-linters/tflint@latest
 
   setup:
     desc: Setup development environment
     cmds:
       - task: setup:precommit
       - task: setup:go-tools
+
+  validate:devtools:
+    desc: Validate that all necessary devtools are installed
+    cmds:
+      - which go 1>/dev/null || (echo "go is not installed" && exit 1)
+      - which python3 1>/dev/null || (echo "python3 is not installed" && exit 1)
+      - which docker 1>/dev/null || (echo "docker is not installed" && exit 1)
+      - which task 1>/dev/null || (echo "task is not installed" && exit 1)
+      - which pre-commit 1>/dev/null || (echo "pre-commit is not installed" && exit 1)
+      - which addlicense 1>/dev/null || (echo "addlicense is not installed" && exit 1)
+      - which svu 1>/dev/null || (echo "svu is not installed" && exit 1)
+      - which goreleaser 1>/dev/null || (echo "goreleaser is not installed" && exit 1)
 
   clean:
     desc: Clean up
@@ -96,7 +107,7 @@ tasks:
     cmds:
       - gofumpt -w -l .
 
-  lint:
+  lint:go:
     desc: Lint the code with golangci-lint
     cmds:
       - golangci-lint run ./...
