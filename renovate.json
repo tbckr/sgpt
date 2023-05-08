@@ -44,7 +44,7 @@
         "digest"
       ],
       "automerge": true,
-      "automergeType": "branch"
+      # "automergeType": "branch"
     }
   ]
 }
