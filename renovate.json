@@ -43,8 +43,7 @@
         "patch",
         "digest"
       ],
-      "automerge": true,
-      # "automergeType": "branch"
+      "automerge": true
     }
   ]
 }
