@@ -19,7 +19,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/go:1.20 as build
+ARG IMAGE_1=cgr.dev/chainguard/go:1.20@sha256:4f4bb2fc02c27259a1eaa1aa00d440ed2e791c9f31d87f63c3cfbf3bd9b0f165
+ARG IMAGE_2=cgr.dev/chainguard/static:latest@sha256:3ee375b4539717ebcdb96ffc9d94ebb15bc5d950b9d714bd0545997b5aec1c19
+
+FROM --platform=$BUILDPLATFORM ${IMAGE_1} as build
 
 WORKDIR /work
 
@@ -35,7 +38,7 @@ RUN \
     GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o sgpt -v ./cmd/sgpt/main.go
 
 
-FROM cgr.dev/chainguard/static:latest
+FROM ${IMAGE_2}
 
 ENV HOME /home/nonroot
 VOLUME /home/nonroot

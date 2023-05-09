@@ -3,7 +3,10 @@
   "extends": [
     "config:base",
     ":semanticCommits",
-    ":preserveSemverRanges"
+    ":preserveSemverRanges",
+    ":enablePreCommit",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigests"
   ],
   "stabilityDays": 7,
   "ignorePaths": [],
@@ -44,6 +47,18 @@
         "digest"
       ],
       "automerge": true
+    }
+  ],
+  "regexManagers": [
+    {
+      "description": "Update docker (multi-stage) base images",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG IMAGE_*?.*?=(?<depName>.*?):(?<currentValue>.*?)@(?<currentDigest>sha256:[a-f0-9]+)$"
+      ],
+      "datasourceTemplate": "docker"
     }
   ]
 }
