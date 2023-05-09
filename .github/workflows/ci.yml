@@ -60,14 +60,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout repo
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
       # Install task.dev
       - uses: arduino/setup-task@v1
         with:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       # Install various tools
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4
         with:
           go-version: '>=1.20.3'
           cache: true
@@ -84,11 +84,11 @@ jobs:
       - name: test
         run: ./scripts/gha-test.sh
       # Upload coverage report
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@894ff025c7b54547a9a2a1e9f228beae737ad3c2 # v3
         with:
           file: ./coverage.txt
       # Check goreleaser config
-      - uses: goreleaser/goreleaser-action@v4
+      - uses: goreleaser/goreleaser-action@f82d6c1c344bcacabba2c841718984797f664a6b # v4
         with:
           distribution: goreleaser
           version: latest
@@ -100,15 +100,15 @@ jobs:
     timeout-minutes: 5
     steps:
       # Checkout repo
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
       # Install Go
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4
         with:
           go-version: '>=1.20.3'
           cache: true
       # Run linter
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@08e2f20817b15149a52b5b3ebe7de50aff2ba8c5 # v3
         with:
           args: --timeout=5m
 
@@ -117,9 +117,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
       - name: Install Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4
         with:
           cache: true
           go-version: '>=1.20.3'
