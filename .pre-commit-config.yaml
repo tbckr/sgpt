@@ -27,8 +27,8 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-    - id: check-added-large-files
-    - id: check-executables-have-shebangs
+      - id: check-added-large-files
+      - id: check-executables-have-shebangs
 
   # Text file hooks
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -39,7 +39,7 @@ repos:
           - --config=.mdl_config.yaml
         files: \.(md|markdown)$
 
-   # GitHub Actions hooks
+  # GitHub Actions hooks
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.22.0
     hooks:
@@ -48,29 +48,30 @@ repos:
 
   - repo: local
     hooks:
-    - id: license-header
-      name: add license header to files
-      entry: ./scripts/license-header.sh
-      language: script
-    - id: goreleaser
-      name: check goreleaser config
-      entry: bash -c "goreleaser check"
-      language: system
-      files: ^\.goreleaser\.yaml$
-      pass_filenames: false
-    - id: golangci-lint
-      name: golangci-lint
-      description: Fast linters runner for Go.
-      entry: golangci-lint run --new-from-rev HEAD --fix
-      types: [go]
-      language: golang
-      require_serial: true
-      pass_filenames: false
-    - id: govulncheck
-      name: govulncheck
-      description: Check for vulnerable dependencies
-      entry: govulncheck ./...
-      types: [go]
-      language: golang
-      require_serial: true
-      pass_filenames: false
+      - id: license-header
+        name: add license header to files
+        entry: bash -c "task license-header"
+        language: system
+        pass_filenames: false
+      - id: goreleaser
+        name: check goreleaser config
+        entry: bash -c "goreleaser check"
+        language: system
+        files: ^\.goreleaser\.yaml$
+        pass_filenames: false
+      - id: golangci-lint
+        name: golangci-lint
+        description: Fast linters runner for Go.
+        entry: golangci-lint run --new-from-rev HEAD --fix
+        types: [ go ]
+        language: golang
+        require_serial: true
+        pass_filenames: false
+      - id: govulncheck
+        name: govulncheck
+        description: Check for vulnerable dependencies
+        entry: govulncheck ./...
+        types: [ go ]
+        language: golang
+        require_serial: true
+        pass_filenames: false

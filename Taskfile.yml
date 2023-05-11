@@ -46,6 +46,7 @@ tasks:
       - which go
     cmds:
       - go install github.com/google/addlicense@latest
+      - go install github.com/caarlos0/svu@latest
 
   setup:
     desc: Setup development environment
@@ -64,6 +65,18 @@ tasks:
       - which addlicense 1>/dev/null || (echo "addlicense is not installed" && exit 1)
       - which svu 1>/dev/null || (echo "svu is not installed" && exit 1)
       - which goreleaser 1>/dev/null || (echo "goreleaser is not installed" && exit 1)
+
+  license-header:
+    desc: Add license header to all files
+    cmds:
+      - |
+        addlicense -c "Tim <tbckr>" -l MIT -s -v \
+        -ignore "dist/**" \
+        -ignore ".idea/**" \
+        -ignore ".task/**" \
+        -ignore ".github/licenses.tmpl" \
+        -ignore "licenses/*" \
+        .
 
   clean:
     desc: Clean up
