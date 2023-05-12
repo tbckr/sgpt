@@ -25,6 +25,7 @@ on:
   push:
     branches:
       - main
+      - 'renovate/**'
     paths:
       - '**/*.go'
       - 'go.mod'

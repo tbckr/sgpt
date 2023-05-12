@@ -27,6 +27,7 @@ on:
       - 'v*'
     branches:
       - main
+      - 'renovate/**'
     paths:
       - '**/*.go'
       - '.golangci.yaml'
@@ -37,6 +38,8 @@ on:
       - 'taskfile.yml'
       - 'scripts/gha-test.sh'
   pull_request:
+    branches:
+      - main
     paths:
       - '**/*.go'
       - '.golangci.yaml'
