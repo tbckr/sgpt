@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/static:latest@sha256:f169ffc4acfad23d529a40d74c3424a22e55417c59a330cf98e4cfdd62201c87
+FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/static:latest@sha256:c7cc7496526ad868bfdb0411544204d25a4a2a748d536ac9ae086fb04a2b08fc
 
 ENV HOME /home/nonroot
 VOLUME /home/nonroot
