@@ -30,6 +30,11 @@ repos:
       - id: check-added-large-files
       - id: check-executables-have-shebangs
 
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.16.3
+    hooks:
+      - id: gitleaks-docker
+
   # Text file hooks
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.34.0
