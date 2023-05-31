@@ -19,7 +19,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-ARG IMAGE_1=cgr.dev/chainguard/go:1.20@sha256:0b8e570b1663a9530f6539e0adab7db628db5064a80ec48b73e32687a92be06f
+ARG IMAGE_1=cgr.dev/chainguard/go:1.20@sha256:a520a5e9d169a47557a3e1c7f45f034956c3a7bedb2ba4f03c3408e8268e4f72
 ARG IMAGE_2=cgr.dev/chainguard/static:latest@sha256:ee47224a2afc674c1f1089b9dea97d5ee400cf2fff3797398778450a4cfb2a8d
 
 FROM --platform=$BUILDPLATFORM ${IMAGE_1} as build
