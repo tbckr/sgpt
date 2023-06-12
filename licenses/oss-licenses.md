@@ -10,7 +10,7 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
 - [github.com/muesli/mango-pflag](https://pkg.go.dev/github.com/muesli/mango-pflag) ([MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE))
 - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
-- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.9.5/LICENSE))
+- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.10.0/LICENSE))
 - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.7.0/LICENSE.txt))
 - [github.com/spf13/jwalterweatherman](https://pkg.go.dev/github.com/spf13/jwalterweatherman) ([MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE))
 - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
@@ -355,8 +355,8 @@ SOFTWARE.
 ### github.com/sashabaranov/go-openai
 
 - Name: github.com/sashabaranov/go-openai
-- Version: v1.9.5
-- License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.9.5/LICENSE)
+- Version: v1.10.0
+- License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.10.0/LICENSE)
 
 ```text
                                  Apache License
