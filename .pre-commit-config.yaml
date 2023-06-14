@@ -31,7 +31,7 @@ repos:
       - id: check-executables-have-shebangs
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.16.3
+    rev: v8.16.4
     hooks:
       - id: gitleaks-docker
 
