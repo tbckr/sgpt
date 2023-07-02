@@ -77,7 +77,6 @@ archives:
     format_overrides:
     - goos: windows
       format: zip
-    rlcp: true
     files:
       - README.md
       - LICENSE.md
@@ -289,23 +288,23 @@ nfpms:
         - statically-linked-binary
         - changelog-file-missing-in-native-package
 
-scoop:
-  bucket:
-    owner: "{{ .Env.GITHUB_USER }}"
-    name: "{{ .Env.SCOOP_BUCKET }}"
-    token: "{{ .Env.SCOOP_TAP_GITHUB_TOKEN }}"
-  commit_author:
-    name: "goreleaserbot"
-    email: "11543666+tbckr@users.noreply.github.com"
-  commit_msg_template: "chore: Scoop update for {{ .ProjectName }} version {{ .Tag }}"
-  description: |-
-   SGPT is a command-line tool that provides a convenient way to interact with OpenAI models,
-   enabling users to run queries, generate shell commands, produce code,
-   and create images from text directly from the terminal.
-  license: MIT
+scoops:
+  - repository:
+      owner: "{{ .Env.GITHUB_USER }}"
+      name: "{{ .Env.SCOOP_BUCKET }}"
+      token: "{{ .Env.SCOOP_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: "goreleaserbot"
+      email: "11543666+tbckr@users.noreply.github.com"
+    commit_msg_template: "chore: Scoop update for {{ .ProjectName }} version {{ .Tag }}"
+    description: |-
+     SGPT is a command-line tool that provides a convenient way to interact with OpenAI models,
+     enabling users to run queries, generate shell commands, produce code,
+     and create images from text directly from the terminal.
+    license: MIT
 
 brews:
-  - tap:
+  - repository:
       owner: "{{ .Env.GITHUB_USER }}"
       name: "{{ .Env.HOMEBREW_TAP }}"
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
