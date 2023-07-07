@@ -52,7 +52,7 @@ jobs:
         with:
           go-version: '>=1.20.5'
           cache: true
-      - uses: docker/setup-buildx-action@16c0bc4a6e6ada2cfd8afd41d22d95379cf7c32a # v2
+      - uses: docker/setup-buildx-action@2a1a44ac4aa01993040736bd95bb470da1a38365 # v2
       - uses: anchore/sbom-action/download-syft@78fc58e266e87a38d4194b2137a3d4e9bcaf7ca1 # v0.14.3
 
       # Login to ghcr.io
