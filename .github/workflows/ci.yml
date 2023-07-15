@@ -72,7 +72,7 @@ jobs:
       # Install various tools
       - uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753 # v4
         with:
-          go-version: '>=1.20.5'
+          go-version: '>=1.20.6'
           cache: true
       - name: setup-tparse
         run: |
@@ -107,7 +107,7 @@ jobs:
       # Install Go
       - uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753 # v4
         with:
-          go-version: '>=1.20.5'
+          go-version: '>=1.20.6'
           cache: true
       # Run linter
       - name: golangci-lint
@@ -125,7 +125,7 @@ jobs:
         uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753 # v4
         with:
           cache: true
-          go-version: '>=1.20.5'
+          go-version: '>=1.20.6'
       - name: govulncheck
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
