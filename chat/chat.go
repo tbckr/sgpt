@@ -52,7 +52,7 @@ type ChatSessionManager interface {
 	DeleteSession(sessionName string) error
 }
 
-func validateSession(sessionName string) error {
+func validateSessionName(sessionName string) error {
 	if !sessionNameMatcher.Match([]byte(sessionName)) {
 		return ErrChatSessionNameInvalid
 	}

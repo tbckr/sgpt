@@ -67,7 +67,7 @@ func (m FilesystemChatSessionManager) fileExists(filePath string) (bool, error) 
 }
 
 func (m FilesystemChatSessionManager) SessionExists(sessionName string) (bool, error) {
-	if err := validateSession(sessionName); err != nil {
+	if err := validateSessionName(sessionName); err != nil {
 		return false, err
 	}
 	sessionFilepath, err := m.getFilepathForSession(sessionName)
@@ -84,7 +84,7 @@ func (m FilesystemChatSessionManager) SessionExists(sessionName string) (bool, e
 
 func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.ChatCompletionMessage, error) {
 	// Validate session name
-	if err := validateSession(sessionName); err != nil {
+	if err := validateSessionName(sessionName); err != nil {
 		return nil, err
 	}
 
@@ -133,7 +133,7 @@ func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.C
 
 func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages []openai.ChatCompletionMessage) error {
 	// Validate session name
-	if err := validateSession(sessionName); err != nil {
+	if err := validateSessionName(sessionName); err != nil {
 		return err
 	}
 
