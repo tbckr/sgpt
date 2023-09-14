@@ -47,6 +47,7 @@ tasks:
     cmds:
       - go install github.com/google/addlicense@latest
       - go install github.com/caarlos0/svu@latest
+      - go install golang.org/x/vuln/cmd/govulncheck@latest
 
   setup:
     desc: Setup development environment
