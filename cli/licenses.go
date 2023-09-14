@@ -29,7 +29,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func licensesCmd() *cobra.Command {
+type licensesCmd struct {
+	cmd *cobra.Command
+}
+
+func newLicensesCmd() *licensesCmd {
+	licenses := &licensesCmd{}
 	cmd := &cobra.Command{
 		Use:   "licenses",
 		Short: "List the open source licenses used in this software",
@@ -37,19 +42,19 @@ func licensesCmd() *cobra.Command {
 List the open source licenses used in this software.
 `),
 		DisableFlagsInUseLine: true,
-		RunE:                  runLicenses,
 		Args:                  cobra.NoArgs,
-	}
-	return cmd
-}
-
-func runLicenses(_ *cobra.Command, _ []string) error {
-	licenses := licensesURL()
-	_, err := fmt.Fprintln(stdout, `To see the open source packages included in SGPT and
+		ValidArgsFunction:     cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			licenses := licensesURL()
+			_, err := fmt.Fprintln(cmd.OutOrStdout(), `To see the open source packages included in SGPT and
 their respective license information, visit:
 
 `+licenses)
-	return err
+			return err
+		},
+	}
+	licenses.cmd = cmd
+	return licenses
 }
 
 // licensesURL returns the absolute URL containing open source license information for the current platform.

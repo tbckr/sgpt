@@ -22,52 +22,35 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tbckr/sgpt/internal/buildinfo"
 )
 
-var versionArgs struct {
-	json bool
+type versionCmd struct {
+	cmd  *cobra.Command
+	full bool
 }
 
-func versionCmd() *cobra.Command {
+func newVersionCmd() *versionCmd {
+	version := &versionCmd{}
 	cmd := &cobra.Command{
-		Use:   "version",
-		Short: "Get the programs version",
-		Long: strings.TrimSpace(`
-Get the program version.
-`),
-		RunE: runVersion,
-		Args: cobra.NoArgs,
-	}
-	fs := cmd.Flags()
-	fs.BoolVar(&versionArgs.json, "json", false, "Output in json format")
-	return cmd
-}
-
-func runVersion(_ *cobra.Command, _ []string) error {
-	var output string
-	if versionArgs.json {
-		versionMap := map[string]string{
-			"version":    buildinfo.Version(),
-			"commit":     buildinfo.Commit(),
-			"commitDate": buildinfo.CommitDate(),
-		}
-		byteData, err := json.Marshal(versionMap)
-		if err != nil {
+		Use:               "version",
+		Short:             "Get the programs version",
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			var err error
+			if version.full {
+				_, err = fmt.Fprintf(cmd.OutOrStdout(), "version: %s\ncommit: %s\ncommitDate: %s\n", buildinfo.Version(), buildinfo.Commit(), buildinfo.CommitDate())
+			} else {
+				_, err = fmt.Fprintf(cmd.OutOrStdout(), "version: %s\n", buildinfo.Version())
+			}
 			return err
-		}
-		output = string(byteData)
-	} else {
-		output = fmt.Sprintf("version: %s\ncommit: %s\ncommitDate: %s",
-			buildinfo.Version(), buildinfo.Commit(), buildinfo.CommitDate())
+		},
 	}
-	if _, err := fmt.Fprintln(stdout, output); err != nil {
-		return err
-	}
-	return nil
+	cmd.Flags().BoolVarP(&version.full, "full", "f", false, "Print full version information")
+	version.cmd = cmd
+	return version
 }

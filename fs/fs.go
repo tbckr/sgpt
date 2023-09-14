@@ -22,64 +22,55 @@
 package fs
 
 import (
-	"crypto/rand"
-	"encoding/base64"
+	"bufio"
+	"errors"
+	"io"
 	"os"
-	"path"
-	"strings"
-
-	jww "github.com/spf13/jwalterweatherman"
+	"path/filepath"
 )
 
-const defaultDirPermissions = 0750
+const (
+	defaultDirPermissions = 0755
+	appName               = "sgpt"
+)
 
-func GetAppCacheDir(applicationName string) (string, error) {
-	// Get user specific config dir
-	baseCacheDir, err := os.UserCacheDir()
-	if err != nil {
-		jww.ERROR.Println("Could not get user cache dir")
-		return "", err
-	}
-	// Application specific cache dir
-	configPath := path.Join(baseCacheDir, applicationName)
-	jww.DEBUG.Println("Application cache dir:", configPath)
-	_, err = os.Stat(configPath)
-	// Check, if application cache dir exists
-	if os.IsNotExist(err) {
-		jww.ERROR.Println("Application cache dir does not exist - creating it")
-		// Create application cache dir
-		if err = os.MkdirAll(configPath, defaultDirPermissions); err != nil {
-			jww.ERROR.Println("Could not create application cache dir")
+func createAppPath(base string) (string, error) {
+	appPath := filepath.Join(base, appName)
+	// if app dir does not exist, create it
+	if _, err := os.Stat(appPath); errors.Is(err, os.ErrNotExist) {
+		if err = os.MkdirAll(appPath, defaultDirPermissions); err != nil {
 			return "", err
 		}
 	}
-	return configPath, nil
+	return appPath, nil
 }
 
-func FileExists(filename string) (bool, error) {
-	if _, err := os.Stat(filename); err != nil {
-		if os.IsNotExist(err) {
-			jww.DEBUG.Println("File does not exist: ", filename)
-			return false, nil
-		}
-		jww.ERROR.Println("Could not check if file exists: ", filename)
-		return false, err
-	}
-	jww.DEBUG.Println("File exists: ", filename)
-	return true, nil
-}
-
-func CreateRandomFileSuffix(size int) (string, error) {
-	// Generate a random byte slice
-	b := make([]byte, size)
-	_, err := rand.Read(b)
+func GetAppConfigPath() (string, error) {
+	configPath, err := os.UserConfigDir()
 	if err != nil {
-		jww.ERROR.Println("Could not generate random byte slice")
 		return "", err
 	}
-	// Encode the byte slice as a string using base64 encoding
-	randomSuffix := base64.URLEncoding.EncodeToString(b)
-	randomSuffix = strings.TrimSuffix(randomSuffix, "==")
-	jww.DEBUG.Println("Generated random file suffix: ", randomSuffix)
-	return randomSuffix, nil
+	return createAppPath(configPath)
+}
+
+func GetAppCacheDir() (string, error) {
+	// Get user specific config dir
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return "", err
+	}
+	return createAppPath(cacheDir)
+}
+
+func ReadString(in io.Reader) (string, error) {
+	var buf []byte
+	scanner := bufio.NewScanner(in)
+	for scanner.Scan() {
+		buf = append(buf, scanner.Bytes()...)
+	}
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+	input := string(buf)
+	return input, nil
 }

@@ -19,62 +19,30 @@
 //
 // SPDX-License-Identifier: MIT
 
-package image
+package cli
 
-import (
-	"bytes"
-	"encoding/base64"
-	"errors"
-	"image"
-	"image/png"
-	"os"
+import "errors"
 
-	jww "github.com/spf13/jwalterweatherman"
+var ErrMissingInput = errors.New("no input provided")
 
-	"github.com/tbckr/sgpt/fs"
-)
+type exitError struct {
+	err     error
+	code    int
+	details string
+}
 
-const DefaultExtension = ".png"
-
-var ErrFileAlreadyExists = errors.New("file already exists")
-
-func SaveB64EncodedImage(filename, imageData string) error {
-	imgBytes, err := base64.StdEncoding.DecodeString(imageData)
-	if err != nil {
-		jww.ERROR.Printf("error decoding image data from base64: %s", err)
-		return err
+func wrapErrorWithCode(err error, code int, details string) *exitError {
+	return &exitError{
+		err:     err,
+		code:    code,
+		details: details,
 	}
+}
 
-	reader := bytes.NewReader(imgBytes)
-	var img image.Image
-	img, err = png.Decode(reader)
-	if err != nil {
-		jww.ERROR.Printf("error decoding image: %s", err)
-		return err
-	}
+func wrapError(err error, details string) *exitError {
+	return wrapErrorWithCode(err, 1, details)
+}
 
-	var exists bool
-	exists, err = fs.FileExists(filename)
-	if err != nil {
-		return err
-	}
-	if exists {
-		jww.ERROR.Println("file already exists")
-		return ErrFileAlreadyExists
-	}
-
-	var file *os.File
-	file, err = os.Create(filename)
-	if err != nil {
-		jww.ERROR.Printf("error creating file: %s\n", err)
-		return err
-	}
-	defer file.Close()
-
-	err = png.Encode(file, img)
-	if err != nil {
-		jww.ERROR.Printf("error encoding image: %s\n", err)
-		return err
-	}
-	return nil
+func (e *exitError) Error() string {
+	return e.err.Error()
 }

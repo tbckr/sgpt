@@ -29,27 +29,32 @@ import (
 	"github.com/tbckr/sgpt/api"
 )
 
-func checkCmd() *cobra.Command {
+type checkCmd struct {
+	cmd *cobra.Command
+}
+
+func newCheckCmd() *checkCmd {
+	check := &checkCmd{}
 	cmd := &cobra.Command{
 		Use:   "check",
 		Short: "Verify the API key was set correctly",
 		Long: strings.TrimSpace(`
 This command will return an error if the API key is not set or invalid.
 `),
-		RunE: runCheck,
-		Args: cobra.NoArgs,
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			_, err := api.CreateClient()
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), "configuration is valid")
+			if err != nil {
+				return err
+			}
+			return nil
+		},
 	}
-	return cmd
-}
-
-func runCheck(_ *cobra.Command, _ []string) error {
-	_, err := api.CreateClient()
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprintln(stdout, "configuration is valid")
-	if err != nil {
-		return err
-	}
-	return nil
+	check.cmd = cmd
+	return check
 }

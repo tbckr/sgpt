@@ -24,119 +24,49 @@ package shell
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
-	"os"
+	"io"
 	"os/exec"
-
-	jww "github.com/spf13/jwalterweatherman"
 )
 
-var ErrMissingInput = errors.New("no input was provided")
-
-func GetInput(args []string) (string, error) {
-	var prompt string
-	// Check, if prompt was provided via stdin
-	pipedShell, err := IsPipedShell()
-	if err != nil {
-		return "", err
-	}
-	if pipedShell {
-		prompt, err = GetPipedData()
-		if err != nil {
-			return "", err
-		}
-		jww.DEBUG.Println("Input via stdin was provided")
-	} else {
-		// Check, if prompt was provided via command line
-		if len(args) != 1 {
-			jww.ERROR.Println("No input via args was provided")
-			return "", ErrMissingInput
-		}
-		prompt = args[0]
-		jww.DEBUG.Println("Input via args was provided")
-	}
-	return prompt, nil
-}
-
-func IsPipedShell() (bool, error) {
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-		jww.ERROR.Println("Could not get stdin info")
-		return false, err
-	}
-	if fi.Mode()&os.ModeNamedPipe == 0 {
-		jww.DEBUG.Println("Input via stdin was not provided")
-		return false, nil
-	}
-	jww.DEBUG.Println("Input via stdin was provided")
-	return true, nil
-}
-
-func GetPipedData() (string, error) {
-	var buf []byte
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		buf = append(buf, scanner.Bytes()...)
-	}
-	if err := scanner.Err(); err != nil {
-		jww.ERROR.Println("Could not read data from stdin")
-		return "", err
-	}
-	input := string(buf)
-	jww.DEBUG.Printf("Input via stdin was: %s", input)
-	return input, nil
-}
-
-func ExecuteCommandWithConfirmation(ctx context.Context, bashCommand string) error {
-	// Print out the command to be executed
-	if _, err := fmt.Fprintln(os.Stdout, bashCommand); err != nil {
-		jww.ERROR.Println("Could not print command to be executed")
-		return err
-	}
+func ExecuteCommandWithConfirmation(ctx context.Context, input io.Reader, output io.Writer, command string) error {
 	// Require user confirmation
-	ok, err := GetUserConfirmation()
+	ok, err := getUserConfirmation(input, output)
 	if err != nil {
 		return err
 	}
 	if ok {
-		return ExecuteShellCommand(ctx, bashCommand)
+		return executeShellCommand(ctx, output, command)
 	}
 	return nil
 }
 
-func GetUserConfirmation() (bool, error) {
+func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
 	for {
-		jww.DEBUG.Println("Waiting for user confirmation")
-		if _, err := fmt.Fprint(os.Stdout, "Do you want to execute this command? (Y/n) "); err != nil {
+		if _, err := fmt.Fprint(output, "Do you want to execute this command? (Y/n) "); err != nil {
 			return false, err
 		}
-		reader := bufio.NewReader(os.Stdin)
+		reader := bufio.NewReader(input)
 		char, _, err := reader.ReadRune()
 		if err != nil {
-			jww.ERROR.Println("Could not read user input for confirmation")
 			return false, err
 		}
 		// 10 = enter
 		if char == 10 || char == 'Y' || char == 'y' {
-			jww.DEBUG.Println("User confirmed execution")
 			return true, nil
 		} else if char == 'N' || char == 'n' {
-			jww.DEBUG.Println("User denied execution")
 			return false, nil
 		}
 	}
 }
 
-func ExecuteShellCommand(ctx context.Context, response string) error {
-	jww.DEBUG.Println("Executing command: ", response)
-	// Execute cmd from response text
-	cmd := exec.CommandContext(ctx, "bash", "-c", response)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+func executeShellCommand(ctx context.Context, output io.Writer, command string) error {
+	// TODO make shell configurable
+	cmd := exec.CommandContext(ctx, "bash", "-c", command)
+	cmd.Stdout = output
+	cmd.Stderr = output
 	err := cmd.Run()
 	if err != nil {
-		jww.ERROR.Println("Error while executing command: ", err)
 		return err
 	}
 	return nil

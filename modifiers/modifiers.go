@@ -27,16 +27,10 @@ import (
 	"os"
 	"runtime"
 	"strings"
-
-	jww "github.com/spf13/jwalterweatherman"
 )
 
 const (
 	envKeyShell = "SHELL"
-
-	Nil   = "NIL_MODIFIER"
-	Code  = "CODE_MODIFIER"
-	Shell = "SHELL_MODIFIER"
 )
 
 // TODO: use go templating engine to set environment specific vars in the prompts (e.g. os, shell, etc.)
@@ -88,21 +82,17 @@ You must always follow them. No exceptions.
 
 var (
 	ErrUnsupportedModifier = errors.New("unsupported modifier")
-	ErrUnsupportedOS       = errors.New("unsupported operating system")
 )
 
 func GetChatModifier(modifier string) (string, error) {
 	switch modifier {
-	case Shell:
+	case "sh":
 		return completeShellModifier(defaultShellTemplateModifier)
-	case Code:
-		jww.DEBUG.Println("code modifier: ", defaultCodeModifier)
+	case "code":
 		return defaultCodeModifier, nil
-	case Nil:
-		jww.DEBUG.Println("nil modifier")
+	case "txt":
 		return "", nil
 	default:
-		jww.ERROR.Println(ErrUnsupportedModifier)
 		return "", ErrUnsupportedModifier
 	}
 }
@@ -110,24 +100,9 @@ func GetChatModifier(modifier string) (string, error) {
 func completeShellModifier(template string) (string, error) {
 	operatingSystem := runtime.GOOS
 	shell, ok := os.LookupEnv(envKeyShell)
-	// fallback to manually set shell
 	if !ok {
-		jww.DEBUG.Printf("environment variable %s not set, falling back to manual shell detection", envKeyShell)
-		if operatingSystem == "windows" {
-			jww.DEBUG.Println("detected windows operating system, using powershell")
-			shell = "powershell"
-		} else if operatingSystem == "linux" {
-			jww.DEBUG.Println("detected linux operating system, using bash")
-			shell = "bash"
-		} else if operatingSystem == "darwin" {
-			jww.DEBUG.Println("detected darwin operating system, using zsh")
-			shell = "zsh"
-		} else {
-			jww.ERROR.Printf("%s, OS: %s", ErrUnsupportedOS, operatingSystem)
-			return "", ErrUnsupportedOS
-		}
+		return "", errors.New("could not determine shell")
 	}
 	shellModifier := fmt.Sprintf(template, shell, operatingSystem, shell, operatingSystem, shell)
-	jww.DEBUG.Println("shell modifier: ", shellModifier)
 	return shellModifier, nil
 }

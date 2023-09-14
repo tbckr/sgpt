@@ -24,7 +24,10 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io"
 	"strings"
+
+	"github.com/spf13/viper"
 
 	jww "github.com/spf13/jwalterweatherman"
 
@@ -44,36 +47,87 @@ var (
 	ErrChatSessionNotExist = errors.New("given chat does not exist")
 )
 
-var chatRmArgs struct {
+type chatCmd struct {
+	cmd *cobra.Command
+}
+
+type chatCreateCmd struct {
+	cmd *cobra.Command
+}
+
+type chatLsCmd struct {
+	cmd *cobra.Command
+}
+
+type chatShowCmd struct {
+	cmd *cobra.Command
+}
+
+type chatRmCmd struct {
+	cmd       *cobra.Command
 	deleteAll bool
 }
 
-func chatCmd() *cobra.Command {
-	rootChatCmd := &cobra.Command{
+func newChatCmd(config *viper.Viper) *chatCmd {
+	chatStruct := &chatCmd{}
+	cmd := &cobra.Command{
 		Use:   "chat",
 		Short: "Manage chat sessions",
 		Long: strings.TrimSpace(`
 Manage all open chat sessions - list, show, and delete chat sessions.
 `),
 		DisableFlagsInUseLine: true,
+		Args:                  cobra.NoArgs,
+		ValidArgsFunction:     cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			// TODO
 			return cmd.Help()
 		},
-		Args: cobra.NoArgs,
 	}
+	cmd.AddCommand(
+		newLsCmd(config).cmd,
+		newShowCmd(config).cmd,
+		newRmCmd(config).cmd,
+	)
+	chatStruct.cmd = cmd
+	return chatStruct
+}
 
-	lsCmd := &cobra.Command{
+func newLsCmd(config *viper.Viper) *chatLsCmd {
+	ls := &chatLsCmd{}
+	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "List all chat sessions",
 		Long: strings.TrimSpace(`
 List all chat sessions.
 `),
 		DisableFlagsInUseLine: true,
-		RunE:                  runChatLsCmd,
 		Args:                  cobra.NoArgs,
+		ValidArgsFunction:     cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+			if err != nil {
+				return err
+			}
+			var sessions []string
+			sessions, err = chatSessionManager.ListSessions()
+			if err != nil {
+				return err
+			}
+			if len(sessions) == 0 {
+				return nil
+			}
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), strings.Join(sessions, "\n"))
+			return err
+		},
 	}
+	ls.cmd = cmd
+	return ls
+}
 
-	showCmd := &cobra.Command{
+func newShowCmd(config *viper.Viper) *chatShowCmd {
+	show := &chatShowCmd{}
+	cmd := &cobra.Command{
 		Use:     "show <session name>",
 		Aliases: []string{"cat"},
 		Short:   "Show the conversation for the given chat session",
@@ -81,68 +135,77 @@ List all chat sessions.
 Show the conversation for the given chat session.
 `),
 		DisableFlagsInUseLine: true,
-		RunE:                  runChatShowCmd,
 		Args:                  cobra.ExactArgs(1),
+		ValidArgsFunction:     cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+			if err != nil {
+				return err
+			}
+			sessionName := args[0]
+			var exists bool
+			exists, err = chatSessionManager.SessionExists(sessionName)
+			if err != nil {
+				return err
+			}
+			if !exists {
+				return ErrChatSessionNotExist
+			}
+			var messages []openai.ChatCompletionMessage
+			messages, err = chatSessionManager.GetSession(sessionName)
+			if err != nil {
+				return err
+			}
+			jww.DEBUG.Println("showing conversation")
+			return showConversation(cmd.OutOrStdout(), messages)
+		},
 	}
+	show.cmd = cmd
+	return show
+}
 
-	rmCmd := &cobra.Command{
+func newRmCmd(config *viper.Viper) *chatRmCmd {
+	rm := &chatRmCmd{}
+	cmd := &cobra.Command{
 		Use:   "rm [session name]",
 		Short: "Remove the specified chat session",
 		Long: strings.TrimSpace(`
 Remove the specified chat session. The --all flag removes all chat sessions.
 `),
-		RunE: runChatRmCmd,
-		Args: cobra.RangeArgs(0, 1),
+		DisableFlagsInUseLine: true,
+		Args:                  cobra.RangeArgs(0, 1),
+		ValidArgsFunction:     cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+			if err != nil {
+				return err
+			}
+			// Get session/s
+			var chatSessions []string
+			if rm.deleteAll {
+				retrievedSessions, err := chatSessionManager.ListSessions()
+				if err != nil {
+					return err
+				}
+				chatSessions = append(chatSessions, retrievedSessions...)
+			} else {
+				if len(args) != 1 {
+					return ErrMissingChatSession
+				}
+				sessionName := args[0]
+				chatSessions = append(chatSessions, sessionName)
+			}
+			return deleteChatSessions(chatSessionManager, cmd.OutOrStdout(), chatSessions)
+		},
 	}
-	rmFs := rmCmd.Flags()
-	rmFs.BoolVarP(&chatRmArgs.deleteAll, "all", "a", false, "remove all chat sessions")
-
-	rootChatCmd.AddCommand(
-		lsCmd,
-		showCmd,
-		rmCmd,
-	)
-
-	return rootChatCmd
+	cmd.Flags().BoolVarP(&rm.deleteAll, "all", "a", false, "remove all chat sessions")
+	rm.cmd = cmd
+	return rm
 }
 
-func runChatLsCmd(_ *cobra.Command, _ []string) error {
-	sessions, err := chat.ListSessions()
-	if err != nil {
-		return err
-	}
-	if len(sessions) == 0 {
-		return nil
-	}
-	_, err = fmt.Fprintln(stdout, strings.Join(sessions, "\n"))
-	return err
-}
-
-func runChatShowCmd(_ *cobra.Command, args []string) error {
-	if len(args) != 1 {
-		jww.ERROR.Println("No chat session name provided")
-		return ErrMissingChatSession
-	}
-	sessionName := args[0]
-	exists, err := chat.SessionExists(sessionName)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return ErrChatSessionNotExist
-	}
-	var messages []openai.ChatCompletionMessage
-	messages, err = chat.GetSession(sessionName)
-	if err != nil {
-		return err
-	}
-	jww.DEBUG.Println("showing conversation")
-	return showConversation(messages)
-}
-
-func showConversation(messages []openai.ChatCompletionMessage) error {
+func showConversation(out io.Writer, messages []openai.ChatCompletionMessage) error {
 	for _, message := range messages {
-		if _, err := fmt.Fprintf(stdout, "%s%s:%s %s\n", chatRoleFormat, message.Role, resetFormat,
+		if _, err := fmt.Fprintf(out, "%s%s:%s %s\n", chatRoleFormat, message.Role, resetFormat,
 			message.Content); err != nil {
 			return err
 		}
@@ -150,35 +213,13 @@ func showConversation(messages []openai.ChatCompletionMessage) error {
 	return nil
 }
 
-func runChatRmCmd(_ *cobra.Command, args []string) error {
-	// Get session/s
-	var chatSessions []string
-	if chatRmArgs.deleteAll {
-		jww.DEBUG.Println("deleting all chat sessions")
-		retrievedSessions, err := chat.ListSessions()
-		if err != nil {
-			return err
-		}
-		chatSessions = append(chatSessions, retrievedSessions...)
-	} else {
-		if len(args) != 1 {
-			jww.ERROR.Println("No chat session name provided")
-			return ErrMissingChatSession
-		}
-		sessionName := args[0]
-		jww.DEBUG.Println("deleting chat session ", sessionName)
-		chatSessions = append(chatSessions, sessionName)
-	}
-	return deleteChatSessions(chatSessions)
-}
-
-func deleteChatSessions(chatSessions []string) error {
+func deleteChatSessions(manager chat.ChatSessionManager, out io.Writer, chatSessions []string) error {
 	for _, chatSession := range chatSessions {
-		err := chat.DeleteSession(chatSession)
+		err := manager.DeleteSession(chatSession)
 		if err != nil {
 			return err
 		}
-		_, err = fmt.Fprintln(stdout, chatSession)
+		_, err = fmt.Fprintln(out, chatSession)
 		if err != nil {
 			return err
 		}

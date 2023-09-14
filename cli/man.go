@@ -29,7 +29,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func manCmd() *cobra.Command {
+type manCmd struct {
+	cmd *cobra.Command
+}
+
+func newManCmd() *manCmd {
+	man := &manCmd{}
 	cmd := &cobra.Command{
 		Use:                   "man",
 		Short:                 "Generate SGPT's command line reference manual",
@@ -37,16 +42,18 @@ func manCmd() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		Hidden:                true,
 		Args:                  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			manPage, err := mcoral.NewManPage(1, rootCmd)
+		ValidArgsFunction:     cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			manPage, err := mcoral.NewManPage(1, man.cmd.Root())
 			if err != nil {
 				return err
 			}
 			manPage = manPage.WithSection("Copyright", "(C) 2023 Tim <tbckr>\n"+
 				"Released under the MIT license.")
-			_, err = fmt.Fprintln(stdout, manPage.Build(roff.NewDocument()))
+			_, err = fmt.Fprint(cmd.OutOrStdout(), manPage.Build(roff.NewDocument()))
 			return err
 		},
 	}
-	return cmd
+	man.cmd = cmd
+	return man
 }
