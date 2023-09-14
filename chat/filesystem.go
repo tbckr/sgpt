@@ -30,7 +30,6 @@ import (
 	"github.com/sashabaranov/go-openai"
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/fs"
 )
 
 type FilesystemChatSessionManager struct {
@@ -44,15 +43,8 @@ func NewFilesystemChatSessionManager(config *viper.Viper) (ChatSessionManager, e
 }
 
 func (m FilesystemChatSessionManager) getFilepathForSession(sessionName string) (string, error) {
-	cacheDirOverride := m.config.GetString("cache-dir")
-	if cacheDirOverride != "" {
-		return cacheDirOverride, nil
-	}
-	dir, err := fs.GetAppCacheDir()
-	if err != nil {
-		return "", err
-	}
-	filePath := filepath.Join(dir, sessionName)
+	cacheDir := m.config.GetString("cacheDir")
+	filePath := filepath.Join(cacheDir, sessionName)
 	return filePath, nil
 }
 
@@ -184,12 +176,8 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 }
 
 func (m FilesystemChatSessionManager) ListSessions() ([]string, error) {
-	dir, err := fs.GetAppCacheDir()
-	if err != nil {
-		return nil, err
-	}
-	var dirFiles []os.DirEntry
-	dirFiles, err = os.ReadDir(dir)
+	cacheDir := m.config.GetString("cacheDir")
+	dirFiles, err := os.ReadDir(cacheDir)
 	if err != nil {
 		return nil, err
 	}

@@ -114,7 +114,11 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (api.
 				handler := slog.NewTextHandler(os.Stdout, opts)
 				slog.SetDefault(slog.New(handler))
 			}
-			if err := config.ReadInConfig(); err != nil {
+			err := setViperDefaults(config)
+			if err != nil {
+				return err
+			}
+			if err = config.ReadInConfig(); err != nil {
 				if errors.Is(err, os.ErrNotExist) {
 					// Config file not found; skip this then
 					return nil
@@ -209,4 +213,14 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (api.
 
 	root.cmd = cmd
 	return root
+}
+
+func setViperDefaults(config *viper.Viper) error {
+	// cache dir
+	appCacheDir, err := fs.GetAppCacheDir()
+	if err != nil {
+		return err
+	}
+	config.SetDefault("cacheDir", appCacheDir)
+	return nil
 }
