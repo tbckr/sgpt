@@ -29,5 +29,5 @@ import (
 
 func main() {
 	args := os.Args[1:]
-	cli.Run(args)
+	cli.Execute(args)
 }
