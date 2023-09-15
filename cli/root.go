@@ -95,7 +95,7 @@ func (r *rootCmd) Execute(args []string) {
 	r.exit(0)
 }
 
-func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (api.Client, error)) *rootCmd {
+func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api.OpenAIClient, error)) *rootCmd {
 	root := &rootCmd{
 		exit: exit,
 	}

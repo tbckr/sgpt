@@ -39,42 +39,45 @@ const (
 )
 
 var (
-	DefaultModel = strings.Clone(openai.GPT3Dot5Turbo)
-
+	DefaultModel     = strings.Clone(openai.GPT3Dot5Turbo)
 	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
 )
 
-type Client interface {
-	GetChatCompletion(ctx context.Context, config *viper.Viper, prompt string, mode string) (string, error)
-}
-
 type OpenAIClient struct {
-	api *openai.Client
+	api                *openai.Client
+	retrieveResponseFn func(*openai.Client, context.Context, openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error)
 }
 
-func CreateClient() (Client, error) {
+func CreateClient() (*OpenAIClient, error) {
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
 	if !exists {
 		return nil, ErrMissingAPIKey
 	}
-	client := OpenAIClient{
+	client := &OpenAIClient{
 		api: openai.NewClient(apiKey),
+		// This is necessary to be able to mock the api in tests
+		retrieveResponseFn: func(api *openai.Client, ctx context.Context, req openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
+			return api.CreateChatCompletion(ctx, req)
+		},
 	}
 	slog.Debug("Created openai client")
 	return client, nil
 }
 
-func (c OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper, prompt, modifier string) (string, error) {
+func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper, prompt, modifier string) (string, error) {
 	var err error
 	var chatSessionManager chat.SessionManager
 	var messages []openai.ChatCompletionMessage
 
 	chatSessionManager, err = chat.NewFilesystemChatSessionManager(config)
-	// TODO check if key is set
-	chatId := config.GetString("chat")
 
-	isChat := chatId != ""
+	var chatId string
+	var isChat bool
+	if config.IsSet("chat") {
+		chatId = config.GetString("chat")
+		isChat = true
+	}
 	chatExists := false
 
 	// Load existing chat messages
@@ -126,7 +129,7 @@ func (c OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper
 		TopP:        float32(config.GetFloat64("top-p")),
 	}
 	var resp openai.ChatCompletionResponse
-	resp, err = c.api.CreateChatCompletion(ctx, req)
+	resp, err = c.retrieveResponseFn(c.api, ctx, req)
 	if err != nil {
 		return "", err
 	}
