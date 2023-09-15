@@ -51,10 +51,6 @@ type chatCmd struct {
 	cmd *cobra.Command
 }
 
-type chatCreateCmd struct {
-	cmd *cobra.Command
-}
-
 type chatLsCmd struct {
 	cmd *cobra.Command
 }
