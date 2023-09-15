@@ -36,7 +36,7 @@ type FilesystemChatSessionManager struct {
 	config *viper.Viper
 }
 
-func NewFilesystemChatSessionManager(config *viper.Viper) (ChatSessionManager, error) {
+func NewFilesystemChatSessionManager(config *viper.Viper) (SessionManager, error) {
 	return FilesystemChatSessionManager{
 		config: config,
 	}, nil

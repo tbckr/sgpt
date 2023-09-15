@@ -40,11 +40,12 @@ var (
 	ErrChatSessionNameInvalid  = fmt.Errorf("chat session name does not match the regex %s", sessionNameRegex)
 	ErrChatSessionNameTooLong  = fmt.Errorf("chat session name is greater than %d", sessionNameMaxLength)
 
-	sessionNameRegex   = "^([-a-zA-Z0-9]*[a-zA-Z0-9])?"
+	// Session name must be valid filename containing only alphanumeric characters, numbers and dashes.
+	sessionNameRegex   = "^[a-zA-Z0-9-_]+$"
 	sessionNameMatcher = regexp.MustCompile(sessionNameRegex)
 )
 
-type ChatSessionManager interface {
+type SessionManager interface {
 	SessionExists(sessionName string) (bool, error)
 	GetSession(sessionName string) ([]openai.ChatCompletionMessage, error)
 	SaveSession(sessionName string, messages []openai.ChatCompletionMessage) error
