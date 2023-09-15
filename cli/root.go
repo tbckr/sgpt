@@ -195,7 +195,6 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 	cmd.Flags().BoolP("execute", "e", false, "execute shell command")
 	// chat flags
 	cmd.Flags().StringP("chat", "c", "", "use an existing chat session")
-	// TODO add file/dir flag - if set, read from file/dir and use as part of prompt
 
 	// Bind flags to viper
 	err := config.BindPFlags(cmd.Flags())
