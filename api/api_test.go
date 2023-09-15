@@ -27,15 +27,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
 )
 
 type MockClient struct {
 	fn func(ctx context.Context, config *viper.Viper, prompt string, mode string) (string, error)
 }
 
+// TODO This does not make any sense. We have to add a custom openai.Client to the api.Client interface to mock it.
 func NewMockClient(fn func(ctx context.Context, config *viper.Viper, prompt string, mode string) (string, error)) (Client, error) {
 	return MockClient{
 		fn: fn,
