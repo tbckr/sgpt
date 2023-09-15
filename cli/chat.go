@@ -213,7 +213,7 @@ func showConversation(out io.Writer, messages []openai.ChatCompletionMessage) er
 	return nil
 }
 
-func deleteChatSessions(manager chat.ChatSessionManager, out io.Writer, chatSessions []string) error {
+func deleteChatSessions(manager chat.SessionManager, out io.Writer, chatSessions []string) error {
 	for _, chatSession := range chatSessions {
 		err := manager.DeleteSession(chatSession)
 		if err != nil {

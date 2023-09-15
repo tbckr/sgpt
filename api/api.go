@@ -67,10 +67,11 @@ func CreateClient() (Client, error) {
 
 func (c OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper, prompt, modifier string) (string, error) {
 	var err error
-	var chatSessionManager chat.ChatSessionManager
+	var chatSessionManager chat.SessionManager
 	var messages []openai.ChatCompletionMessage
 
 	chatSessionManager, err = chat.NewFilesystemChatSessionManager(config)
+	// TODO check if key is set
 	chatId := config.GetString("chat")
 
 	isChat := chatId != ""
