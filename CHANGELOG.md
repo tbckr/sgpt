@@ -8,6 +8,7 @@ Release 2.0 is a complete rewrite of the original codebase. It is not backwards 
 
 - Add support for personas / custom modifiers
 - Add tests
+- Set default values in a config file (Viper library)
 
 ### Dropped features
 
