@@ -96,7 +96,7 @@ func TestSimplePrompt(t *testing.T) {
 	prompt := "Say: Hello World!"
 	expected := "Hello World!"
 
-	client, err := MockClient(strings.Clone(expected))()
+	client, err := MockClient(strings.Clone(expected), nil)()
 	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
@@ -123,7 +123,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 	prompt := "Say: Hello World!"
 	expected := "Hello World!"
 
-	client, err := MockClient(strings.Clone(expected))()
+	client, err := MockClient(strings.Clone(expected), nil)()
 	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
@@ -159,7 +159,7 @@ func TestPromptLoadChat(t *testing.T) {
 	prompt := "Repeat last message"
 	expected := "World!"
 
-	client, err := MockClient(strings.Clone(expected))()
+	client, err := MockClient(strings.Clone(expected), nil)()
 	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
@@ -205,7 +205,7 @@ func TestPromptWithModifier(t *testing.T) {
 	prompt := "Print Hello World"
 	expected := `echo "Hello World"`
 
-	client, err := MockClient(strings.Clone(expected))()
+	client, err := MockClient(strings.Clone(expected), nil)()
 	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)

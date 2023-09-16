@@ -22,34 +22,44 @@
 package cli
 
 import (
-	"os"
+	"bytes"
+	"io"
+	"strings"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
 	"github.com/tbckr/sgpt/api"
 )
 
-func TestCheckCmd(t *testing.T) {
+func TestLicensesCmd(t *testing.T) {
 	mem := &exitMemento{}
+	expected := `To see the open source packages included in SGPT and
+their respective license information, visit:
+`
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
-	err := os.Setenv("OPENAI_API_KEY", "test")
-	defer require.NoError(t, os.Unsetenv("OPENAI_API_KEY"))
-	require.NoError(t, err)
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"check"})
+	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.True(t, strings.HasPrefix(buf.String(), expected))
+	}()
+
+	root.Execute([]string{"licenses"})
 	require.Equal(t, 0, mem.code)
-}
+	require.NoError(t, writer.Close())
 
-func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
-	mem := &exitMemento{}
-
-	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
-	err := os.Unsetenv("OPENAI_API_KEY")
-	require.NoError(t, err)
-
-	newRootCmd(mem.Exit, config, api.MockClient("", api.ErrMissingAPIKey)).Execute([]string{"check"})
-	require.Equal(t, 1, mem.code)
+	wg.Wait()
 }

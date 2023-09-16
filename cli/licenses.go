@@ -45,11 +45,11 @@ List the open source licenses used in this software.
 		Args:                  cobra.NoArgs,
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			licenses := licensesURL()
+			url := licensesURL()
 			_, err := fmt.Fprintln(cmd.OutOrStdout(), `To see the open source packages included in SGPT and
 their respective license information, visit:
 
-`+licenses)
+`+url)
 			return err
 		},
 	}
