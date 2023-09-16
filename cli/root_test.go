@@ -31,8 +31,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/spf13/viper"
-
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/require"
 	"github.com/tbckr/sgpt/api"
@@ -54,7 +52,6 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
@@ -80,11 +77,9 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	prompt := "Say: Hello World!"
 	mem := &exitMemento{}
 
-	configDir, err := createTempDir("config")
-	require.NoError(t, err)
+	configDir := createTempDir(t, "config")
 
-	var config *viper.Viper
-	config, err = createViperConfig()
+	config, err := createViperConfig()
 	config.SetConfigFile(filepath.Join(configDir, "config.yaml"))
 	config.Set("TESTING", 1)
 
@@ -100,15 +95,12 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	require.Equal(t, 0, mem.code)
 
 	require.Equal(t, openai.GPT4, config.GetString("model"))
-
-	require.NoError(t, removeTempDir(configDir))
 }
 
 func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 
@@ -125,7 +117,6 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
@@ -157,7 +148,6 @@ func TestRootCmd_SimplePromptViaStdin(t *testing.T) {
 	stdoutReader, stdoutWriter := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetIn(stdinReader)
@@ -198,7 +188,6 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
@@ -230,7 +219,6 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	stdoutReader, stdoutWriter := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetIn(stdinReader)
@@ -273,7 +261,6 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
@@ -322,7 +309,6 @@ func TestRootCmd_ChatConversation(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	// Create an existing chat session
 	manager, err := chat.NewFilesystemChatSessionManager(config)

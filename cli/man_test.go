@@ -32,7 +32,6 @@ func TestManCmd(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
@@ -44,7 +43,6 @@ func TestManCmdUnknowArgs(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)

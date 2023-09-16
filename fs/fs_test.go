@@ -35,11 +35,9 @@ func TestGetAppCacheDir(t *testing.T) {
 	existingEnv := os.Getenv("XDG_CACHE_HOME")
 	defer require.NoError(t, os.Setenv("XDG_CACHE_HOME", existingEnv))
 
-	tempDir, err := createTempDir()
-	require.NoError(t, err)
-	defer require.NoError(t, removeTempDir(tempDir))
+	tempDir := createTempDir(t)
 
-	err = os.Setenv("XDG_CACHE_HOME", tempDir)
+	err := os.Setenv("XDG_CACHE_HOME", tempDir)
 	require.NoError(t, err)
 
 	var cacheDir string
@@ -53,11 +51,9 @@ func TestGetAppConfigDir(t *testing.T) {
 	existingEnv := os.Getenv("XDG_CONFIG_HOME")
 	defer require.NoError(t, os.Setenv("XDG_CONFIG_HOME", existingEnv))
 
-	tempDir, err := createTempDir()
-	require.NoError(t, err)
-	defer require.NoError(t, removeTempDir(tempDir))
+	tempDir := createTempDir(t)
 
-	err = os.Setenv("XDG_CONFIG_HOME", tempDir)
+	err := os.Setenv("XDG_CONFIG_HOME", tempDir)
 	require.NoError(t, err)
 
 	var cacheDir string
@@ -88,10 +84,11 @@ func TestReadString(t *testing.T) {
 	wg.Wait()
 }
 
-func createTempDir() (string, error) {
-	return os.MkdirTemp("", "sgpt_temp_*")
-}
-
-func removeTempDir(fullConfigPath string) error {
-	return os.RemoveAll(fullConfigPath)
+func createTempDir(t *testing.T) string {
+	tempFilepath, err := os.MkdirTemp("", "sgpt_temp_*")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.RemoveAll(tempFilepath))
+	})
+	return tempFilepath
 }

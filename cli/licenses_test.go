@@ -42,7 +42,6 @@ their respective license information, visit:
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 	root.cmd.SetOut(writer)

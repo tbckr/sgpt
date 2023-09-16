@@ -39,7 +39,6 @@ func TestChatCmd(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 
@@ -55,7 +54,6 @@ func TestChatCmdListEmptySessions(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 	root.cmd.SetOut(writer)
@@ -85,7 +83,6 @@ func TestChatCmdListOneSession(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -122,7 +119,6 @@ func TestChatCmdListTwoSessions(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -159,7 +155,6 @@ func TestChatCmdShowSession(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -193,7 +188,6 @@ func TestChatCmdShowSessionMissingName(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 
@@ -205,7 +199,6 @@ func TestChatCmdShowSessionNonExistent(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -226,7 +219,6 @@ func TestChatCmdShowSessionWithAlias(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -260,7 +252,6 @@ func TestChatCmdRmSession(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -281,7 +272,6 @@ func TestChatCmdRmSessionNonExistent(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -302,7 +292,6 @@ func TestChatCmdRmSessionAll(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	manager, err := chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -327,7 +316,6 @@ func TestChatCmdRmSessionMissingName(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 

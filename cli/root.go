@@ -239,12 +239,13 @@ func loadViperConfig(config *viper.Viper) error {
 		}
 	}
 	if err := config.ReadInConfig(); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			// Config file not found; skip this then
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found; ignore error
 			return nil
+		} else {
+			// Config file was found but another error was produced
+			return err
 		}
-		// Config file was found but another error was produced
-		return err
 	}
 	return nil
 }

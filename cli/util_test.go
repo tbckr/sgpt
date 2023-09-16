@@ -39,16 +39,12 @@ func (e *exitMemento) Exit(i int) {
 }
 
 func createTestConfig(t *testing.T) *viper.Viper {
-	cacheDir, err := createTempDir("cache")
-	require.NoError(t, err)
-
-	var configDir string
-	configDir, err = createTempDir("config")
-	require.NoError(t, err)
+	configDir := createTempDir(t, "config")
+	cacheDir := createTempDir(t, "cache")
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
-	config.SetConfigFile("config")
+	config.SetConfigName("config")
 	config.SetConfigType("yaml")
 	config.Set("cacheDir", cacheDir)
 	config.Set("TESTING", 1)
@@ -56,21 +52,14 @@ func createTestConfig(t *testing.T) *viper.Viper {
 	return config
 }
 
-func teardownTestDirs(t *testing.T, config *viper.Viper) {
-	cacheDir := config.GetString("cacheDir")
-	require.NoError(t, removeTempDir(cacheDir))
-
-	configDir := config.ConfigFileUsed()
-	require.NoError(t, removeTempDir(configDir))
-}
-
-func createTempDir(suffix string) (string, error) {
+func createTempDir(t *testing.T, suffix string) string {
 	if suffix != "" {
 		suffix = "_" + suffix
 	}
-	return os.MkdirTemp("", strings.Join([]string{"sgpt_temp_*", suffix}, ""))
-}
-
-func removeTempDir(fullConfigPath string) error {
-	return os.RemoveAll(fullConfigPath)
+	tempFilepath, err := os.MkdirTemp("", strings.Join([]string{"sgpt_temp_*", suffix}, ""))
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.RemoveAll(tempFilepath))
+	})
+	return tempFilepath
 }
