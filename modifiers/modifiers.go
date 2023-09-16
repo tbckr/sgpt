@@ -40,15 +40,15 @@ var (
 )
 
 func GetChatModifier(modifier string) (string, error) {
-	loadedPrompts, err := loadDefaultPrompts()
+	loadedDefaultPrompts, err := loadDefaultPrompts()
 	if err != nil {
 		return "", err
 	}
 	switch modifier {
 	case "sh":
-		return renderPrompt(loadedPrompts[modifier].Messages[0].Text)
+		return renderPrompt(loadedDefaultPrompts[modifier].Messages[0].Text)
 	case "code":
-		return renderPrompt(loadedPrompts[modifier].Messages[0].Text)
+		return renderPrompt(loadedDefaultPrompts[modifier].Messages[0].Text)
 	case "txt":
 		return "", nil
 	default:
