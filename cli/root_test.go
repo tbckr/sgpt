@@ -23,11 +23,15 @@ package cli
 
 import (
 	"bytes"
+	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/spf13/viper"
 
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/require"
@@ -70,6 +74,32 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	require.NoError(t, writer.Close())
 
 	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
+	prompt := "Say: Hello World!"
+	mem := &exitMemento{}
+
+	configDir, err := createTempDir("config")
+	require.NoError(t, err)
+
+	var config *viper.Viper
+	config, err = createViperConfig()
+	config.SetConfigFile(filepath.Join(configDir, "config.yaml"))
+	config.Set("TESTING", 1)
+
+	var configFile *os.File
+	configFile, err = os.Create(filepath.Join(configDir, "config.yaml"))
+	require.NoError(t, err)
+
+	_, err = configFile.WriteString(fmt.Sprintf("model: \"%s\"\n", openai.GPT4))
+
+	root := newRootCmd(mem.Exit, config, api.MockClient("Hello World", nil))
+
+	root.Execute([]string{"txt", prompt})
+	require.Equal(t, 0, mem.code)
+
+	require.Equal(t, openai.GPT4, config.GetString("model"))
 }
 
 func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
