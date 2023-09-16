@@ -133,12 +133,9 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 				}
 				prompt = input
 
-			} else if len(args) == 2 {
+			} else {
 				// input is provided via command line args
 				prompt = args[1]
-			} else {
-				// input is missing
-				return ErrMissingInput
 			}
 
 			// TODO validate flag combination
@@ -150,24 +147,18 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 				return err
 			}
 
-			switch mode {
-			case "txt":
-			case "sh":
-			case "code":
-			default:
-				var response string
-				response, err = client.GetChatCompletion(cmd.Context(), config, prompt, mode)
-				if err != nil {
-					return err
-				}
-				_, err = fmt.Fprintln(cmd.OutOrStdout(), response)
-				if err != nil {
-					return err
-				}
-				if config.GetBool("execute") {
-					return shell.ExecuteCommandWithConfirmation(cmd.Context(), cmd.InOrStdin(), cmd.OutOrStdout(), response)
-				}
-				break
+			var response string
+			response, err = client.GetChatCompletion(cmd.Context(), config, prompt, mode)
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), response)
+			if err != nil {
+				return err
+			}
+
+			if config.GetBool("execute") {
+				return shell.ExecuteCommandWithConfirmation(cmd.Context(), cmd.InOrStdin(), cmd.OutOrStdout(), response)
 			}
 			return nil
 		},
@@ -205,11 +196,13 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 }
 
 func loadViperConfig(config *viper.Viper) error {
-	err := setViperDefaults(config)
-	if err != nil {
-		return err
+	if !viper.IsSet("TESTING") {
+		err := setViperDefaults(config)
+		if err != nil {
+			return err
+		}
 	}
-	if err = config.ReadInConfig(); err != nil {
+	if err := config.ReadInConfig(); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			// Config file not found; skip this then
 			return nil

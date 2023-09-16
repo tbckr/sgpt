@@ -51,6 +51,7 @@ func createTestConfig(t *testing.T) *viper.Viper {
 	config.SetConfigFile("config")
 	config.SetConfigType("yaml")
 	config.Set("cacheDir", cacheDir)
+	config.Set("TESTING", 1)
 
 	return config
 }

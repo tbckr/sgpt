@@ -23,7 +23,7 @@ package cli
 
 import "errors"
 
-var ErrMissingInput = errors.New("no input provided")
+var ErrMissingInput = errors.New("no input prompt provided")
 
 type exitError struct {
 	err     error
