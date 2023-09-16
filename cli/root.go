@@ -101,6 +101,7 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 	}
 
 	// TODO add documentation
+	// TODO add an interactive mode, shorts: explain, add next message, execute
 	cmd := &cobra.Command{
 		Use:                   "sgpt",
 		Short:                 "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
