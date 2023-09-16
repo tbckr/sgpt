@@ -34,8 +34,8 @@ const (
 	appName               = "sgpt"
 )
 
-func createAppPath(base string) (string, error) {
-	appPath := filepath.Join(base, appName)
+func createPath(dirs ...string) (string, error) {
+	appPath := filepath.Join(dirs...)
 	// if app dir does not exist, create it
 	if _, err := os.Stat(appPath); errors.Is(err, os.ErrNotExist) {
 		if err = os.MkdirAll(appPath, defaultDirPermissions); err != nil {
@@ -50,7 +50,7 @@ func GetAppConfigPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return createAppPath(configPath)
+	return createPath(configPath, appName)
 }
 
 func GetAppCacheDir() (string, error) {
@@ -59,7 +59,15 @@ func GetAppCacheDir() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return createAppPath(cacheDir)
+	return createPath(cacheDir, appName)
+}
+
+func GetPersonasPath() (string, error) {
+	configPath, err := GetAppConfigPath()
+	if err != nil {
+		return "", err
+	}
+	return createPath(configPath, "personas")
 }
 
 func ReadString(in io.Reader) (string, error) {

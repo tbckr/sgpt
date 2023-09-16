@@ -23,24 +23,43 @@ package modifiers
 
 import (
 	"errors"
+	"log/slog"
 	"os"
+	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"text/template"
+
+	"github.com/spf13/viper"
+
+	"github.com/tbckr/sgpt/fs"
 )
 
 const (
 	envKeyShell = "SHELL"
 )
 
-// TODO: read custom modifiers from os app config dir
-
 var (
+	personaNameRegex   = "^[a-zA-Z0-9-_]+$"
+	personaNameMatcher = regexp.MustCompile(personaNameRegex)
+
 	ErrUnsupportedModifier = errors.New("unsupported modifier")
 )
 
-func GetChatModifier(modifier string) (string, error) {
-	loadedDefaultPrompts, err := loadDefaultPrompts()
+func GetChatModifier(config *viper.Viper, modifier string) (string, error) {
+	persona, err := getPersonasModifier(config, modifier)
+	if err != nil {
+		return "", err
+	}
+	// if a persona is found, render the prompt
+	// this overrides the default personas
+	if persona != "" {
+		return renderPrompt(persona)
+	}
+	// if no persona is found, try to load the default prompt
+	var loadedDefaultPrompts map[string]Prompt
+	loadedDefaultPrompts, err = loadDefaultPrompts()
 	if err != nil {
 		return "", err
 	}
@@ -54,6 +73,56 @@ func GetChatModifier(modifier string) (string, error) {
 	default:
 		return "", ErrUnsupportedModifier
 	}
+}
+
+func getPersonasModifier(config *viper.Viper, modifier string) (string, error) {
+	var err error
+
+	var personasPath string
+	if config.IsSet("personas") {
+		personasPath = config.GetString("personas")
+	} else {
+		personasPath, err = fs.GetPersonasPath()
+		if err != nil {
+			return "", err
+		}
+	}
+
+	var personaPath string
+	err = filepath.WalkDir(personasPath, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if personasPath == path {
+			return nil
+		}
+		if d.IsDir() {
+			return filepath.SkipDir
+		}
+		if !personaNameMatcher.MatchString(d.Name()) {
+			return nil
+		}
+		if modifier == d.Name() {
+			personaPath = path
+			return filepath.SkipAll
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	if personaPath == "" {
+		slog.Debug("could not find custom persona")
+		return "", nil
+	}
+
+	var data []byte
+	data, err = os.ReadFile(personaPath)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 func renderPrompt(promptText string) (string, error) {

@@ -300,6 +300,66 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	wg.Wait()
 }
 
+func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
+	persona := "This is my custom persona"
+	prompt := "Say: Hello World!"
+	expected := "Hello World!\n"
+
+	mem := &exitMemento{}
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	config := createTestConfig(t)
+
+	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "my-persona"))
+	require.NoError(t, err)
+	_, err = fileHandler.WriteString(persona)
+	require.NoError(t, err)
+	require.NoError(t, fileHandler.Close())
+
+	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"my-persona", prompt, "--chat", "test_chat"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
+
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 3)
+
+	// Check if the persona was added
+	require.Equal(t, openai.ChatMessageRoleSystem, messages[0].Role)
+	require.Equal(t, persona, messages[0].Content)
+
+	// Check if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[1].Role)
+	require.Equal(t, prompt, messages[1].Content)
+
+	// Check if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[2].Role)
+	require.Equal(t, strings.TrimSpace(expected), messages[2].Content)
+
+	wg.Wait()
+}
+
 func TestRootCmd_ChatConversation(t *testing.T) {
 	prompt := "Repeat last message"
 	expected := "World!\n"

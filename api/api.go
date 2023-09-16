@@ -122,7 +122,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 	// then add modifier message
 	if !isChat || (isChat && !chatExists) {
 		var modifierPrompt string
-		modifierPrompt, err = modifiers.GetChatModifier(modifier)
+		modifierPrompt, err = modifiers.GetChatModifier(config, modifier)
 		if err != nil {
 			return "", err
 		}
