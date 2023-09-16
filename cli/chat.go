@@ -76,7 +76,6 @@ Manage all open chat sessions - list, show, and delete chat sessions.
 		Args:                  cobra.NoArgs,
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			// TODO
 			return cmd.Help()
 		},
 	}
