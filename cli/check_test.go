@@ -22,44 +22,34 @@
 package cli
 
 import (
-	"fmt"
-	"strings"
+	"os"
+	"testing"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
+
 	"github.com/tbckr/sgpt/api"
 )
 
-type checkCmd struct {
-	cmd *cobra.Command
+func TestCheckCmd(t *testing.T) {
+	mem := &exitMemento{}
+
+	config := createTestConfig(t)
+	defer teardownTestDirs(t, config)
+	err := os.Setenv("OPENAI_API_KEY", "test")
+	require.NoError(t, err)
+
+	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"check"})
+	require.Equal(t, 0, mem.code)
 }
 
-func newCheckCmd(config *viper.Viper, createClientFn func() (*api.OpenAIClient, error)) *checkCmd {
-	check := &checkCmd{}
-	cmd := &cobra.Command{
-		Use:   "check",
-		Short: "Verify the API key was set correctly",
-		Long: strings.TrimSpace(`
-This command will return an error if the API key is not set or invalid.
-`),
-		Args:              cobra.NoArgs,
-		ValidArgsFunction: cobra.NoFileCompletions,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			err := loadViperConfig(config)
-			if err != nil {
-				return err
-			}
-			_, err = createClientFn()
-			if err != nil {
-				return err
-			}
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), "configuration is valid")
-			if err != nil {
-				return err
-			}
-			return nil
-		},
-	}
-	check.cmd = cmd
-	return check
+func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
+	mem := &exitMemento{}
+
+	config := createTestConfig(t)
+	defer teardownTestDirs(t, config)
+	err := os.Unsetenv("OPENAI_API_KEY")
+	require.NoError(t, err)
+
+	newRootCmd(mem.Exit, config, api.MockClient("", api.ErrMissingAPIKey)).Execute([]string{"check"})
+	require.Equal(t, 1, mem.code)
 }

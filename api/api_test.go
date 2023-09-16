@@ -28,30 +28,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tbckr/sgpt/chat"
-
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
+	"github.com/tbckr/sgpt/chat"
 )
-
-func CreateMockClient(response string) *OpenAIClient {
-	return &OpenAIClient{
-		api: nil,
-		retrieveResponseFn: func(_ *openai.Client, _ context.Context, _ openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
-			return openai.ChatCompletionResponse{
-				Choices: []openai.ChatCompletionChoice{
-					{
-						Message: openai.ChatCompletionMessage{
-							Role:    openai.ChatMessageRoleAssistant,
-							Content: response,
-						},
-					},
-				},
-			}, nil
-		},
-	}
-}
 
 func createTestConfig(t *testing.T) *viper.Viper {
 	cacheDir, err := createTempDir("cache")
@@ -115,11 +96,13 @@ func TestSimplePrompt(t *testing.T) {
 	prompt := "Say: Hello World!"
 	expected := "Hello World!"
 
-	client := CreateMockClient(strings.Clone(expected))
+	client, err := MockClient(strings.Clone(expected))()
+	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
 
-	result, err := client.GetChatCompletion(context.Background(), config, prompt, "txt")
+	var result string
+	result, err = client.GetChatCompletion(context.Background(), config, prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
@@ -140,13 +123,15 @@ func TestPromptSaveAsChat(t *testing.T) {
 	prompt := "Say: Hello World!"
 	expected := "Hello World!"
 
-	client := CreateMockClient(strings.Clone(expected))
+	client, err := MockClient(strings.Clone(expected))()
+	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
 
 	config.Set("chat", "test_chat")
 
-	result, err := client.GetChatCompletion(context.Background(), config, prompt, "txt")
+	var result string
+	result, err = client.GetChatCompletion(context.Background(), config, prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
@@ -174,13 +159,13 @@ func TestPromptLoadChat(t *testing.T) {
 	prompt := "Repeat last message"
 	expected := "World!"
 
-	client := CreateMockClient(strings.Clone(expected))
+	client, err := MockClient(strings.Clone(expected))()
+	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
 
 	config.Set("chat", "test_chat")
 
-	var err error
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -220,13 +205,15 @@ func TestPromptWithModifier(t *testing.T) {
 	prompt := "Print Hello World"
 	expected := `echo "Hello World"`
 
-	client := CreateMockClient(strings.Clone(expected))
+	client, err := MockClient(strings.Clone(expected))()
+	require.NoError(t, err)
 	config := createTestConfig(t)
 	defer teardownTestDirs(t, config)
 
 	config.Set("chat", "test_chat")
 
-	result, err := client.GetChatCompletion(context.Background(), config, prompt, "sh")
+	var result string
+	result, err = client.GetChatCompletion(context.Background(), config, prompt, "sh")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
