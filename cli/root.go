@@ -49,7 +49,7 @@ func createViperConfig() (*viper.Viper, error) {
 		return nil, err
 	}
 	config.AddConfigPath(appConfigPath)
-	config.SetConfigFile("config")
+	config.SetConfigName("config")
 	config.SetConfigType("yaml")
 	return config, nil
 }
@@ -138,7 +138,6 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 				prompt = args[1]
 			}
 
-			// TODO validate flag combination
 			// TODO override config with mode config
 
 			// Create client
