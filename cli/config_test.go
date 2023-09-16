@@ -35,7 +35,6 @@ func TestConfigCmd(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 
@@ -46,8 +45,7 @@ func TestConfigCmd(t *testing.T) {
 func TestConfigCmdInit(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir, err := createTempDir("config")
-	require.NoError(t, err)
+	configDir := createTempDir(t, "config")
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -59,15 +57,12 @@ func TestConfigCmdInit(t *testing.T) {
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(configDir, "config.yaml"))
-
-	require.NoError(t, removeTempDir(configDir))
 }
 
 func TestConfigCmdInitAlreadyExists(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir, err := createTempDir("config")
-	require.NoError(t, err)
+	configDir := createTempDir(t, "config")
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -82,22 +77,19 @@ func TestConfigCmdInitAlreadyExists(t *testing.T) {
 
 	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "init"})
 	require.Equal(t, 1, mem.code)
-
-	require.NoError(t, removeTempDir(configDir))
 }
 
 func TestConfigCmdShowConfig(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir, err := createTempDir("config")
-	require.NoError(t, err)
+	configDir := createTempDir(t, "config")
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
 	config.SetConfigName("config")
 	config.SetConfigType("yaml")
 	config.Set("TESTING", 1)
-	setViperDefaults(config)
+	require.NoError(t, setViperDefaults(config))
 
 	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "init"})
 	require.Equal(t, 0, mem.code)
@@ -106,15 +98,12 @@ func TestConfigCmdShowConfig(t *testing.T) {
 
 	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "show"})
 	require.Equal(t, 0, mem.code)
-
-	require.NoError(t, removeTempDir(configDir))
 }
 
 func TestConfigCmdShowConfigNonExistent(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir, err := createTempDir("config")
-	require.NoError(t, err)
+	configDir := createTempDir(t, "config")
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -126,6 +115,4 @@ func TestConfigCmdShowConfigNonExistent(t *testing.T) {
 
 	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "show"})
 	require.Equal(t, 1, mem.code)
-
-	require.NoError(t, removeTempDir(configDir))
 }

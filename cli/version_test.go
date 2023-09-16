@@ -33,7 +33,6 @@ func TestVersionCmd(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	cmd := root.cmd
@@ -55,7 +54,6 @@ func TestVersionCmdFull(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	cmd := root.cmd
@@ -77,7 +75,6 @@ func TestVersionCmdUnknowArg(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	newRootCmd(mem.Exit, config, nil).Execute([]string{"version", "abcd"})
 	require.Equal(t, 1, mem.code)

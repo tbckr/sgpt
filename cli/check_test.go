@@ -33,10 +33,12 @@ func TestCheckCmd(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
+
 	err := os.Setenv("OPENAI_API_KEY", "test")
-	defer require.NoError(t, os.Unsetenv("OPENAI_API_KEY"))
 	require.NoError(t, err)
+	t.Cleanup(func() {
+		os.Unsetenv("OPENAI_API_KEY")
+	})
 
 	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"check"})
 	require.Equal(t, 0, mem.code)
@@ -46,7 +48,6 @@ func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 	err := os.Unsetenv("OPENAI_API_KEY")
 	require.NoError(t, err)
 

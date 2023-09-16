@@ -32,7 +32,6 @@ func TestCompletionCmd(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
@@ -45,7 +44,6 @@ func TestCompletionCmdBash(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
@@ -58,7 +56,6 @@ func TestCompletionCmdFish(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
@@ -71,7 +68,6 @@ func TestCompletionCmdPowershell(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
@@ -84,7 +80,6 @@ func TestCompletionCmdZsh(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
@@ -97,7 +92,6 @@ func TestCompletionCmdUnknownCompletion(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
@@ -110,7 +104,6 @@ func TestCompletionCmdTooManyArgs(t *testing.T) {
 	mem := &exitMemento{}
 
 	config := createTestConfig(t)
-	defer teardownTestDirs(t, config)
 
 	root := newRootCmd(mem.Exit, config, nil)
 	root.cmd.SetOut(io.Discard)
