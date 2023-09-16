@@ -100,6 +100,8 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	require.Equal(t, 0, mem.code)
 
 	require.Equal(t, openai.GPT4, config.GetString("model"))
+
+	require.NoError(t, removeTempDir(configDir))
 }
 
 func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
