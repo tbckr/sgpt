@@ -106,7 +106,7 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 		DisableFlagsInUseLine: true,
 		Args:                  cobra.RangeArgs(1, 2),
 		ValidArgsFunction:     cobra.NoFileCompletions,
-		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+		PersistentPreRun: func(_ *cobra.Command, _ []string) {
 			if root.verbose {
 				opts := &slog.HandlerOptions{
 					Level: slog.LevelDebug,
@@ -114,19 +114,9 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 				handler := slog.NewTextHandler(os.Stdout, opts)
 				slog.SetDefault(slog.New(handler))
 			}
-			err := setViperDefaults(config)
-			if err != nil {
-				return err
-			}
-			if err = config.ReadInConfig(); err != nil {
-				if errors.Is(err, os.ErrNotExist) {
-					// Config file not found; skip this then
-					return nil
-				}
-				// Config file was found but another error was produced
-				return err
-			}
-			return nil
+		},
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			return loadViperConfig(config)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			mode := strings.ToLower(args[0])
@@ -204,7 +194,7 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 
 	cmd.AddCommand(
 		newChatCmd(config).cmd,
-		newCheckCmd().cmd,
+		newCheckCmd(config, createClientFn).cmd,
 		newVersionCmd().cmd,
 		newLicensesCmd().cmd,
 		newManCmd().cmd,
@@ -212,6 +202,22 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 
 	root.cmd = cmd
 	return root
+}
+
+func loadViperConfig(config *viper.Viper) error {
+	err := setViperDefaults(config)
+	if err != nil {
+		return err
+	}
+	if err = config.ReadInConfig(); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// Config file not found; skip this then
+			return nil
+		}
+		// Config file was found but another error was produced
+		return err
+	}
+	return nil
 }
 
 func setViperDefaults(config *viper.Viper) error {

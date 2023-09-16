@@ -48,6 +48,26 @@ type OpenAIClient struct {
 	retrieveResponseFn func(*openai.Client, context.Context, openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error)
 }
 
+func MockClient(response string, err error) func() (*OpenAIClient, error) {
+	return func() (*OpenAIClient, error) {
+		return &OpenAIClient{
+			api: nil,
+			retrieveResponseFn: func(_ *openai.Client, _ context.Context, _ openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
+				return openai.ChatCompletionResponse{
+					Choices: []openai.ChatCompletionChoice{
+						{
+							Message: openai.ChatCompletionMessage{
+								Role:    openai.ChatMessageRoleAssistant,
+								Content: response,
+							},
+						},
+					},
+				}, nil
+			},
+		}, err
+	}
+}
+
 func CreateClient() (*OpenAIClient, error) {
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
