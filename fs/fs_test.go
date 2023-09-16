@@ -69,6 +69,8 @@ func TestGetAppConfigDir(t *testing.T) {
 
 func TestReadString(t *testing.T) {
 	reader, writer := io.Pipe()
+	defer require.NoError(t, reader.Close())
+	defer require.NoError(t, writer.Close())
 
 	var wg sync.WaitGroup
 
