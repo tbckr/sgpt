@@ -103,7 +103,6 @@ func TestCompletionCmdUnknownCompletion(t *testing.T) {
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "abcd"})
 
-	// TODO this is inconsistent, should be 1
 	require.Equal(t, 0, mem.code)
 }
 
@@ -117,6 +116,5 @@ func TestCompletionCmdTooManyArgs(t *testing.T) {
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "abcd", "efgh"})
 
-	// TODO this is inconsistent, should be 1
 	require.Equal(t, 0, mem.code)
 }
