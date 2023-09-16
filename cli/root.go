@@ -166,21 +166,7 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 	cmd.PersistentFlags().BoolVarP(&root.verbose, "verbose", "v", false,
 		"enable more verbose output for debugging")
 
-	// text based commands
-	cmd.Flags().StringP("model", "m", api.DefaultModel, "model name")
-	cmd.Flags().IntP("max-tokens", "s", 2048, "strict length of output (tokens)")
-	cmd.Flags().Float64P("temperature", "t", 0.8, "randomness of generated output")
-	cmd.Flags().Float64P("top-p", "p", 0.2, "limits highest probable tokens")
-	// additionally: shell command
-	cmd.Flags().BoolP("execute", "e", false, "execute shell command")
-	// chat flags
-	cmd.Flags().StringP("chat", "c", "", "use an existing chat session")
-
-	// Bind flags to viper
-	err := config.BindPFlags(cmd.Flags())
-	if err != nil {
-		panic(err)
-	}
+	bindFlagsToViper(cmd, config)
 
 	cmd.AddCommand(
 		newChatCmd(config).cmd,
@@ -188,10 +174,61 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 		newVersionCmd().cmd,
 		newLicensesCmd().cmd,
 		newManCmd().cmd,
+		newConfigCmd(config).cmd,
 	)
 
 	root.cmd = cmd
 	return root
+}
+
+func bindFlagsToViper(cmd *cobra.Command, config *viper.Viper) {
+	var bindErrors []error
+	var err error
+	// text based commands
+	cmd.Flags().StringP("model", "m", api.DefaultModel, "model name")
+	err = config.BindPFlag("model", cmd.Flags().Lookup("model"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
+	cmd.Flags().IntP("max-tokens", "s", 2048, "strict length of output (tokens)")
+	err = config.BindPFlag("maxTokens", cmd.Flags().Lookup("max-tokens"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
+	cmd.Flags().Float64P("temperature", "t", 1, "randomness of generated output")
+	err = config.BindPFlag("temperature", cmd.Flags().Lookup("temperature"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
+	cmd.Flags().Float64P("top-p", "p", 1, "limits highest probable tokens")
+	err = config.BindPFlag("topP", cmd.Flags().Lookup("top-p"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
+	// shell command
+	cmd.Flags().BoolP("execute", "e", false, "execute shell command")
+	err = config.BindPFlag("execute", cmd.Flags().Lookup("execute"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
+	// chat flags
+	cmd.Flags().StringP("chat", "c", "", "use an existing chat session")
+	err = config.BindPFlag("chat", cmd.Flags().Lookup("chat"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
+	if len(bindErrors) > 0 {
+		for _, err = range bindErrors {
+			slog.Error("Failed to bind flag to viper", "error", err)
+		}
+		panic("Failed to bind flags to viper")
+	}
 }
 
 func loadViperConfig(config *viper.Viper) error {
@@ -219,5 +256,17 @@ func setViperDefaults(config *viper.Viper) error {
 		return err
 	}
 	config.SetDefault("cacheDir", appCacheDir)
+
+	// model
+	config.SetDefault("model", api.DefaultModel)
+	// max-tokens
+	config.SetDefault("maxTokens", 2048)
+	// temperature
+	config.SetDefault("temperature", 1)
+	// top-p
+	config.SetDefault("topP", 1)
+	// execute
+	config.SetDefault("execute", false)
+
 	return nil
 }
