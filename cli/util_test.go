@@ -41,12 +41,14 @@ func (e *exitMemento) Exit(i int) {
 func createTestConfig(t *testing.T) *viper.Viper {
 	configDir := createTempDir(t, "config")
 	cacheDir := createTempDir(t, "cache")
+	personasDir := createTempDir(t, "personas")
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
 	config.SetConfigName("config")
 	config.SetConfigType("yaml")
 	config.Set("cacheDir", cacheDir)
+	config.Set("personas", personasDir)
 	config.Set("TESTING", 1)
 
 	return config

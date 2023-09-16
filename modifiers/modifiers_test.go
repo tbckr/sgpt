@@ -23,13 +23,19 @@ package modifiers
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/spf13/viper"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestGetChatModifierShell(t *testing.T) {
-	modifier, err := GetChatModifier("sh")
+	config := createTestConfig(t)
+
+	modifier, err := GetChatModifier(config, "sh")
 	require.NoError(t, err)
 	require.NotEmpty(t, modifier)
 	require.NotContains(t, modifier, "{{")
@@ -37,10 +43,12 @@ func TestGetChatModifierShell(t *testing.T) {
 }
 
 func TestGetChatModifierNoShell(t *testing.T) {
+	config := createTestConfig(t)
+
 	shellEnv := os.Getenv("SHELL")
 	require.NoError(t, os.Unsetenv("SHELL"))
 
-	modifier, err := GetChatModifier("sh")
+	modifier, err := GetChatModifier(config, "sh")
 	require.Error(t, err)
 	require.Empty(t, modifier)
 
@@ -48,18 +56,130 @@ func TestGetChatModifierNoShell(t *testing.T) {
 }
 
 func TestGetChatModifierCode(t *testing.T) {
-	modifier, err := GetChatModifier("code")
+	config := createTestConfig(t)
+
+	modifier, err := GetChatModifier(config, "code")
 	require.NoError(t, err)
 	require.NotEmpty(t, modifier)
 }
 
+func TestGetChatModifierCodeOverride(t *testing.T) {
+	codeOverride := `Act as a natural language to code translation engine.`
+
+	config := createTestConfig(t)
+
+	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "code"))
+	require.NoError(t, err)
+
+	_, err = fileHandler.WriteString(codeOverride)
+	require.NoError(t, err)
+
+	var modifier string
+	modifier, err = GetChatModifier(config, "code")
+	require.NoError(t, err)
+	require.Equal(t, codeOverride, modifier)
+	require.NoError(t, fileHandler.Close())
+}
+
+func TestGetChatModifierCustomPersona(t *testing.T) {
+	codeOverride := `This is custom persona.`
+
+	config := createTestConfig(t)
+
+	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "my-persona"))
+	require.NoError(t, err)
+
+	_, err = fileHandler.WriteString(codeOverride)
+	require.NoError(t, err)
+
+	var modifier string
+	modifier, err = GetChatModifier(config, "my-persona")
+	require.NoError(t, err)
+	require.Equal(t, codeOverride, modifier)
+	require.NoError(t, fileHandler.Close())
+}
+
+func TestGetChatModifierInvalidPersonaInSubdir(t *testing.T) {
+	personaText := `This is custom persona.`
+
+	config := createTestConfig(t)
+
+	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "my-persona"))
+	require.NoError(t, err)
+	_, err = fileHandler.WriteString(personaText)
+	require.NoError(t, err)
+	require.NoError(t, fileHandler.Close())
+
+	err = os.MkdirAll(filepath.Join(config.GetString("personas"), "subdir"), 0755)
+	require.NoError(t, err)
+	fileHandler, err = os.Create(filepath.Join(config.GetString("personas"), "subdir", "my-persona2"))
+	require.NoError(t, err)
+	_, err = fileHandler.WriteString(personaText)
+	require.NoError(t, err)
+	require.NoError(t, fileHandler.Close())
+
+	var modifier string
+	modifier, err = GetChatModifier(config, "my-persona2")
+	require.Error(t, err)
+	require.Empty(t, modifier)
+}
+
+func TestGetChatModifierInvalidWhitespacesInName(t *testing.T) {
+	personaText := `This is custom persona.`
+
+	config := createTestConfig(t)
+
+	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "my persona"))
+	require.NoError(t, err)
+	_, err = fileHandler.WriteString(personaText)
+	require.NoError(t, err)
+	require.NoError(t, fileHandler.Close())
+
+	var modifier string
+	modifier, err = GetChatModifier(config, "my persona2")
+	require.Error(t, err)
+	require.Empty(t, modifier)
+}
+
 func TestGetChatModifierTxt(t *testing.T) {
-	modifier, err := GetChatModifier("txt")
+	config := createTestConfig(t)
+
+	modifier, err := GetChatModifier(config, "txt")
 	require.NoError(t, err)
 	require.Empty(t, modifier)
 }
 
 func TestGetChatModifierInvalid(t *testing.T) {
-	_, err := GetChatModifier("abcd")
+	config := createTestConfig(t)
+
+	_, err := GetChatModifier(config, "abcd")
 	require.Error(t, err)
+}
+
+func createTestConfig(t *testing.T) *viper.Viper {
+	cacheDir := createTempDir(t, "cache")
+	configDir := createTempDir(t, "config")
+	personasDir := createTempDir(t, "personas")
+
+	config := viper.New()
+	config.AddConfigPath(configDir)
+	config.SetConfigName("config")
+	config.SetConfigType("yaml")
+	config.Set("cacheDir", cacheDir)
+	config.Set("personas", personasDir)
+	config.Set("TESTING", 1)
+
+	return config
+}
+
+func createTempDir(t *testing.T, suffix string) string {
+	if suffix != "" {
+		suffix = "_" + suffix
+	}
+	tempFilepath, err := os.MkdirTemp("", strings.Join([]string{"sgpt_temp_*", suffix}, ""))
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.RemoveAll(tempFilepath))
+	})
+	return tempFilepath
 }
