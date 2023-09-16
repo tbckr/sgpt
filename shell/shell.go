@@ -64,7 +64,8 @@ func executeShellCommand(ctx context.Context, output io.Writer, command string) 
 	// TODO make shell configurable
 	cmd := exec.CommandContext(ctx, "bash", "-c", command)
 	cmd.Stdout = output
-	cmd.Stderr = output
+	// TODO pass in stderr?
+	//cmd.Stderr = output
 	err := cmd.Run()
 	if err != nil {
 		return err
