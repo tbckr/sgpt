@@ -22,44 +22,23 @@
 package modifiers
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetChatModifierShell(t *testing.T) {
-	modifier, err := GetChatModifier("sh")
+func TestLoadDefaultPrompts(t *testing.T) {
+	prompts, err := loadDefaultPrompts()
 	require.NoError(t, err)
-	require.NotEmpty(t, modifier)
-	require.NotContains(t, modifier, "{{")
-	require.NotContains(t, modifier, "}}")
-}
 
-func TestGetChatModifierNoShell(t *testing.T) {
-	shellEnv := os.Getenv("SHELL")
-	require.NoError(t, os.Unsetenv("SHELL"))
+	shellPrompt, exists := prompts["sh"]
+	require.True(t, exists)
+	require.NotEmpty(t, shellPrompt.Messages)
+	require.NotEmpty(t, shellPrompt.Messages[0].Text)
 
-	modifier, err := GetChatModifier("sh")
-	require.Error(t, err)
-	require.Empty(t, modifier)
-
-	require.NoError(t, os.Setenv("SHELL", shellEnv))
-}
-
-func TestGetChatModifierCode(t *testing.T) {
-	modifier, err := GetChatModifier("code")
-	require.NoError(t, err)
-	require.NotEmpty(t, modifier)
-}
-
-func TestGetChatModifierTxt(t *testing.T) {
-	modifier, err := GetChatModifier("txt")
-	require.NoError(t, err)
-	require.Empty(t, modifier)
-}
-
-func TestGetChatModifierInvalid(t *testing.T) {
-	_, err := GetChatModifier("abcd")
-	require.Error(t, err)
+	var codePrompt Prompt
+	codePrompt, exists = prompts["code"]
+	require.True(t, exists)
+	require.NotEmpty(t, codePrompt.Messages)
+	require.NotEmpty(t, codePrompt.Messages[0].Text)
 }

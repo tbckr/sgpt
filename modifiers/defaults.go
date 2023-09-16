@@ -22,44 +22,33 @@
 package modifiers
 
 import (
-	"os"
-	"testing"
+	_ "embed"
 
-	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
-func TestGetChatModifierShell(t *testing.T) {
-	modifier, err := GetChatModifier("sh")
-	require.NoError(t, err)
-	require.NotEmpty(t, modifier)
-	require.NotContains(t, modifier, "{{")
-	require.NotContains(t, modifier, "}}")
+//go:embed prompts.yml
+var defaultPrompts []byte
+
+type Prompt struct {
+	Source     string    `yaml:"source"`
+	Version    string    `yaml:"version"`
+	License    string    `yaml:"license"`
+	LicenseURL string    `yaml:"licenseUrl"`
+	Messages   []Message `yaml:"messages"`
 }
 
-func TestGetChatModifierNoShell(t *testing.T) {
-	shellEnv := os.Getenv("SHELL")
-	require.NoError(t, os.Unsetenv("SHELL"))
-
-	modifier, err := GetChatModifier("sh")
-	require.Error(t, err)
-	require.Empty(t, modifier)
-
-	require.NoError(t, os.Setenv("SHELL", shellEnv))
+type Message struct {
+	Role string `yaml:"role"`
+	Text string `yaml:"text"`
 }
 
-func TestGetChatModifierCode(t *testing.T) {
-	modifier, err := GetChatModifier("code")
-	require.NoError(t, err)
-	require.NotEmpty(t, modifier)
-}
-
-func TestGetChatModifierTxt(t *testing.T) {
-	modifier, err := GetChatModifier("txt")
-	require.NoError(t, err)
-	require.Empty(t, modifier)
-}
-
-func TestGetChatModifierInvalid(t *testing.T) {
-	_, err := GetChatModifier("abcd")
-	require.Error(t, err)
+func loadDefaultPrompts() (map[string]Prompt, error) {
+	// Load default prompts
+	var prompts map[string]Prompt
+	err := yaml.Unmarshal(defaultPrompts, &prompts)
+	if err != nil {
+		return map[string]Prompt{}, err
+	}
+	return prompts, nil
 }
