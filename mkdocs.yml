@@ -67,5 +67,10 @@ nav:
   - Home: 'index.md'
   - Installation: 'installation.md'
   - Getting Started: 'getting-started.md'
-  - Usage Guide: 'usage.md'
+  - Usage Guide:
+      - Query Models: 'usage/query-models.md'
+      - Chat: 'usage/chat.md'
+      - Docker: 'usage/docker.md'
+      - Personas: 'usage/personas.md'
+  - Configuration: 'configuration.md'
   - Examples: 'examples.md'
