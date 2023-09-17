@@ -5,14 +5,14 @@
 SGPT allows you to ask simple questions and receive informative answers. For example:
 
 ```shell
-$ sgpt txt "mass of sun"
+$ sgpt "mass of sun"
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
 You can also pass prompts to SGPT using pipes:
 
 ```shell
-$ echo -n "mass of sun" | sgpt txt
+$ echo -n "mass of sun" | sgpt
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 

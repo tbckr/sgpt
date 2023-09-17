@@ -10,17 +10,17 @@ The example below demonstrates how to fine-tune the model's responses for more t
 
 1. The first command initiates a chat session named `ls-files` and asks the model to "list all files directory":
 
-  ```shell
-  $ sgpt sh --chat ls-files "list all files directory"
-  ls
-  ```
+```shell
+$ sgpt sh --chat ls-files "list all files directory"
+ls
+```
 
 1. The second command continues the conversation within the `ls-files` chat session and requests to "sort by name":
 
-  ```shell
-  $ sgpt sh --chat ls-files "sort by name"
-  ls | sort
-  ```
+```shell
+$ sgpt sh --chat ls-files "sort by name"
+ls | sort
+```
 
 The model provides the appropriate shell command `ls | sort`, which lists all files in a directory and sorts them by
 name.
