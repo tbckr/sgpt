@@ -28,7 +28,6 @@ import (
 	"path/filepath"
 
 	"github.com/sashabaranov/go-openai"
-	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 )
 
@@ -171,7 +170,6 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 			return err
 		}
 	}
-	jww.DEBUG.Println("session saved")
 	return nil
 }
 
