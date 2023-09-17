@@ -318,9 +318,6 @@ brews:
      enabling users to run queries, generate shell commands, produce code,
      and create images from text directly from the terminal.
     license: MIT
-    dependencies:
-    - name: go
-      type: optional
     install: |-
       bin.install "sgpt"
       bash_completion.install "completions/sgpt.bash" => "sgpt"
