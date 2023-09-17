@@ -100,11 +100,49 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 		exit: exit,
 	}
 
-	// TODO add documentation
+	// TODO more (debug) logs
 	// TODO add an interactive mode, shorts: explain, add next message, execute
 	cmd := &cobra.Command{
-		Use:                   "sgpt",
-		Short:                 "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
+		Use:   "sgpt [persona] [prompt]",
+		Short: "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
+		Long: `SGPT is a command-line interface (CLI) tool to access the OpenAI models via the command line.
+
+Provide your prompt via stdin or as an argument and the tool will return the generated text. You can also provide a persona as an argument before the prompt to add further customize the generated responses.
+
+By default the personas "code" and "sh" are included and can be used to generate code or shell commands. You can also add your own personas in a "personas"" directory of SGPT's config directory.
+
+The tool can also be used to chat with the OpenAI models. You can start a new chat session or continue an existing one. The chat session is stored in the cache directory and can be deleted at any time.`,
+		Example: `
+# Ask questions
+$ sgpt "mass of sun"
+The mass of the sun is approximately 1.989 x 10^30 kilograms.
+
+# Provide prompt via stdin
+$ echo -n "mass of sun" | sgpt
+The mass of the sun is approximately 1.989 x 10^30 kilograms.
+
+# Generate code
+$ sgpt code "Solve classic fizz buzz problem using Python"
+for i in range(1, 101):
+    if i % 3 == 0 and i % 5 == 0:
+        print("FizzBuzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    elif i % 5 == 0:
+        print("Buzz")
+    else:
+        print(i)
+
+# Generate shell commands
+$ sgpt sh "list all files in the current directory"
+ls
+
+# Use a chat to further customize the generated text
+$ sgpt sh --chat ls-files "list all files directory"
+ls
+$ sgpt sh --chat ls-files "sort by name"
+ls | sort
+`,
 		DisableFlagsInUseLine: true,
 		Args:                  cobra.RangeArgs(0, 2),
 		ValidArgsFunction:     cobra.NoFileCompletions,
@@ -184,7 +222,7 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 	cmd.PersistentFlags().BoolVarP(&root.verbose, "verbose", "v", false,
 		"enable more verbose output for debugging")
 
-	bindFlagsToViper(cmd, config)
+	createFlags(cmd, config)
 
 	cmd.AddCommand(
 		newChatCmd(config).cmd,
@@ -199,7 +237,7 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 	return root
 }
 
-func bindFlagsToViper(cmd *cobra.Command, config *viper.Viper) {
+func createFlags(cmd *cobra.Command, config *viper.Viper) {
 	var bindErrors []error
 	var err error
 	// text based commands
@@ -228,14 +266,14 @@ func bindFlagsToViper(cmd *cobra.Command, config *viper.Viper) {
 	}
 
 	// shell command
-	cmd.Flags().BoolP("execute", "e", false, "execute shell command")
+	cmd.Flags().BoolP("execute", "e", false, "execute a response in the shell")
 	err = config.BindPFlag("execute", cmd.Flags().Lookup("execute"))
 	if err != nil {
 		bindErrors = append(bindErrors, err)
 	}
 
 	// chat flags
-	cmd.Flags().StringP("chat", "c", "", "use an existing chat session")
+	cmd.Flags().StringP("chat", "c", "", "use an existing chat session or create a new one")
 	err = config.BindPFlag("chat", cmd.Flags().Lookup("chat"))
 	if err != nil {
 		bindErrors = append(bindErrors, err)
