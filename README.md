@@ -31,7 +31,6 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
   - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
   - [Code Generation Capabilities](#code-generation-capabilities)
-  - [Transforming Text to Images](#transforming-text-to-images)
 - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -312,27 +311,6 @@ for i in range(1, 101):
 ```
 
 SGPT will return the appropriate Python code to address the FizzBuzz problem
-
-### Transforming Text to Images
-
-SGPT can also generate images based on textual descriptions using the DALLE API. To create an image from text, input
-your desired description as shown below:
-
-```shell
-$ sgpt image "v for vendetta"
-<image url>
-```
-
-SGPT will return an image URL representing the "V for Vendetta" prompt.
-
-If you prefer to download the generated image directly to your current working directory, use the `--download` flag:
-
-```shell
-$ sgpt image --download "v for vendetta"
-1c561592-6d93-438f-9bee-d96c898a31a8.png
-```
-
-The image will be downloaded with a unique file name, making it easily accessible within your working directory.
 
 ## Acknowledgements
 
