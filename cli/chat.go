@@ -27,14 +27,10 @@ import (
 	"io"
 	"strings"
 
-	"github.com/spf13/viper"
-
-	jww "github.com/spf13/jwalterweatherman"
-
-	"github.com/tbckr/sgpt/chat"
-
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/tbckr/sgpt/chat"
 )
 
 const (
@@ -151,7 +147,6 @@ Show the conversation for the given chat session.
 			if err != nil {
 				return err
 			}
-			jww.DEBUG.Println("showing conversation")
 			return showConversation(cmd.OutOrStdout(), messages)
 		},
 	}
