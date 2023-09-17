@@ -73,6 +73,36 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	wg.Wait()
 }
 
+func TestRootCmd_SimplePromptOnly(t *testing.T) {
+	prompt := "Say: Hello World!"
+	expected := "Hello World!\n"
+
+	mem := &exitMemento{}
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	config := createTestConfig(t)
+
+	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
 func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	prompt := "Say: Hello World!"
 	mem := &exitMemento{}
@@ -104,7 +134,7 @@ func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 
 	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
 
-	root.Execute([]string{"txt"})
+	root.Execute([]string{})
 	require.Equal(t, 1, mem.code)
 }
 
@@ -139,6 +169,47 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 }
 
 func TestRootCmd_SimplePromptViaStdin(t *testing.T) {
+	prompt := "Say: Hello World!"
+	expected := "Hello World!\n"
+
+	mem := &exitMemento{}
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	config := createTestConfig(t)
+
+	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(prompt))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, stdoutReader)
+		require.NoError(t, err)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptViaStdinAndModifier(t *testing.T) {
 	prompt := "Say: Hello World!"
 	expected := "Hello World!\n"
 
