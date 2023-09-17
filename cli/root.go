@@ -106,7 +106,7 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 		Use:                   "sgpt",
 		Short:                 "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
 		DisableFlagsInUseLine: true,
-		Args:                  cobra.RangeArgs(1, 2),
+		Args:                  cobra.RangeArgs(0, 2),
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
 			if root.verbose {
@@ -121,10 +121,10 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 			return loadViperConfig(config)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mode := strings.ToLower(args[0])
 
 			var prompt string
-			if len(args) == 1 {
+			mode := "txt"
+			if len(args) == 0 {
 				// input is provided via stdin
 				input, err := fs.ReadString(cmd.InOrStdin())
 				if err != nil {
@@ -135,8 +135,24 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 				}
 				prompt = input
 
+			} else if len(args) == 1 {
+				// check, if input is provided via stdin
+				input, err := fs.ReadString(cmd.InOrStdin())
+				if err != nil {
+					return err
+				}
+				if len(input) > 0 {
+					// input is provided via stdin
+					prompt = input
+					mode = args[0]
+				} else {
+					// input is provided via command line args
+					prompt = args[0]
+				}
+
 			} else {
-				// input is provided via command line args
+				// input and mode are provided via command line args
+				mode = strings.ToLower(args[0])
 				prompt = args[1]
 			}
 
