@@ -49,11 +49,19 @@ tasks:
       - go install github.com/caarlos0/svu@latest
       - go install golang.org/x/vuln/cmd/govulncheck@latest
 
+  setup:docs:
+    desc: Install mkdocs and plugins
+    preconditions:
+      - which python3
+    cmds:
+      - python3 -m pip install -r docs/requirements.txt
+
   setup:
     desc: Setup development environment
     cmds:
       - task: setup:precommit
       - task: setup:go-tools
+      - task: setup:docs
 
   validate:devtools:
     desc: Validate that all necessary devtools are installed
@@ -66,6 +74,12 @@ tasks:
       - which addlicense 1>/dev/null || (echo "addlicense is not installed" && exit 1)
       - which svu 1>/dev/null || (echo "svu is not installed" && exit 1)
       - which goreleaser 1>/dev/null || (echo "goreleaser is not installed" && exit 1)
+      - which mkdocs 1>/dev/null || (echo "mkdocs is not installed" && exit 1)
+
+  docs:
+    desc: Serve documentation locally
+    cmds:
+      - mkdocs serve
 
   license-header:
     desc: Add license header to all files
@@ -77,6 +91,7 @@ tasks:
         -ignore ".task/**" \
         -ignore ".github/licenses.tmpl" \
         -ignore "licenses/*" \
+        -ignore "venv/*" \
         .
 
   clean:
