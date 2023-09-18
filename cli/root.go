@@ -298,10 +298,9 @@ func loadViperConfig(config *viper.Viper) error {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore error
 			return nil
-		} else {
-			// Config file was found but another error was produced
-			return err
 		}
+		// Config file was found but another error was produced
+		return err
 	}
 	return nil
 }
