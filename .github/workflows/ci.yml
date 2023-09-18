@@ -79,9 +79,8 @@ jobs:
           go install github.com/mfridman/tparse@latest
       # Build executable
       - name: Build
-        env:
-          SHELL: /bin/bash
         run: |
+          echo $SHELL
           task clean
           task prepare
           task build
