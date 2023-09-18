@@ -100,8 +100,6 @@ func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api
 		exit: exit,
 	}
 
-	// TODO more (debug) logs
-	// TODO add an interactive mode, shorts: explain, add next message, execute
 	cmd := &cobra.Command{
 		Use:   "sgpt [persona] [prompt]",
 		Short: "A command-line interface (CLI) tool to access the OpenAI models via the command line.",
@@ -193,8 +191,6 @@ ls | sort
 				mode = strings.ToLower(args[0])
 				prompt = args[1]
 			}
-
-			// TODO override config with mode config
 
 			// Create client
 			client, err := createClientFn()

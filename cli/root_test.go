@@ -260,7 +260,6 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	// TODO the shell env variable is not set in some gha tests
 	err := os.Setenv("SHELL", "/bin/bash")
 	require.NoError(t, err)
 	t.Cleanup(func() {
@@ -298,7 +297,6 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	// TODO the shell env variable is not set in some gha tests
 	err := os.Setenv("SHELL", "/bin/bash")
 	require.NoError(t, err)
 	t.Cleanup(func() {
@@ -396,7 +394,6 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	// TODO the shell env variable is not set in some gha tests
 	err := os.Setenv("SHELL", "/bin/bash")
 	require.NoError(t, err)
 	t.Cleanup(func() {

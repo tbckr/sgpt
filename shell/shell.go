@@ -61,7 +61,6 @@ func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
 }
 
 func executeShellCommand(ctx context.Context, output io.Writer, command string) error {
-	// TODO use correct shell for each OS
 	cmd := exec.CommandContext(ctx, "bash", "-c", command)
 	cmd.Stdout = output
 	err := cmd.Run()
