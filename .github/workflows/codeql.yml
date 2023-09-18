@@ -60,7 +60,7 @@ jobs:
         language: [ 'go' ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@489225d82a57396c6f426a40e66d461b16b3461d # v2
