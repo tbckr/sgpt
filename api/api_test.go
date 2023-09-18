@@ -196,6 +196,9 @@ func TestPromptWithModifier(t *testing.T) {
 	require.NoError(t, err)
 	config := createTestConfig(t)
 
+	_, exists := os.LookupEnv("SHELL")
+	require.True(t, exists)
+
 	config.Set("chat", "test_chat")
 
 	var result string

@@ -35,6 +35,9 @@ import (
 func TestGetChatModifierShell(t *testing.T) {
 	config := createTestConfig(t)
 
+	_, exists := os.LookupEnv("SHELL")
+	require.True(t, exists)
+
 	modifier, err := GetChatModifier(config, "sh")
 	require.NoError(t, err)
 	require.NotEmpty(t, modifier)
