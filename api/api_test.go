@@ -196,8 +196,12 @@ func TestPromptWithModifier(t *testing.T) {
 	require.NoError(t, err)
 	config := createTestConfig(t)
 
-	_, exists := os.LookupEnv("SHELL")
-	require.True(t, exists)
+	// TODO the shell env variable is not set in some gha tests
+	err = os.Setenv("SHELL", "/bin/bash")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Unsetenv("SHELL"))
+	})
 
 	config.Set("chat", "test_chat")
 

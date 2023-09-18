@@ -260,8 +260,12 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	_, exists := os.LookupEnv("SHELL")
-	require.True(t, exists)
+	// TODO the shell env variable is not set in some gha tests
+	err := os.Setenv("SHELL", "/bin/bash")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Unsetenv("SHELL"))
+	})
 
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
