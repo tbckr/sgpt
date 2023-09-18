@@ -298,6 +298,13 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 
 	config := createTestConfig(t)
 
+	// TODO the shell env variable is not set in some gha tests
+	err := os.Setenv("SHELL", "/bin/bash")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Unsetenv("SHELL"))
+	})
+
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
@@ -388,6 +395,13 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	reader, writer := io.Pipe()
 
 	config := createTestConfig(t)
+
+	// TODO the shell env variable is not set in some gha tests
+	err := os.Setenv("SHELL", "/bin/bash")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Unsetenv("SHELL"))
+	})
 
 	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "my-persona"))
 	require.NoError(t, err)
