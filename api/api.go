@@ -92,23 +92,23 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 
 	chatSessionManager, err = chat.NewFilesystemChatSessionManager(config)
 
-	var chatId string
+	var chatID string
 	var isChat bool
 	if config.IsSet("chat") {
-		chatId = config.GetString("chat")
+		chatID = config.GetString("chat")
 		isChat = true
 	}
 	chatExists := false
 
 	// Load existing chat messages
 	if isChat {
-		chatExists, err = chatSessionManager.SessionExists(chatId)
+		chatExists, err = chatSessionManager.SessionExists(chatID)
 		if err != nil {
 			return "", err
 		}
 		if chatExists {
 			var loadedMessages []openai.ChatCompletionMessage
-			loadedMessages, err = chatSessionManager.GetSession(chatId)
+			loadedMessages, err = chatSessionManager.GetSession(chatID)
 			if err != nil {
 				return "", err
 			}
@@ -161,7 +161,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 	// If a session was provided, save received message to this chat
 	if isChat {
 		messages = append(messages, receivedMessage)
-		if err = chatSessionManager.SaveSession(chatId, messages); err != nil {
+		if err = chatSessionManager.SaveSession(chatID, messages); err != nil {
 			return "", err
 		}
 	}
