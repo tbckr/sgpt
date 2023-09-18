@@ -80,7 +80,6 @@ jobs:
       # Build executable
       - name: Build
         run: |
-          echo $SHELL
           task clean
           task prepare
           task build
