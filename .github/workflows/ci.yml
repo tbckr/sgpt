@@ -78,7 +78,7 @@ jobs:
         run: |
           go install github.com/mfridman/tparse@latest
       # Build executable
-      - name: Build
+      - name: build
         run: |
           task clean
           task prepare

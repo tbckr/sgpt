@@ -47,12 +47,13 @@ func TestGetChatModifierNoShell(t *testing.T) {
 
 	shellEnv := os.Getenv("SHELL")
 	require.NoError(t, os.Unsetenv("SHELL"))
+	t.Cleanup(func() {
+		require.NoError(t, os.Setenv("SHELL", shellEnv))
+	})
 
 	modifier, err := GetChatModifier(config, "sh")
 	require.Error(t, err)
 	require.Empty(t, modifier)
-
-	require.NoError(t, os.Setenv("SHELL", shellEnv))
 }
 
 func TestGetChatModifierCode(t *testing.T) {

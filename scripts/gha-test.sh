@@ -21,10 +21,6 @@
 # SPDX-License-Identifier: MIT
 
 # If shell env var is not set, set it to default value
-if [ -z "$SHELL" ]; then
-  $SHELL="/bin/bash"
-fi
-
 echo $SHELL
 
 set -o pipefail && TEST_OPTIONS="-json" task test | tee output.json | tparse -follow
