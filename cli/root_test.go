@@ -260,6 +260,9 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 
 	config := createTestConfig(t)
 
+	_, exists := os.LookupEnv("SHELL")
+	require.True(t, exists)
+
 	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
