@@ -29,6 +29,6 @@ if ! command -v "go-licenses" >/dev/null 2>&1; then
   exit 1
 fi
 
-go-licenses report github.com/tbckr/sgpt/cmd/sgpt \
-  --ignore github.com/tbckr/sgpt \
+go-licenses report github.com/tbckr/sgpt/v2/cmd/sgpt \
+  --ignore github.com/tbckr/sgpt/v2 \
   --template .github/licenses.tmpl >licenses/oss-licenses.md
