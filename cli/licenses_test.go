@@ -30,7 +30,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tbckr/sgpt/api"
+	"github.com/tbckr/sgpt/v2/api"
 )
 
 func TestLicensesCmd(t *testing.T) {

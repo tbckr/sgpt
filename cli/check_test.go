@@ -26,7 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/api"
+	"github.com/tbckr/sgpt/v2/api"
 )
 
 func TestCheckCmd(t *testing.T) {

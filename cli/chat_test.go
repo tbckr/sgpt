@@ -29,10 +29,10 @@ import (
 	"testing"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt/chat"
+	"github.com/tbckr/sgpt/v2/chat"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/api"
+	"github.com/tbckr/sgpt/v2/api"
 )
 
 func TestChatCmd(t *testing.T) {

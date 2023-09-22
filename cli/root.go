@@ -30,9 +30,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/api"
-	"github.com/tbckr/sgpt/fs"
-	"github.com/tbckr/sgpt/shell"
+	"github.com/tbckr/sgpt/v2/api"
+	"github.com/tbckr/sgpt/v2/fs"
+	"github.com/tbckr/sgpt/v2/shell"
 )
 
 type rootCmd struct {

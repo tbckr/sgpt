@@ -1,4 +1,4 @@
-module github.com/tbckr/sgpt
+module github.com/tbckr/sgpt/v2
 
 go 1.21
 

@@ -25,7 +25,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tbckr/sgpt/internal/buildinfo"
+	"github.com/tbckr/sgpt/v2/internal/buildinfo"
 )
 
 type versionCmd struct {

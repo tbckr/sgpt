@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/api"
+	"github.com/tbckr/sgpt/v2/api"
 )
 
 func TestConfigCmd(t *testing.T) {

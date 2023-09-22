@@ -27,7 +27,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/api"
+	"github.com/tbckr/sgpt/v2/api"
 )
 
 type checkCmd struct {

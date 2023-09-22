@@ -33,7 +33,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/tbckr/sgpt/fs"
+	"github.com/tbckr/sgpt/v2/fs"
 )
 
 const (
