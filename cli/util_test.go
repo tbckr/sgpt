@@ -22,12 +22,9 @@
 package cli
 
 import (
-	"os"
-	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
-	"github.com/stretchr/testify/require"
 )
 
 type exitMemento struct {
@@ -39,9 +36,9 @@ func (e *exitMemento) Exit(i int) {
 }
 
 func createTestConfig(t *testing.T) *viper.Viper {
-	configDir := createTempDir(t, "config")
-	cacheDir := createTempDir(t, "cache")
-	personasDir := createTempDir(t, "personas")
+	configDir := t.TempDir()
+	cacheDir := t.TempDir()
+	personasDir := t.TempDir()
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -52,16 +49,4 @@ func createTestConfig(t *testing.T) *viper.Viper {
 	config.Set("TESTING", 1)
 
 	return config
-}
-
-func createTempDir(t *testing.T, suffix string) string {
-	if suffix != "" {
-		suffix = "_" + suffix
-	}
-	tempFilepath, err := os.MkdirTemp("", strings.Join([]string{"sgpt_temp_*", suffix}, ""))
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		require.NoError(t, os.RemoveAll(tempFilepath))
-	})
-	return tempFilepath
 }

@@ -24,7 +24,6 @@ package modifiers
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -164,9 +163,9 @@ func TestGetChatModifierInvalid(t *testing.T) {
 }
 
 func createTestConfig(t *testing.T) *viper.Viper {
-	cacheDir := createTempDir(t, "cache")
-	configDir := createTempDir(t, "config")
-	personasDir := createTempDir(t, "personas")
+	cacheDir := t.TempDir()
+	configDir := t.TempDir()
+	personasDir := t.TempDir()
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -177,16 +176,4 @@ func createTestConfig(t *testing.T) *viper.Viper {
 	config.Set("TESTING", 1)
 
 	return config
-}
-
-func createTempDir(t *testing.T, suffix string) string {
-	if suffix != "" {
-		suffix = "_" + suffix
-	}
-	tempFilepath, err := os.MkdirTemp("", strings.Join([]string{"sgpt_temp_*", suffix}, ""))
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		require.NoError(t, os.RemoveAll(tempFilepath))
-	})
-	return tempFilepath
 }

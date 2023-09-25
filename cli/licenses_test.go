@@ -29,7 +29,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
 	"github.com/tbckr/sgpt/v2/api"
 )
 

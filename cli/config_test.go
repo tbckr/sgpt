@@ -26,7 +26,6 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
-
 	"github.com/stretchr/testify/require"
 	"github.com/tbckr/sgpt/v2/api"
 )
@@ -45,7 +44,7 @@ func TestConfigCmd(t *testing.T) {
 func TestConfigCmdInit(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir := createTempDir(t, "config")
+	configDir := t.TempDir()
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -62,7 +61,7 @@ func TestConfigCmdInit(t *testing.T) {
 func TestConfigCmdInitAlreadyExists(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir := createTempDir(t, "config")
+	configDir := t.TempDir()
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -82,7 +81,7 @@ func TestConfigCmdInitAlreadyExists(t *testing.T) {
 func TestConfigCmdShowConfig(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir := createTempDir(t, "config")
+	configDir := t.TempDir()
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
@@ -103,7 +102,7 @@ func TestConfigCmdShowConfig(t *testing.T) {
 func TestConfigCmdShowConfigNonExistent(t *testing.T) {
 	mem := &exitMemento{}
 
-	configDir := createTempDir(t, "config")
+	configDir := t.TempDir()
 
 	config := viper.New()
 	config.AddConfigPath(configDir)

@@ -107,7 +107,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	prompt := "Say: Hello World!"
 	mem := &exitMemento{}
 
-	configDir := createTempDir(t, "config")
+	configDir := t.TempDir()
 
 	config, err := createViperConfig()
 	config.SetConfigFile(filepath.Join(configDir, "config.yaml"))
