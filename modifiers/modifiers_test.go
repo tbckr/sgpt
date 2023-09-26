@@ -22,8 +22,11 @@
 package modifiers
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -48,6 +51,10 @@ func TestGetChatModifierShell(t *testing.T) {
 }
 
 func TestGetChatModifierNoShell(t *testing.T) {
+	expectedPattern := `Act as a natural language to command translation engine on %s.
+You are an expert in %s and translate the question at the end to valid syntax.`
+	expected := fmt.Sprintf(expectedPattern, runtime.GOOS, runtime.GOOS)
+
 	config := createTestConfig(t)
 
 	shellEnv := os.Getenv("SHELL")
@@ -57,8 +64,8 @@ func TestGetChatModifierNoShell(t *testing.T) {
 	})
 
 	modifier, err := GetChatModifier(config, "sh")
-	require.Error(t, err)
-	require.Empty(t, modifier)
+	require.NoError(t, err)
+	require.True(t, strings.HasPrefix(modifier, expected))
 }
 
 func TestGetChatModifierCode(t *testing.T) {
