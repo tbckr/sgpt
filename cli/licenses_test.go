@@ -42,7 +42,7 @@ their respective license information, visit:
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)

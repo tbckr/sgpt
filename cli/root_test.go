@@ -23,6 +23,7 @@ package cli
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -53,7 +54,7 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -83,7 +84,7 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -119,7 +120,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 
 	_, err = configFile.WriteString(fmt.Sprintf("model: \"%s\"\n", openai.GPT4))
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("Hello World", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("Hello World", nil))
 
 	root.Execute([]string{"txt", prompt})
 	require.Equal(t, 0, mem.code)
@@ -132,7 +133,7 @@ func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{})
 	require.Equal(t, 1, mem.code)
@@ -148,7 +149,7 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -168,7 +169,7 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	wg.Wait()
 }
 
-func TestRootCmd_SimplePromptViaStdin(t *testing.T) {
+func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	prompt := "Say: Hello World!"
 	expected := "Hello World!\n"
 
@@ -179,7 +180,7 @@ func TestRootCmd_SimplePromptViaStdin(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -209,7 +210,46 @@ func TestRootCmd_SimplePromptViaStdin(t *testing.T) {
 	wg.Wait()
 }
 
-func TestRootCmd_SimplePromptViaStdinAndModifier(t *testing.T) {
+func TestRootCmd_PipedShell_NoInput(t *testing.T) {
+	mem := &exitMemento{}
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+
+	config := createTestConfig(t)
+
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient("", nil))
+	root.cmd.SetIn(stdinReader)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(""))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	root.Execute([]string{})
+	require.Equal(t, 1, mem.code)
+	require.NoError(t, stdinReader.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
+	prompt := "Say: Hello World!"
+
+	mem := &exitMemento{}
+	config := createTestConfig(t)
+
+	testError := errors.New("test error")
+
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, testError), api.MockClient("", nil))
+
+	root.Execute([]string{prompt})
+	require.Equal(t, 1, mem.code)
+}
+
+func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	prompt := "Say: Hello World!"
 	expected := "Hello World!\n"
 
@@ -220,7 +260,7 @@ func TestRootCmd_SimplePromptViaStdinAndModifier(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -266,7 +306,7 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 		require.NoError(t, os.Unsetenv("SHELL"))
 	})
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -303,7 +343,7 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 		require.NoError(t, os.Unsetenv("SHELL"))
 	})
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -345,7 +385,7 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -406,7 +446,7 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, fileHandler.Close())
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -474,7 +514,7 @@ func TestRootCmd_ChatConversation(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient(strings.Clone(expected), nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)

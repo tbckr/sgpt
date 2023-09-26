@@ -35,6 +35,12 @@ func (e *exitMemento) Exit(i int) {
 	e.code = i
 }
 
+func mockIsPipedShell(isPiped bool, err error) func() (bool, error) {
+	return func() (bool, error) {
+		return isPiped, err
+	}
+}
+
 func createTestConfig(t *testing.T) *viper.Viper {
 	configDir := t.TempDir()
 	cacheDir := t.TempDir()

@@ -35,7 +35,7 @@ func TestConfigCmd(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"config"})
 	require.Equal(t, 0, mem.code)
@@ -52,7 +52,7 @@ func TestConfigCmdInit(t *testing.T) {
 	config.SetConfigType("yaml")
 	config.Set("TESTING", 1)
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "init"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"config", "init"})
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(configDir, "config.yaml"))
@@ -69,12 +69,12 @@ func TestConfigCmdInitAlreadyExists(t *testing.T) {
 	config.SetConfigType("yaml")
 	config.Set("TESTING", 1)
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "init"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"config", "init"})
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(configDir, "config.yaml"))
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "init"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"config", "init"})
 	require.Equal(t, 1, mem.code)
 }
 
@@ -90,12 +90,12 @@ func TestConfigCmdShowConfig(t *testing.T) {
 	config.Set("TESTING", 1)
 	require.NoError(t, setViperDefaults(config))
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "init"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"config", "init"})
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(configDir, "config.yaml"))
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "show"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"config", "show"})
 	require.Equal(t, 0, mem.code)
 }
 
@@ -112,6 +112,6 @@ func TestConfigCmdShowConfigNonExistent(t *testing.T) {
 
 	require.NoFileExists(t, filepath.Join(configDir, "config.yaml"))
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"config", "show"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"config", "show"})
 	require.Equal(t, 1, mem.code)
 }
