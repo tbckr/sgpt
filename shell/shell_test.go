@@ -25,11 +25,51 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func TestIsPipedShell(t *testing.T) {
+	// Create a mock Stdin that is a pipe
+	reader, writer, _ := os.Pipe()
+
+	existingStdin := os.Stdin
+	t.Cleanup(func() {
+		os.Stdin = existingStdin
+	})
+
+	os.Stdin = reader
+	require.NoError(t, writer.Close())
+
+	isPiped, err := IsPipedShell()
+	require.NoError(t, err)
+	require.True(t, isPiped)
+	require.NoError(t, os.Stdin.Close())
+}
+
+func TestIsPipedShell_NotPiped(t *testing.T) {
+	existingStdin := os.Stdin
+	t.Cleanup(func() {
+		os.Stdin = existingStdin
+	})
+
+	tempDir := t.TempDir()
+
+	testIn, err := os.Create(filepath.Join(tempDir, "pipe"))
+	require.NoError(t, err)
+
+	os.Stdin = testIn
+
+	var isPiped bool
+	isPiped, err = IsPipedShell()
+	require.NoError(t, err)
+	require.False(t, isPiped)
+	require.NoError(t, os.Stdin.Close())
+}
 
 func TestGetUserConfirmationYes(t *testing.T) {
 	stdinReader, stdinWriter := io.Pipe()
