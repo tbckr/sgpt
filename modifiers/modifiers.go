@@ -147,14 +147,14 @@ func renderPrompt(promptText string) (string, error) {
 }
 
 func loadVariables() (map[string]string, error) {
-	operatingSystem := runtime.GOOS
+	templateVars := make(map[string]string)
+
+	templateVars["OS"] = runtime.GOOS
+
 	shell, ok := os.LookupEnv(envKeyShell)
-	if !ok {
-		return map[string]string{}, errors.New("could not determine shell")
+	if ok {
+		templateVars["SHELL"] = shell
 	}
 
-	return map[string]string{
-		"Shell": shell,
-		"Os":    operatingSystem,
-	}, nil
+	return templateVars, nil
 }
