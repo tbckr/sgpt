@@ -33,7 +33,7 @@ func TestCompletionCmd(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion"})
 
@@ -45,7 +45,7 @@ func TestCompletionCmdBash(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "bash"})
 
@@ -57,7 +57,7 @@ func TestCompletionCmdFish(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "fish"})
 
@@ -69,7 +69,7 @@ func TestCompletionCmdPowershell(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "powershell"})
 
@@ -81,7 +81,7 @@ func TestCompletionCmdZsh(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "zsh"})
 
@@ -93,7 +93,7 @@ func TestCompletionCmdUnknownCompletion(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "abcd"})
 
@@ -105,7 +105,7 @@ func TestCompletionCmdTooManyArgs(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "abcd", "efgh"})
 

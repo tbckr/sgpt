@@ -26,8 +26,20 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 )
+
+func IsPipedShell() (bool, error) {
+	fi, err := os.Stdin.Stat()
+	if err != nil {
+		return false, err
+	}
+	if fi.Mode()&os.ModeNamedPipe == 0 {
+		return false, nil
+	}
+	return true, nil
+}
 
 func ExecuteCommandWithConfirmation(ctx context.Context, input io.Reader, output io.Writer, command string) error {
 	// Require user confirmation

@@ -33,7 +33,7 @@ func TestManCmd(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"man"})
 
@@ -44,7 +44,7 @@ func TestManCmdUnknowArgs(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"man", "abcd"})
 

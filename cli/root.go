@@ -60,7 +60,7 @@ func Execute(args []string) {
 		slog.Error("Failed to create viper config", "error", err)
 		os.Exit(1)
 	}
-	newRootCmd(os.Exit, viperConfig, api.CreateClient).Execute(args)
+	newRootCmd(os.Exit, viperConfig, shell.IsPipedShell, api.CreateClient).Execute(args)
 }
 
 func (r *rootCmd) Execute(args []string) {
@@ -95,7 +95,7 @@ func (r *rootCmd) Execute(args []string) {
 	r.exit(0)
 }
 
-func newRootCmd(exit func(int), config *viper.Viper, createClientFn func() (*api.OpenAIClient, error)) *rootCmd {
+func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func() (*api.OpenAIClient, error)) *rootCmd {
 	root := &rootCmd{
 		exit: exit,
 	}
@@ -157,12 +157,17 @@ ls | sort
 			return loadViperConfig(config)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPiped, err := isPipedShell()
+			if err != nil {
+				return err
+			}
 
-			var prompt string
+			var prompt, input string
 			mode := "txt"
-			if len(args) == 0 {
+
+			if isPiped {
 				// input is provided via stdin
-				input, err := fs.ReadString(cmd.InOrStdin())
+				input, err = fs.ReadString(cmd.InOrStdin())
 				if err != nil {
 					return err
 				}
@@ -170,26 +175,23 @@ ls | sort
 					return ErrMissingInput
 				}
 				prompt = input
-
-			} else if len(args) == 1 {
-				// check, if input is provided via stdin
-				input, err := fs.ReadString(cmd.InOrStdin())
-				if err != nil {
-					return err
-				}
-				if len(input) > 0 {
-					// input is provided via stdin
-					prompt = input
+				// mode is provided via command line args
+				if len(args) == 1 {
 					mode = args[0]
-				} else {
-					// input is provided via command line args
-					prompt = args[0]
 				}
 
 			} else {
-				// input and mode are provided via command line args
-				mode = strings.ToLower(args[0])
-				prompt = args[1]
+				// input is provided via command line args
+				if len(args) == 0 {
+					return ErrMissingInput
+				} else if len(args) == 1 {
+					// input is provided via command line args
+					prompt = args[0]
+				} else {
+					// input and mode are provided via command line args
+					mode = strings.ToLower(args[0])
+					prompt = args[1]
+				}
 			}
 
 			// Create client

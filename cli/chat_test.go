@@ -40,7 +40,7 @@ func TestChatCmd(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"chat"})
 	require.Equal(t, 0, mem.code)
@@ -55,7 +55,7 @@ func TestChatCmdListEmptySessions(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -91,7 +91,7 @@ func TestChatCmdListOneSession(t *testing.T) {
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -129,7 +129,7 @@ func TestChatCmdListTwoSessions(t *testing.T) {
 	err = manager.SaveSession("test2", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -163,7 +163,7 @@ func TestChatCmdShowSession(t *testing.T) {
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -189,7 +189,7 @@ func TestChatCmdShowSessionMissingName(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"chat", "show"})
 	require.Equal(t, 1, mem.code)
@@ -207,7 +207,7 @@ func TestChatCmdShowSessionNonExistent(t *testing.T) {
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"chat", "show", "test2"})
 	require.Equal(t, 1, mem.code)
@@ -227,7 +227,7 @@ func TestChatCmdShowSessionWithAlias(t *testing.T) {
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -261,7 +261,7 @@ func TestChatCmdRmSession(t *testing.T) {
 	require.NoError(t, err)
 	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"chat", "rm", "test"})
 	require.Equal(t, 0, mem.code)
@@ -281,7 +281,7 @@ func TestChatCmdRmSessionNonExistent(t *testing.T) {
 	require.NoError(t, err)
 	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"chat", "rm", "test2"})
 	require.Equal(t, 0, mem.code)
@@ -304,7 +304,7 @@ func TestChatCmdRmSessionAll(t *testing.T) {
 	require.NoError(t, err)
 	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test2"))
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"chat", "rm", "--all"})
 	require.Equal(t, 0, mem.code)
@@ -317,7 +317,7 @@ func TestChatCmdRmSessionMissingName(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
 
 	root.Execute([]string{"chat", "rm"})
 	require.Equal(t, 1, mem.code)

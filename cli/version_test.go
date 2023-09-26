@@ -34,7 +34,7 @@ func TestVersionCmd(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	cmd := root.cmd
 
 	outBytes := bytes.NewBufferString("")
@@ -55,7 +55,7 @@ func TestVersionCmdFull(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	root := newRootCmd(mem.Exit, config, nil)
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
 	cmd := root.cmd
 
 	outBytes := bytes.NewBufferString("")
@@ -76,6 +76,6 @@ func TestVersionCmdUnknowArg(t *testing.T) {
 
 	config := createTestConfig(t)
 
-	newRootCmd(mem.Exit, config, nil).Execute([]string{"version", "abcd"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil).Execute([]string{"version", "abcd"})
 	require.Equal(t, 1, mem.code)
 }

@@ -40,7 +40,7 @@ func TestCheckCmd(t *testing.T) {
 		os.Unsetenv("OPENAI_API_KEY")
 	})
 
-	newRootCmd(mem.Exit, config, api.MockClient("", nil)).Execute([]string{"check"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"check"})
 	require.Equal(t, 0, mem.code)
 }
 
@@ -51,6 +51,6 @@ func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
 	err := os.Unsetenv("OPENAI_API_KEY")
 	require.NoError(t, err)
 
-	newRootCmd(mem.Exit, config, api.MockClient("", api.ErrMissingAPIKey)).Execute([]string{"check"})
+	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", api.ErrMissingAPIKey)).Execute([]string{"check"})
 	require.Equal(t, 1, mem.code)
 }
