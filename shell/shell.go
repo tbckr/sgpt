@@ -28,6 +28,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"runtime"
 )
 
 func IsPipedShell() (bool, error) {
@@ -73,7 +74,18 @@ func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
 }
 
 func executeShellCommand(ctx context.Context, output io.Writer, command string) error {
-	cmd := exec.CommandContext(ctx, "bash", "-c", command)
+	var executeCommand string
+	var args []string
+	switch runtime.GOOS {
+	case "windows":
+		executeCommand = "cmd"
+		args = []string{"/C", command}
+	default:
+		executeCommand = "bash"
+		args = []string{"-c", command}
+	}
+
+	cmd := exec.CommandContext(ctx, executeCommand, args...)
 	cmd.Stdout = output
 	err := cmd.Run()
 	if err != nil {
