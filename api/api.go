@@ -81,7 +81,7 @@ func CreateClient() (*OpenAIClient, error) {
 			return api.CreateChatCompletion(ctx, req)
 		},
 	}
-	slog.Debug("Created openai client")
+	slog.Debug("OpenAI client created")
 	return client, nil
 }
 
@@ -113,6 +113,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 				return "", err
 			}
 			messages = append(messages, loadedMessages...)
+			slog.Debug("Loaded chat session")
 		}
 	}
 
@@ -131,6 +132,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 				Role:    openai.ChatMessageRoleSystem,
 				Content: modifierPrompt,
 			})
+			slog.Debug("Added modifier message")
 		}
 	}
 
@@ -139,6 +141,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 		Role:    openai.ChatMessageRoleUser,
 		Content: prompt,
 	})
+	slog.Debug("Added prompt message")
 
 	// Do request
 	req := openai.ChatCompletionRequest{
@@ -154,6 +157,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 		return "", err
 	}
 	receivedMessage := resp.Choices[0].Message
+	slog.Debug("Received message from OpenAI API")
 
 	// Remove surrounding white spaces
 	receivedMessage.Content = strings.TrimSpace(receivedMessage.Content)
@@ -164,6 +168,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 		if err = chatSessionManager.SaveSession(chatID, messages); err != nil {
 			return "", err
 		}
+		slog.Debug("Saved chat session")
 	}
 	// Return received message
 	return receivedMessage.Content, nil

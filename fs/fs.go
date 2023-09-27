@@ -25,6 +25,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 )
@@ -38,6 +39,7 @@ func createPath(dirs ...string) (string, error) {
 	appPath := filepath.Join(dirs...)
 	// if app dir does not exist, create it
 	if _, err := os.Stat(appPath); errors.Is(err, os.ErrNotExist) {
+		slog.Debug("Creating directory: %s", appPath)
 		if err = os.MkdirAll(appPath, defaultDirPermissions); err != nil {
 			return "", err
 		}

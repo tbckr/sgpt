@@ -26,6 +26,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"os/exec"
 	"runtime"
@@ -66,9 +67,13 @@ func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
 		}
 		// 10 = enter
 		if char == 10 || char == 'Y' || char == 'y' {
+			slog.Debug("User confirmed")
 			return true, nil
 		} else if char == 'N' || char == 'n' {
+			slog.Debug("User denied")
 			return false, nil
+		} else {
+			slog.Debug("User entered unrecognised input for confirmation: " + string(char))
 		}
 	}
 }
@@ -78,9 +83,11 @@ func executeShellCommand(ctx context.Context, output io.Writer, command string) 
 	var args []string
 	switch runtime.GOOS {
 	case "windows":
+		slog.Debug("Running on Windows - using cmd")
 		executeCommand = "cmd"
 		args = []string{"/C", command}
 	default:
+		slog.Debug("Running on Linux like OS - using bash")
 		executeCommand = "bash"
 		args = []string{"-c", command}
 	}
@@ -91,5 +98,6 @@ func executeShellCommand(ctx context.Context, output io.Writer, command string) 
 	if err != nil {
 		return err
 	}
+	slog.Debug("Command executed successfully")
 	return nil
 }

@@ -88,7 +88,7 @@ func (r *rootCmd) Execute(args []string) {
 		}
 
 		// Log error with details and exit
-		slog.Error(msg, "error", err)
+		slog.Debug(msg, "error", err)
 		r.exit(code)
 		return
 	}
@@ -142,6 +142,7 @@ $ sgpt sh --chat ls-files "sort by name"
 ls | sort
 `,
 		DisableFlagsInUseLine: true,
+		SilenceUsage:          true,
 		Args:                  cobra.RangeArgs(0, 2),
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
@@ -166,17 +167,20 @@ ls | sort
 			mode := "txt"
 
 			if isPiped {
+				slog.Debug("Piped shell detected")
 				// input is provided via stdin
 				input, err = fs.ReadString(cmd.InOrStdin())
 				if err != nil {
 					return err
 				}
 				if len(input) == 0 {
+					slog.Debug("No input via pipe provided")
 					return ErrMissingInput
 				}
 				prompt = input
 				// mode is provided via command line args
 				if len(args) == 1 {
+					slog.Debug("Mode provided via command line args")
 					mode = args[0]
 				}
 
@@ -186,16 +190,19 @@ ls | sort
 					return ErrMissingInput
 				} else if len(args) == 1 {
 					// input is provided via command line args
+					slog.Debug("No mode provided via command line args - using default mode")
 					prompt = args[0]
 				} else {
 					// input and mode are provided via command line args
+					slog.Debug("Mode and prompt provided via command line args")
 					mode = strings.ToLower(args[0])
 					prompt = args[1]
 				}
 			}
 
 			// Create client
-			client, err := createClientFn()
+			var client *api.OpenAIClient
+			client, err = createClientFn()
 			if err != nil {
 				return err
 			}
@@ -211,6 +218,7 @@ ls | sort
 			}
 
 			if config.GetBool("execute") {
+				slog.Debug("Trying to execute response in shell")
 				return shell.ExecuteCommandWithConfirmation(cmd.Context(), cmd.InOrStdin(), cmd.OutOrStdout(), response)
 			}
 			return nil
@@ -287,6 +295,7 @@ func createFlags(cmd *cobra.Command, config *viper.Viper) {
 
 func loadViperConfig(config *viper.Viper) error {
 	if !viper.IsSet("TESTING") {
+		slog.Debug("Loading config")
 		err := setViperDefaults(config)
 		if err != nil {
 			return err
@@ -295,11 +304,13 @@ func loadViperConfig(config *viper.Viper) error {
 	if err := config.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore error
+			slog.Debug("Config file not found - using defaults")
 			return nil
 		}
 		// Config file was found but another error was produced
 		return err
 	}
+	slog.Debug("Config file loaded")
 	return nil
 }
 

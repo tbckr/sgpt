@@ -24,6 +24,7 @@ package chat
 import (
 	"bufio"
 	"encoding/json"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -84,6 +85,7 @@ func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.C
 	if err != nil {
 		return nil, err
 	}
+	slog.Debug("Using session file at: " + sessionFilepath)
 
 	// Check, if session exists
 	var exists bool
@@ -94,6 +96,7 @@ func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.C
 	if !exists {
 		return []openai.ChatCompletionMessage{}, ErrChatSessionDoesNotExist
 	}
+	slog.Debug("Session exists")
 
 	// Open file
 	var file *os.File
@@ -103,6 +106,7 @@ func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.C
 	}
 	defer file.Close()
 
+	slog.Debug("Reading messages from session file")
 	// Read messages
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
@@ -119,6 +123,7 @@ func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.C
 		}
 		messages = append(messages, readMessage)
 	}
+	slog.Debug("Messages from session file imported")
 	return messages, nil
 }
 
@@ -133,6 +138,7 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 	if err != nil {
 		return err
 	}
+	slog.Debug("Using session file at: " + sessionFilepath)
 
 	// Check, if session exists
 	var exists bool
@@ -140,6 +146,7 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 	if err != nil {
 		return err
 	}
+	slog.Debug("Session exists")
 
 	// Open file
 	var file *os.File
@@ -149,12 +156,14 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 		if err != nil {
 			return err
 		}
+		slog.Debug("Existing session file opened and truncated")
 	} else {
 		// Create file
 		file, err = os.Create(sessionFilepath)
 		if err != nil {
 			return err
 		}
+		slog.Debug("New session file created")
 	}
 	defer file.Close()
 
@@ -170,15 +179,18 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 			return err
 		}
 	}
+	slog.Debug("Messages saved to session file")
 	return nil
 }
 
 func (m FilesystemChatSessionManager) ListSessions() ([]string, error) {
 	cacheDir := m.config.GetString("cacheDir")
+	slog.Debug("Listing files in cache directory: " + cacheDir)
 	dirFiles, err := os.ReadDir(cacheDir)
 	if err != nil {
 		return nil, err
 	}
+	slog.Debug("Iterating files in cache directory")
 	var files []string
 	for _, file := range dirFiles {
 		files = append(files, file.Name())
@@ -188,6 +200,7 @@ func (m FilesystemChatSessionManager) ListSessions() ([]string, error) {
 
 func (m FilesystemChatSessionManager) DeleteSession(sessionName string) error {
 	sessionFilepath, err := m.getFilepathForSession(sessionName)
+	slog.Debug("Deleting session file at: " + sessionFilepath)
 	if err != nil {
 		return err
 	}
@@ -197,11 +210,13 @@ func (m FilesystemChatSessionManager) DeleteSession(sessionName string) error {
 		return err
 	}
 	if !exists {
+		slog.Debug("Session does not exist - nothing to delete")
 		return nil
 	}
 	err = os.Remove(sessionFilepath)
 	if err != nil {
 		return err
 	}
+	slog.Debug("Session deleted")
 	return nil
 }

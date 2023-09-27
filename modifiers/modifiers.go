@@ -55,6 +55,7 @@ func GetChatModifier(config *viper.Viper, modifier string) (string, error) {
 	// if a persona is found, render the prompt
 	// this overrides the default personas
 	if persona != "" {
+		slog.Debug("Using custom persona: " + modifier)
 		return renderPrompt(persona)
 	}
 	// if no persona is found, try to load the default prompt
@@ -65,12 +66,16 @@ func GetChatModifier(config *viper.Viper, modifier string) (string, error) {
 	}
 	switch modifier {
 	case "sh":
+		slog.Debug("Using default persona: " + modifier)
 		return renderPrompt(loadedDefaultPrompts[modifier].Messages[0].Text)
 	case "code":
+		slog.Debug("Using default persona: " + modifier)
 		return renderPrompt(loadedDefaultPrompts[modifier].Messages[0].Text)
 	case "txt":
+		slog.Debug("No persona provided")
 		return "", nil
 	default:
+		slog.Debug("Unsupported persona: " + modifier)
 		return "", ErrUnsupportedModifier
 	}
 }
@@ -87,6 +92,7 @@ func getPersonasModifier(config *viper.Viper, modifier string) (string, error) {
 			return "", err
 		}
 	}
+	slog.Debug("Loading personas from path: " + personasPath)
 
 	var personaPath string
 	err = filepath.WalkDir(personasPath, func(path string, d os.DirEntry, err error) error {
@@ -116,6 +122,7 @@ func getPersonasModifier(config *viper.Viper, modifier string) (string, error) {
 		slog.Debug("could not find custom persona")
 		return "", nil
 	}
+	slog.Debug("Custom persona found: " + personaPath)
 
 	var data []byte
 	data, err = os.ReadFile(personaPath)
@@ -126,6 +133,7 @@ func getPersonasModifier(config *viper.Viper, modifier string) (string, error) {
 }
 
 func renderPrompt(promptText string) (string, error) {
+	slog.Debug("Rendering persona prompt")
 	t, err := template.New("prompt").Parse(promptText)
 	if err != nil {
 		return "", err
@@ -143,10 +151,12 @@ func renderPrompt(promptText string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	slog.Debug("Persona prompt rendered")
 	return renderedPrompt.String(), nil
 }
 
 func loadVariables() (map[string]string, error) {
+	slog.Debug("Loading variables for persona prompt rendering")
 	templateVars := make(map[string]string)
 
 	templateVars["OS"] = runtime.GOOS
@@ -154,6 +164,9 @@ func loadVariables() (map[string]string, error) {
 	shell, ok := os.LookupEnv(envKeyShell)
 	if ok {
 		templateVars["SHELL"] = shell
+		slog.Debug("Found SHELL environment variable: " + shell)
+	} else {
+		slog.Debug("Could not find SHELL environment variable")
 	}
 
 	return templateVars, nil
