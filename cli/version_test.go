@@ -47,7 +47,7 @@ func TestVersionCmd(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.Equal(t, "version: dev\n", string(out))
+	require.Equal(t, "dev\n", string(out))
 }
 
 func TestVersionCmdFull(t *testing.T) {
