@@ -45,7 +45,7 @@ func newVersionCmd() *versionCmd {
 			if version.full {
 				_, err = fmt.Fprintf(cmd.OutOrStdout(), "version: %s\ncommit: %s\ncommitDate: %s\n", buildinfo.Version(), buildinfo.Commit(), buildinfo.CommitDate())
 			} else {
-				_, err = fmt.Fprintf(cmd.OutOrStdout(), "version: %s\n", buildinfo.Version())
+				_, err = fmt.Fprintf(cmd.OutOrStdout(), "%s\n", buildinfo.Version())
 			}
 			return err
 		},
