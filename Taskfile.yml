@@ -179,8 +179,19 @@ tasks:
       NEXT:
         sh: svu n
     cmds:
+      - task: set:version
+        vars:
+          VERSION: '{{.NEXT}}'
       - git tag {{.NEXT}}
       - git push --tags
+
+  set:version:
+    desc: Set the release version in the code
+    internal: true
+    cmds:
+      - sed -i 's/\(version\s*=\s*\)".*"/\1"'"{{.VERSION}}"'"/' internal/buildinfo/version.go
+      - git add internal/buildinfo/version.go
+      - "git commit -m \"chore: Bump version to {{.VERSION}}\""
 
   sgpt:test:pkg:
     desc: Test a package
