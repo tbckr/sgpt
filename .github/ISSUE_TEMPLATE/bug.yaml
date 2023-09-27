@@ -41,7 +41,7 @@ body:
     id: reproducible
     attributes:
       label: How can we reproduce this?
-      description: Please share a public repository that reproduces the issue, or an example config file. Links to failing sgpt runs and etc are also helpful.
+      description: Please include the command and arguments that you ran to cause the error. If possible, add the `--verbose' flag to the command and include the output in addition to the command itself here.
     validations:
       required: true
   - type: textarea
