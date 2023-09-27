@@ -109,7 +109,7 @@ func TestGetUserConfirmationYes(t *testing.T) {
 	wg.Wait()
 }
 
-func TestGetUserConfirmationEnter(t *testing.T) {
+func TestGetUserConfirmationLinuxEnter(t *testing.T) {
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
@@ -119,6 +119,44 @@ func TestGetUserConfirmationEnter(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		_, errWrite := stdinWriter.Write([]byte("\n"))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errRead := io.Copy(&buf, stdoutReader)
+		require.NoError(t, stdoutReader.Close())
+		require.NoError(t, errRead)
+		require.Equal(t, "Do you want to execute this command? (Y/n) ", buf.String())
+	}()
+
+	var ok bool
+	var err error
+
+	ok, err = getUserConfirmation(stdinReader, stdoutWriter)
+
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	require.NoError(t, err)
+	require.Equal(t, true, ok)
+
+	wg.Wait()
+}
+
+func TestGetUserConfirmationWindowsEnter(t *testing.T) {
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte("\r"))
 		require.NoError(t, stdinWriter.Close())
 		require.NoError(t, errWrite)
 	}()

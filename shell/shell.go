@@ -65,8 +65,7 @@ func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		// 10 = enter
-		if char == 10 || char == 'Y' || char == 'y' {
+		if char == '\n' || char == '\r' || char == 'Y' || char == 'y' {
 			slog.Debug("User confirmed")
 			return true, nil
 		} else if char == 'N' || char == 'n' {
