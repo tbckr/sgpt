@@ -38,8 +38,9 @@ The mass of the sun is approximately 1.989 x 10^30 kilograms.
 
 ## Code Generation Capabilities
 
-SGPT can efficiently generate code based on given instructions. For instance, to solve the classic FizzBuzz problem
-using Python, simply provide the prompt as follows:
+By adding the `code` command to your prompt, you can generate code based on given instructions by using the
+`code` [persona](./usage/personas.md). For instance, to solve the classic FizzBuzz problem using Python, simply provide
+the prompt as follows:
 
 ```shell
 $ sgpt code "Solve classic fizz buzz problem using Python"
@@ -58,7 +59,7 @@ SGPT will return the appropriate Python code to address the FizzBuzz problem.
 
 ## Generating and Executing Shell Commands
 
-SGPT can generate shell commands based on your input:
+SGPT also supports a `shell` [persona](./usage/personas.md) that can generate shell commands based on your input:
 
 ```shell
 $ sgpt sh "make all files in current directory read only"

@@ -6,10 +6,10 @@ is `~/.config/sgpt/` on Linux and MacOS and `%APPDATA%/sgpt/` on Windows. The co
 The config file is a YAML file with the following structure:
 
 ```yaml
-maxtokens: 2048
+maxTokens: 2048
 model: "gpt-4"
 temperature: "1"
-topp: "1"
+topP: "1"
 ```
 
 These options override the default values for the corresponding command line options.

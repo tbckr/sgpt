@@ -34,11 +34,13 @@ for i in range(1, 101):
         print(i)
 ```
 
+The second argument is the code command that identifies the [persona](personas.md) to use.
+
 SGPT will return the appropriate Python code to address the FizzBuzz problem.
 
 ## Generate and Execute Shell Commands
 
-SGPT can generate shell commands based on your input:
+SGPT also supports a shell [persona](personas.md) that can generate shell commands based on your input:
 
 ```shell
 $ sgpt sh "make all files in current directory read only"
