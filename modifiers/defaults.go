@@ -23,6 +23,7 @@ package modifiers
 
 import (
 	_ "embed"
+	"log/slog"
 
 	"gopkg.in/yaml.v3"
 )
@@ -50,5 +51,6 @@ func loadDefaultPrompts() (map[string]Prompt, error) {
 	if err != nil {
 		return map[string]Prompt{}, err
 	}
+	slog.Debug("Loaded default prompts")
 	return prompts, nil
 }
