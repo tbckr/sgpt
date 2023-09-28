@@ -31,6 +31,7 @@ on:
     paths:
       - Pipfile
       - Pipfile.lock
+      - .github/workflows/docs.yml
   schedule:
     - cron: '30 2 * * *' # every day at 2:30am UTC
 
