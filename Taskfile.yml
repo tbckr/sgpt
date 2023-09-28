@@ -51,11 +51,11 @@ tasks:
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
   setup:docs:
-    desc: Install mkdocs and plugins
+    desc: Install pipenv
     preconditions:
       - which python3
     cmds:
-      - python3 -m pip install -r docs/requirements.txt
+      - python3 -m pip install --upgrade --user pipenv
 
   setup:
     desc: Setup development environment
@@ -69,18 +69,24 @@ tasks:
     cmds:
       - which go 1>/dev/null || (echo "go is not installed" && exit 1)
       - which python3 1>/dev/null || (echo "python3 is not installed" && exit 1)
+      - which pipenv 1>/dev/null || (echo "python3 is not installed" && exit 1)
       - which docker 1>/dev/null || (echo "docker is not installed" && exit 1)
       - which task 1>/dev/null || (echo "task is not installed" && exit 1)
       - which pre-commit 1>/dev/null || (echo "pre-commit is not installed" && exit 1)
       - which addlicense 1>/dev/null || (echo "addlicense is not installed" && exit 1)
       - which svu 1>/dev/null || (echo "svu is not installed" && exit 1)
       - which goreleaser 1>/dev/null || (echo "goreleaser is not installed" && exit 1)
-      - which mkdocs 1>/dev/null || (echo "mkdocs is not installed" && exit 1)
+
+  docs:requirements:
+    desc: Create requirements.txt
+    cmds:
+      - pipenv requirements > docs/requirements.txt
 
   docs:
     desc: Serve documentation locally
     cmds:
-      - mkdocs serve
+      - pipenv sync
+      - pipenv run mkdocs serve
 
   license-header:
     desc: Add license header to all files
