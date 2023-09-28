@@ -53,7 +53,7 @@ jobs:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       # Install Python
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4
         with:
           python-version: '3.10'
           cache: 'pipenv'
@@ -65,7 +65,7 @@ jobs:
           task docs:requirements
 
       - name: Commit updated requirements.txt
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@3ea6ae190baf489ba007f7c92608f33ce20ef04a # v4
         with:
           commit_message: "chore: update requirements.txt for readthedocs"
           commit_user_name: actions-user
