@@ -19,7 +19,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Github Release
+name: Update requirements.txt for readthedocs
 
 on:
   push:
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4
         with:
           python-version: '3.10'
-          cache: 'pipenv'
+          # cache: 'pipenv'
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update requirements.txt for readthedocs
