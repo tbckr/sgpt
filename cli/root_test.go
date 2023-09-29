@@ -32,6 +32,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/atotto/clipboard"
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/require"
 	"github.com/tbckr/sgpt/v2/api"
@@ -98,6 +99,39 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	}()
 
 	root.Execute([]string{prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimpleClipboard(t *testing.T) {
+	prompt := "Say: Hello World!"
+	expected := "Hello World!\n"
+
+	mem := &exitMemento{}
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	config := createTestConfig(t)
+
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, reader)
+		_ = clipboard.WriteAll(buf.String())
+		clipboardBuffer, _ := clipboard.ReadAll()
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+		require.Equal(t, clipboardBuffer, buf.String())
+	}()
+
+	root.Execute([]string{"--clipboard", prompt})
 	require.Equal(t, 0, mem.code)
 	require.NoError(t, writer.Close())
 

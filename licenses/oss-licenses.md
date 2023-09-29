@@ -5,6 +5,7 @@ Some packages may only be included on certain architectures or operating systems
 
 ## Overview
 
+- [github.com/atotto/clipboard](https://pkg.go.dev/github.com/atotto/clipboard) ([BSD 3-Clause](https://github.com/atotto/clipboard/blob/v0.1.4/LICENSE))
 - [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.6.0/LICENSE))
 - [github.com/hashicorp/hcl](https://pkg.go.dev/github.com/hashicorp/hcl) ([MPL-2.0](https://github.com/hashicorp/hcl/blob/v1.0.0/LICENSE))
 - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.1.0/LICENSE))
