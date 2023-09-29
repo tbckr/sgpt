@@ -205,6 +205,14 @@ tasks:
     cmds:
       - "docker run --platform linux/{{.Platform}} --rm --workdir /tmp -v $PWD/dist:/tmp {{.Image}} sh -c '{{.Cmd}} && sgpt version'"
 
+  renovate:debug:
+    desc: Run the current renovate configuration in debug mode
+    vars:
+      Repo:
+        sh: git remote get-url origin | cut -d':' -f2 | sed 's/\.git//'
+    cmds:
+      - docker run --rm -v $(pwd):/usr/src/app:ro -e LOG_LEVEL=debug -e RENOVATE_CONFIG_FILE=renovate.json -e RENOVATE_TOKEN=${GITHUB_TOKEN} renovate/renovate:35 --dry-run {{.Repo}}
+
   sgpt:test:rpm:
     desc: Tests rpm packages
     vars:
