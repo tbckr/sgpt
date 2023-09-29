@@ -9,6 +9,12 @@ By participating in this project, you agree to abide our
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
+
+- [Set up your machine](#set-up-your-machine)
+- [Test your change](#test-your-change)
+- [Create a commit](#create-a-commit)
+- [Submit a pull request](#submit-a-pull-request)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Set up your machine
