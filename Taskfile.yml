@@ -144,6 +144,11 @@ tasks:
     cmds:
       - gofumpt -w -l .
 
+  lint:
+    desc: Lint the code
+    cmds:
+      - task: lint:go
+
   lint:go:
     desc: Lint the code with golangci-lint
     cmds:
