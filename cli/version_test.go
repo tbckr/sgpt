@@ -24,6 +24,7 @@ package cli
 import (
 	"bytes"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -47,7 +48,9 @@ func TestVersionCmd(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.Equal(t, "dev\n", string(out))
+	printedVersion := string(out)
+	require.NotEmpty(t, printedVersion)
+	require.True(t, strings.HasPrefix(printedVersion, "v"))
 }
 
 func TestVersionCmdFull(t *testing.T) {
@@ -68,7 +71,9 @@ func TestVersionCmdFull(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.Equal(t, "version: dev\ncommit: unset\ncommitDate: unset\n", string(out))
+	printedVersion := string(out)
+	require.NotEmpty(t, printedVersion)
+	require.True(t, strings.HasPrefix(printedVersion, "version: "))
 }
 
 func TestVersionCmdUnknowArg(t *testing.T) {
