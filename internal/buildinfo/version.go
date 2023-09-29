@@ -22,7 +22,7 @@
 package buildinfo
 
 var (
-	version    = "dev"
+	version    = "v2.0.0-PRE-RELEASE"
 	commit     = "unset"
 	commitDate = "unset"
 )
