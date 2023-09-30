@@ -67,7 +67,7 @@ jobs:
           task setup:docs
           task docs:requirements
 
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@49ce228ea7cddec9f88dd09c5b7740dbac82d7ba # v1
         id: generate_token
         with:
           app_id: ${{ secrets.AUTOMATION_APP_ID }}
