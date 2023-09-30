@@ -193,24 +193,26 @@ tasks:
       NEXT:
         sh: svu n
     cmds:
-      - task: set:version
+      - task: version:set
         vars:
           VERSION: '{{.NEXT}}'
       - git push
       - git tag {{.NEXT}}
       - git push --tags
 
-  inc:version:
+  version:wip:
     desc: Increment the version in the code - used to create a pre-release.
+    aliases:
+      - wip
     vars:
       NEXT:
         sh: svu n --pre-release=PRE-RELEASE
     cmds:
-      - task: set:version
+      - task: version:set
         vars:
           VERSION: '{{.NEXT}}'
 
-  set:version:
+  version:set:
     desc: Set the release version in the code
     internal: true
     cmds:
