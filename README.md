@@ -34,8 +34,8 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [Querying OpenAI Models](#querying-openai-models)
   - [Chat Capabilities](#chat-capabilities)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
-  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
   - [Code Generation Capabilities](#code-generation-capabilities)
+  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
 - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
