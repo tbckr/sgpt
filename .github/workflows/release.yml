@@ -44,7 +44,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         id: release
         with:
-          token: ${{ secrets.WORKFLOW_COMMITS_PAT }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           release-type: go
           package-name: sgpt
           skip-github-release: false
