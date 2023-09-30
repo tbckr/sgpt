@@ -1,5 +1,12 @@
 # SGPT
 
+[![Release](https://img.shields.io/github/release/tbckr/sgpt.svg?style=for-the-badge)](https://github.com/tbckr/sgpt/releases/latest)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](/LICENSE.md)
+[![Codecov branch](https://img.shields.io/codecov/c/github/tbckr/sgpt/main.svg?style=for-the-badge)](https://codecov.io/gh/tbckr/sgpt)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/tbckr/sgpt)
+[![Powered By: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=for-the-badge)](https://github.com/goreleaser)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge)](https://conventionalcommits.org)
+
 SGPT (*aka shell-gpt*) is a powerful command-line interface (CLI) tool designed for seamless interaction with OpenAI
 models directly from your terminal. Effortlessly run queries, generate shell commands or code, create images from text,
 and more, using simple commands. Streamline your workflow and enhance productivity with this powerful and user-friendly
@@ -26,8 +33,6 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
   - [Querying OpenAI Models](#querying-openai-models)
   - [Chat Capabilities](#chat-capabilities)
-  - [Running Queries with Docker](#running-queries-with-docker)
-  - [Saving Chat Sessions in Docker](#saving-chat-sessions-in-docker)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
   - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
   - [Code Generation Capabilities](#code-generation-capabilities)
@@ -45,8 +50,6 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   find solutions to coding problems.
 - ChatGPT Integration: Utilize ChatGPT's interactive chat capabilities to refine your prompts and achieve more precise
   results, benefiting from the powerful language model.
-- Image Generation with DALLE: Create images from textual prompts using the DALLE API, expanding the range of tasks you
-  can accomplish with the tool.
 - Bash Functions and Aliases: Seamlessly integrate SGPT responses into custom bash functions and aliases, optimizing
   your workflows and making your daily tasks more efficient.
 
@@ -101,7 +104,7 @@ To run SGPT with Docker, use the following command to pull the latest image:
 docker pull ghcr.io/tbckr/sgpt:latest
 ```
 
-Examples on how to use SGPT with Docker can be found [here](#running-queries-with-docker).
+Examples on how to use SGPT with Docker can be found [here](https://sgpt.readthedocs.io/en/latest/usage/docker/).
 
 ### Other platforms
 
@@ -109,6 +112,8 @@ For other platforms, visit the GitHub [release page](https://github.com/tbckr/sg
 release suitable for your system.
 
 ## Usage Guide
+
+See the [docs](http://sgpt.readthedocs.io/) for detailed usage instructions.
 
 ### Getting started: Obtaining an OpenAI API Key
 
@@ -149,7 +154,7 @@ The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ### Chat Capabilities
 
 SGPT provides chat functionality that enables interactive conversations with OpenAI models. You can use the `--chat`
-flag with the `txt`, `sh`, and `code` subcommands to initiate and reference chat sessions.
+flag to initiate and reference chat sessions.
 
 The chat capabilities allow you to interact with OpenAI models in a more dynamic and engaging way, making it
 easier to obtain relevant responses, code, or shell commands through continuous conversations.
@@ -173,67 +178,6 @@ The example below demonstrates how to fine-tune the model's responses for more t
 The model provides the appropriate shell command `ls | sort`, which lists all files in a directory and sorts them by
 name.
 
-To manage active chat sessions, use the `sgpt chat` command. Here are the available options for chat session management:
-
-- `sgpt chat ls`: List all active chat sessions.
-- `sgpt chat show <chat session>`: Display the content of a specific chat session.
-- `sgpt chat rm <chat session>`: Remove a chat session.
-- `sgpt chat rm --all`: Delete all chat sessions.
-
-### Running Queries with Docker
-
-For users who prefer to use Docker, SGPT provides a Docker image:
-
-1. Pull the latest Docker image:
-
-  ```shell
-  docker pull ghcr.io/tbckr/sgpt:latest
-  ```
-
-1. Run queries using the Docker image:
-
-  ```shell
-  $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} ghcr.io/tbckr/sgpt:latest txt "mass of sun"
-  The mass of the sun is approximately 1.989 x 10^30 kilograms.
-  ```
-
-### Saving Chat Sessions in Docker
-
-When using SGPT within a Docker container, you can mount a local folder to the container's `/home/nonroot` path to save
-and persist all active chat sessions. This allows you to maintain your chat history and resume previous conversations
-across different container instances.
-
-To mount a local folder and save chat sessions, follow these steps:
-
-1. Pull the SGPT Docker image:
-
-  ```shell
-  docker pull ghcr.io/tbckr/sgpt:latest
-  ```
-
-1. Create a local folder to store your chat sessions, e.g. `sgpt-chat-sessions`:
-
-  ```shell
-  mkdir sgpt-chat-sessions
-  ```
-
-1. Change the permissions of the folder to the nonroot user of the Docker image:
-
-  ```shell
-  sudo chown 65532:65532 sgpt-chat-sessions
-  ```
-
-1. Run the Docker container with the local folder mounted to `/home/nonroot`:
-
-  ```shell
-  $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "mass of sun"
-  The mass of the sun is approximately 1.99 x 10^30 kilograms.
-  $ docker run --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -v $(pwd)/sgpt-chat-sessions:/home/nonroot ghcr.io/tbckr/sgpt:latest txt "convert to earth masses"
-  To convert the mass of the sun to earth masses, we need to divide it by the mass of the Earth:
-  1.99 x 10^30 kg / 5.97 x 10^24 kg = 333,000 Earth masses (rounded to the nearest thousand) 
-  So the mass of the sun is about 333,000 times greater than the mass of the Earth.
-  ```
-
 ### Generating and Executing Shell Commands
 
 SGPT can generate shell commands based on your input:
@@ -250,6 +194,32 @@ $ sgpt sh --execute "make all files in current directory read only"
 chmod -R 444 *
 Do you want to execute this command? (Y/n) y
 ```
+
+The `sh` command is a default persona to generate shell commands. For more information on personas, see
+the [docs](https://sgpt.readthedocs.io/en/latest/usage/personas/).
+
+### Code Generation Capabilities
+
+SGPT can efficiently generate code based on given instructions. For instance, to solve the classic FizzBuzz problem
+using Python, simply provide the prompt as follows:
+
+```shell
+$ sgpt code "Solve classic fizz buzz problem using Python"
+for i in range(1, 101):
+    if i % 3 == 0 and i % 5 == 0:
+        print("FizzBuzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    elif i % 5 == 0:
+        print("Buzz")
+    else:
+        print(i)
+```
+
+SGPT will return the appropriate Python code to address the FizzBuzz problem.
+
+The `code` command is a default persona to generate code. For more information on personas, see
+the [docs](https://sgpt.readthedocs.io/en/latest/usage/personas/).
 
 ### Enhancing Your Workflow with Bash Aliases and Functions
 
@@ -291,26 +261,6 @@ Do you want to commit your changes with this commit message? [y/N] y
 
 A compilation of beneficial bash aliases and functions, including an updated gsum function, is available
 in [.bash_aliases](.bash_aliases).
-
-### Code Generation Capabilities
-
-SGPT can efficiently generate code based on given instructions. For instance, to solve the classic FizzBuzz problem
-using Python, simply provide the prompt as follows:
-
-```shell
-$ sgpt code "Solve classic fizz buzz problem using Python"
-for i in range(1, 101):
-    if i % 3 == 0 and i % 5 == 0:
-        print("FizzBuzz")
-    elif i % 3 == 0:
-        print("Fizz")
-    elif i % 5 == 0:
-        print("Buzz")
-    else:
-        print(i)
-```
-
-SGPT will return the appropriate Python code to address the FizzBuzz problem
 
 ## Acknowledgements
 
