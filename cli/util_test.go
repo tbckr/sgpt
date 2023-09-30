@@ -22,6 +22,7 @@
 package cli
 
 import (
+	"os"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -55,4 +56,10 @@ func createTestConfig(t *testing.T) *viper.Viper {
 	config.Set("TESTING", 1)
 
 	return config
+}
+
+func skipInCI(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test on CI")
+	}
 }

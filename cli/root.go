@@ -220,8 +220,9 @@ ls | sort
 
 			if config.GetBool("clipboard") {
 				slog.Debug("Sending client response to clipboard")
-				err := clipboard.WriteAll(response)
+				err = clipboard.WriteAll(response)
 				if err != nil {
+					slog.Debug("Failed to send client response to clipboard", "error", err)
 					return err
 				}
 			}
