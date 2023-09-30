@@ -29,12 +29,14 @@ $ sgpt "mass of sun"
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
-You can also pass prompts to SGPT using pipes:
+In addition, you can pass a file via pipes and add your prompt to ask a question about the file or have it summarized
+for you.
 
 ```shell
-$ echo -n "mass of sun" | sgpt
-The mass of the sun is approximately 1.989 x 10^30 kilograms.
+cat yourfile.txt | sgpt "summarize everything above"
 ```
+
+The prompt passed as an argument is appended to the data that is piped in.
 
 ## Code Generation Capabilities
 

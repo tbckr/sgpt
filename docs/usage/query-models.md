@@ -9,19 +9,22 @@ $ sgpt "mass of sun"
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
-You can also pass prompts to SGPT using pipes:
-
-```shell
-$ echo -n "mass of sun" | sgpt
-The mass of the sun is approximately 1.989 x 10^30 kilograms.
-```
-
 You can also use the `--clipboard` flag to write the answer to the clipboard:
 
 ```shell
 $ sgpt --clipboard "mass of sun"
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
+
+In addition, you can pass a file via pipes and add your prompt to ask a question about the file or have it summarized
+for you.
+
+```shell
+cat yourfile.txt | sgpt "summarize everything above"
+```
+
+The prompt passed as an argument is appended to the data that is piped in. Keep in mind: Depending on the model you are
+using, there are different limits to the number of tokens you can use in your prompt.
 
 ## Generate Code
 
