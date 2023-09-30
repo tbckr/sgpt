@@ -231,6 +231,130 @@ func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	wg.Wait()
 }
 
+func TestRootCmd_SimplePromptViaPipedShell_AdditionalArgPrompt(t *testing.T) {
+	stdinPrompt := "Say the following: "
+	argPrompt := "Hello World!"
+	expectedPrompt := stdinPrompt + "\n\n" + argPrompt
+	expectedResponse := "Hello World!\n"
+
+	mem := &exitMemento{}
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	config := createTestConfig(t)
+
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient(strings.Clone(expectedResponse), nil))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(stdinPrompt))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, stdoutReader)
+		require.NoError(t, err)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expectedResponse, buf.String())
+	}()
+
+	chatName := "test_chat"
+	root.Execute([]string{argPrompt, "--chat", chatName})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	manager, err := chat.NewFilesystemChatSessionManager(config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession(chatName)
+	require.NoError(t, err)
+	require.Len(t, messages, 2)
+
+	// Check if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
+	require.Equal(t, expectedPrompt, messages[0].Content)
+
+	// Check if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
+	require.Equal(t, strings.TrimSpace(expectedResponse), messages[1].Content)
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptViaPipedShell_AdditionalModeAndArg(t *testing.T) {
+	stdinPrompt := "Say the following: "
+	argPrompt := "Hello World!"
+	expectedPrompt := stdinPrompt + "\n\n" + argPrompt
+	expectedResponse := "Hello World!\n"
+
+	mem := &exitMemento{}
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	config := createTestConfig(t)
+
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient(strings.Clone(expectedResponse), nil))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(stdinPrompt))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, stdoutReader)
+		require.NoError(t, err)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expectedResponse, buf.String())
+	}()
+
+	chatName := "test_chat"
+	root.Execute([]string{"sh", argPrompt, "--chat", chatName})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	manager, err := chat.NewFilesystemChatSessionManager(config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession(chatName)
+	require.NoError(t, err)
+	require.Len(t, messages, 3)
+
+	// Check if the modifier was added
+	require.Equal(t, openai.ChatMessageRoleSystem, messages[0].Role)
+	require.Contains(t, messages[0].Content, "command translation engine")
+
+	// Check if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[1].Role)
+	require.Equal(t, expectedPrompt, messages[1].Content)
+
+	// Check if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[2].Role)
+	require.Equal(t, strings.TrimSpace(expectedResponse), messages[2].Content)
+
+	wg.Wait()
+}
+
 func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 	mem := &exitMemento{}
 	var wg sync.WaitGroup

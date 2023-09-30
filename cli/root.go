@@ -164,6 +164,7 @@ ls | sort
 				return err
 			}
 
+			var promptBuilder strings.Builder
 			var prompt, input string
 			mode := "txt"
 
@@ -178,12 +179,33 @@ ls | sort
 					slog.Debug("No input via pipe provided")
 					return ErrMissingInput
 				}
-				prompt = input
-				// mode is provided via command line args
-				if len(args) == 1 {
-					slog.Debug("Mode provided via command line args")
-					mode = args[0]
+				_, err = promptBuilder.WriteString(input)
+				if err != nil {
+					return err
 				}
+
+				// check if args are provided
+				if len(args) == 0 {
+					// no mode or prompt provided via command line args
+					slog.Debug("No mode or additional prompt provided via command line args")
+
+				} else if len(args) == 1 {
+					// additional prompt was provided via command line args
+					slog.Debug("Additional prompt provided via command line args")
+					_, err = promptBuilder.WriteString("\n\n" + args[0])
+					if err != nil {
+						return err
+					}
+
+				} else {
+					// mode and additional prompt were provided via command line args
+					mode = strings.ToLower(args[0])
+					_, err = promptBuilder.WriteString("\n\n" + args[1])
+					if err != nil {
+						return err
+					}
+				}
+				prompt = promptBuilder.String()
 
 			} else {
 				// input is provided via command line args
