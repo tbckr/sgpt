@@ -78,6 +78,6 @@ jobs:
         with:
           token: ${{ steps.generate_token.outputs.token }}
           commit_message: "chore: update requirements.txt for readthedocs"
-          commit_user_name: actions-user
+          commit_user_name: tbckr-automation[bot]
           commit_user_email: actions@github.com
-          commit_author: actions-user <actions@github.com>
+          commit_author: tbckr-automation[bot] <actions@github.com>
