@@ -70,6 +70,7 @@ jobs:
       - name: Commit updated requirements.txt
         uses: stefanzweifel/git-auto-commit-action@3ea6ae190baf489ba007f7c92608f33ce20ef04a # v4
         with:
+          token: ${{ secrets.WORKFLOW_COMMITS_PAT }}
           commit_message: "chore: update requirements.txt for readthedocs"
           commit_user_name: actions-user
           commit_user_email: actions@github.com

@@ -28,6 +28,7 @@ on:
     paths:
       - 'README.md'
       - 'CONTRIBUTING.md'
+      - '.github/workflows/toc.yml'
 
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
@@ -43,5 +44,5 @@ jobs:
       - name: TOC Generator
         uses: technote-space/toc-generator@9e238e7974de5fcf7b17b7acc54c896160dda0a3 # v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_COMMITS_PAT }}
           TARGET_PATHS: "README.md,CONTRIBUTING.md"
