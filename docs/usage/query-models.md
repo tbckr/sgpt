@@ -16,6 +16,13 @@ $ echo -n "mass of sun" | sgpt
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
+You can also use the `--clipboard` flag to write the answer to the clipboard:
+
+```shell
+$ sgpt --clipboard "mass of sun"
+The mass of the sun is approximately 1.989 x 10^30 kilograms.
+```
+
 ## Generate Code
 
 SGPT can efficiently generate code based on given instructions. For instance, to solve the classic FizzBuzz problem
