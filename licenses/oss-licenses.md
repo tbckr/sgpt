@@ -5,7 +5,7 @@ Some packages may only be included on certain architectures or operating systems
 
 ## Overview
 
-- [github.com/atotto/clipboard](https://pkg.go.dev/github.com/atotto/clipboard) ([BSD 3-Clause](https://github.com/atotto/clipboard/blob/v0.1.4/LICENSE))
+- [github.com/atotto/clipboard](https://pkg.go.dev/github.com/atotto/clipboard) ([BSD-3-Clause](https://github.com/atotto/clipboard/blob/v0.1.4/LICENSE))
 - [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.6.0/LICENSE))
 - [github.com/hashicorp/hcl](https://pkg.go.dev/github.com/hashicorp/hcl) ([MPL-2.0](https://github.com/hashicorp/hcl/blob/v1.0.0/LICENSE))
 - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.1.0/LICENSE))
@@ -30,6 +30,43 @@ Some packages may only be included on certain architectures or operating systems
 - [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE))
 
 ## Details
+
+### github.com/atotto/clipboard
+
+- Name: github.com/atotto/clipboard
+- Version: v0.1.4
+- License: [BSD-3-Clause](https://github.com/atotto/clipboard/blob/v0.1.4/LICENSE)
+
+```text
+Copyright (c) 2013 Ato Araki. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of @atotto. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+```
 
 ### github.com/fsnotify/fsnotify
 
