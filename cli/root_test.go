@@ -32,6 +32,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/atotto/clipboard"
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/require"
 	"github.com/tbckr/sgpt/v2/api"
@@ -102,6 +103,21 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	require.NoError(t, writer.Close())
 
 	wg.Wait()
+}
+
+func TestRootCmd_SimpleClipboard(t *testing.T) {
+	prompt := "Say: Hello World!"
+	expected := "Hello World!"
+
+	mem := &exitMemento{}
+	config := createTestConfig(t)
+
+	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
+
+	root.Execute([]string{"--clipboard", prompt})
+	require.Equal(t, 0, mem.code)
+	textInClipboard, _ := clipboard.ReadAll()
+	require.Equal(t, expected, textInClipboard)
 }
 
 func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {

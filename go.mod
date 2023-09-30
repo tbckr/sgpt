@@ -3,6 +3,7 @@ module github.com/tbckr/sgpt/v2
 go 1.21
 
 require (
+	github.com/atotto/clipboard v0.1.4
 	github.com/muesli/mango-cobra v1.2.0
 	github.com/muesli/roff v0.1.0
 	github.com/sashabaranov/go-openai v1.15.3

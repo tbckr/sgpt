@@ -28,6 +28,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tbckr/sgpt/v2/api"
@@ -217,6 +218,14 @@ ls | sort
 				return err
 			}
 
+			if config.GetBool("clipboard") {
+				slog.Debug("Sending client response to clipboard")
+				err := clipboard.WriteAll(response)
+				if err != nil {
+					return err
+				}
+			}
+
 			if config.GetBool("execute") {
 				slog.Debug("Trying to execute response in shell")
 				return shell.ExecuteCommandWithConfirmation(cmd.Context(), cmd.InOrStdin(), cmd.OutOrStdout(), response)
@@ -274,6 +283,13 @@ func createFlags(cmd *cobra.Command, config *viper.Viper) {
 	// shell command
 	cmd.Flags().BoolP("execute", "e", false, "execute a response in the shell")
 	err = config.BindPFlag("execute", cmd.Flags().Lookup("execute"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
+	// clipboard flags
+	cmd.Flags().BoolP("clipboard", "b", false, "send client response to clipboard")
+	err = config.BindPFlag("clipboard", cmd.Flags().Lookup("clipboard"))
 	if err != nil {
 		bindErrors = append(bindErrors, err)
 	}
