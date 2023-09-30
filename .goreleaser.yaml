@@ -63,6 +63,12 @@ builds:
       - -X 'github.com/tbckr/sgpt/internal/buildinfo.commit={{.Commit}}'
       - -X 'github.com/tbckr/sgpt/internal/buildinfo.commitDate={{.CommitDate}}'
 
+release:
+  github:
+    owner: tbckr
+    name: sgpt
+  mode: keep-existing
+
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of uname.
