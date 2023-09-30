@@ -20,6 +20,24 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
+
+- [Features](#features)
+- [Installation](#installation)
+  - [Linux](#linux)
+  - [macOS](#macos)
+  - [Windows](#windows)
+  - [Using Go](#using-go)
+  - [Docker](#docker)
+  - [Other platforms](#other-platforms)
+- [Usage Guide](#usage-guide)
+  - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
+  - [Querying OpenAI Models](#querying-openai-models)
+  - [Chat Capabilities](#chat-capabilities)
+  - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
+  - [Code Generation Capabilities](#code-generation-capabilities)
+  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
+- [Acknowledgements](#acknowledgements)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Features
