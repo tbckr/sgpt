@@ -106,6 +106,7 @@ func TestSimplePrompt(t *testing.T) {
 		require.Fail(t, "Cache dir should be empty")
 		return nil
 	})
+	require.NoError(t, err)
 }
 
 func TestPromptSaveAsChat(t *testing.T) {

@@ -91,6 +91,9 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 	var messages []openai.ChatCompletionMessage
 
 	chatSessionManager, err = chat.NewFilesystemChatSessionManager(config)
+	if err != nil {
+		return "", err
+	}
 
 	var chatID string
 	var isChat bool

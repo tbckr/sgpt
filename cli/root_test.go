@@ -129,6 +129,8 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	configDir := t.TempDir()
 
 	config, err := createViperConfig()
+	require.NoError(t, err)
+
 	config.SetConfigFile(filepath.Join(configDir, "config.yaml"))
 	config.Set("TESTING", 1)
 
