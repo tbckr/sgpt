@@ -139,6 +139,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = configFile.WriteString(fmt.Sprintf("model: \"%s\"\n", openai.GPT4))
+	require.NoError(t, err)
 
 	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("Hello World", nil))
 
