@@ -114,7 +114,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 
 	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
 
-	root.Execute([]string{"--clipboard", prompt})
+	root.Execute([]string{"--clipboard", "-v", prompt})
 	require.Equal(t, 0, mem.code)
 	textInClipboard, _ := clipboard.ReadAll()
 	require.Equal(t, expected, textInClipboard)
