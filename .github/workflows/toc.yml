@@ -41,8 +41,13 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: generate_token
+        with:
+          app_id: ${{ secrets.AUTOMATION_APP_ID }}
+          private_key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
       - name: TOC Generator
         uses: technote-space/toc-generator@9e238e7974de5fcf7b17b7acc54c896160dda0a3 # v4
         with:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_COMMITS_PAT }}
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
           TARGET_PATHS: "README.md,CONTRIBUTING.md"

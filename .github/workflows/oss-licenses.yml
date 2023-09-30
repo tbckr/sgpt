@@ -47,23 +47,33 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+
       - name: Set up Go
         uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4
         with:
           go-version-file: go.mod
+
       - name: Install go-licenses
         run: |
           go install github.com/google/go-licenses@5348b744d0983d85713295ea08a20cca1654a45e # v1.6.0
+
       - name: Run go-licenses
         env:
           # include all build tags to include platform-specific dependencies
           GOFLAGS: "-tags=darwin,linux,windows"
         run: |
           ./scripts/oss-licenses.sh
+
+      - uses: actions/create-github-app-token@v1
+        id: generate_token
+        with:
+          app_id: ${{ secrets.AUTOMATION_APP_ID }}
+          private_key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+
       - name: Send pull request
         uses: peter-evans/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38 # v5.0.2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate_token.outputs.token }}
           author: OSS License Updater <11543666+tbckr@users.noreply.github.com>
           committer: OSS License Updater <11543666+tbckr@users.noreply.github.com>
           branch: licenses/oss-licenses

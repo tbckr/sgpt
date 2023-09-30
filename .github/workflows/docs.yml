@@ -67,10 +67,16 @@ jobs:
           task setup:docs
           task docs:requirements
 
+      - uses: actions/create-github-app-token@v1
+        id: generate_token
+        with:
+          app_id: ${{ secrets.AUTOMATION_APP_ID }}
+          private_key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+
       - name: Commit updated requirements.txt
         uses: stefanzweifel/git-auto-commit-action@3ea6ae190baf489ba007f7c92608f33ce20ef04a # v4
         with:
-          token: ${{ secrets.WORKFLOW_COMMITS_PAT }}
+          token: ${{ steps.generate_token.outputs.token }}
           commit_message: "chore: update requirements.txt for readthedocs"
           commit_user_name: actions-user
           commit_user_email: actions@github.com
