@@ -94,6 +94,25 @@ func TestGetChatModifierCodeOverride(t *testing.T) {
 	require.NoError(t, fileHandler.Close())
 }
 
+func TestGetChatModifierCodeOverrideWithComments(t *testing.T) {
+	codeOverride := `Act as a natural language to code translation engine.`
+	personaContent := "# This is a comment\n" + codeOverride
+
+	config := createTestConfig(t)
+
+	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "code"))
+	require.NoError(t, err)
+
+	_, err = fileHandler.WriteString(personaContent)
+	require.NoError(t, err)
+
+	var modifier string
+	modifier, err = GetChatModifier(config, "code")
+	require.NoError(t, err)
+	require.Equal(t, codeOverride, modifier)
+	require.NoError(t, fileHandler.Close())
+}
+
 func TestGetChatModifierCustomPersona(t *testing.T) {
 	codeOverride := `This is custom persona.`
 
