@@ -35,8 +35,7 @@ on:
   schedule:
     - cron: '30 2 * * *' # every day at 2:30am UTC
 
-permissions:
-  contents: read
+permissions: { }
 
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
@@ -46,7 +45,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       # Checkout repo
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4

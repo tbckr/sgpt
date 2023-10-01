@@ -29,6 +29,8 @@ on:
 env:
   REGISTRY: ghcr.io
 
+permissions: { }
+
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -36,9 +38,6 @@ concurrency:
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
     steps:
       - uses: actions/create-github-app-token@49ce228ea7cddec9f88dd09c5b7740dbac82d7ba # v1
         id: generate_token
@@ -58,6 +57,7 @@ jobs:
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
         if: ${{ steps.release.outputs.release_created }}
         with:
+          token: ${{ steps.generate_token.outputs.token }}
           fetch-depth: 0
       - run: git fetch --force --tags
         if: ${{ steps.release.outputs.release_created }}
@@ -79,7 +79,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ steps.generate_token.outputs.token }}
 
       # Release with goreleaser
       - uses: goreleaser/goreleaser-action@7ec5c2b0c6cdda6e8bbb49444bc797dd33d74dd8 # v5

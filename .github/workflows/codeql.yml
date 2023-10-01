@@ -42,6 +42,8 @@ on:
   schedule:
     - cron: '30 12 * * 1'
 
+permissions: { }
+
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -51,8 +53,8 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
-      actions: read
       contents: read
+      actions: read
       security-events: write
     strategy:
       fail-fast: false

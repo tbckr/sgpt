@@ -30,6 +30,8 @@ on:
       - 'CONTRIBUTING.md'
       - '.github/workflows/toc.yml'
 
+permissions: { }
+
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -38,8 +40,6 @@ jobs:
   generateTOC:
     name: TOC Generator
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/create-github-app-token@49ce228ea7cddec9f88dd09c5b7740dbac82d7ba # v1
         id: generate_token

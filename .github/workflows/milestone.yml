@@ -29,21 +29,16 @@ on:
     branches:
       - main
 
+permissions: { }
+
 jobs:
   milestone:
     runs-on: ubuntu-latest
 
     permissions:
-      actions: none
-      checks: none
       contents: read
-      deployments: none
       issues: write
-      packages: none
       pull-requests: write
-      repository-projects: none
-      security-events: none
-      statuses: none
 
     steps:
       - uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6

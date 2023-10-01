@@ -34,6 +34,8 @@ on:
       - scripts/oss-licenses.sh
   workflow_dispatch:
 
+permissions: { }
+
 concurrency:
   group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -42,8 +44,7 @@ jobs:
   update-licenses:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     steps:
       - name: Check out code
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
