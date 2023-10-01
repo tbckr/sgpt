@@ -3,8 +3,10 @@
 [![Release](https://img.shields.io/github/release/tbckr/sgpt.svg?style=for-the-badge)](https://github.com/tbckr/sgpt/releases/latest)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](/LICENSE.md)
 [![Codecov branch](https://img.shields.io/codecov/c/github/tbckr/sgpt/main.svg?style=for-the-badge)](https://codecov.io/gh/tbckr/sgpt)
+[![Go Report Card](https://goreportcard.com/badge/github.com/tbckr/sgpt?style=for-the-badge)](https://goreportcard.com/report/github.com/tbckr/sgpt)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/tbckr/sgpt)
 [![Powered By: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=for-the-badge)](https://github.com/goreleaser)
+[![Read the Docs](https://img.shields.io/readthedocs/sgpt?style=for-the-badge)](https://sgpt.readthedocs.io/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge)](https://conventionalcommits.org)
 [![Protected by Gitleaks](https://img.shields.io/badge/protected%20by-gitleaks-blue?style=for-the-badge)](https://github.com/gitleaks/gitleaks-action)
 
