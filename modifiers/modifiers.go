@@ -41,6 +41,8 @@ const (
 )
 
 var (
+	commentRegex = `(?m)^#.*$`
+
 	personaNameRegex   = "^[a-zA-Z0-9-_]+$"
 	personaNameMatcher = regexp.MustCompile(personaNameRegex)
 
@@ -152,7 +154,13 @@ func renderPrompt(promptText string) (string, error) {
 		return "", err
 	}
 	slog.Debug("Persona prompt rendered")
-	return renderedPrompt.String(), nil
+	prompt := renderedPrompt.String()
+
+	// remove lines starting with # (comments)
+	slog.Debug("Removing comments from persona prompt")
+	prompt = regexp.MustCompile(commentRegex).ReplaceAllString(prompt, "")
+
+	return strings.TrimSpace(prompt), nil
 }
 
 func loadVariables() (map[string]string, error) {
