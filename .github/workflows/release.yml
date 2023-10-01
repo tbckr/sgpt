@@ -51,6 +51,8 @@ jobs:
           token: ${{ steps.generate_token.outputs.token }}
           release-type: go
           package-name: sgpt
+          extra-files: |
+            internal/buildinfo/version.go
           skip-github-release: false
 
       # Checkout repo
