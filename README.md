@@ -6,6 +6,7 @@
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/tbckr/sgpt)
 [![Powered By: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=for-the-badge)](https://github.com/goreleaser)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge)](https://conventionalcommits.org)
+[![Protected by Gitleaks](https://img.shields.io/badge/protected%20by-gitleaks-blue?style=for-the-badge)](https://github.com/gitleaks/gitleaks-action)
 
 SGPT (*aka shell-gpt*) is a powerful command-line interface (CLI) tool designed for seamless interaction with OpenAI
 models directly from your terminal. Effortlessly run queries, generate shell commands or code, create images from text,
