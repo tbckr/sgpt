@@ -300,8 +300,8 @@ scoops:
       name: "{{ .Env.SCOOP_BUCKET }}"
       token: "{{ .Env.SCOOP_TAP_GITHUB_TOKEN }}"
     commit_author:
-      name: "goreleaserbot"
-      email: "11543666+tbckr@users.noreply.github.com"
+      name: "tbckr-automation[bot]"
+      email: "gh-automation@tb5.dev"
     commit_msg_template: "chore: Scoop update for {{ .ProjectName }} version {{ .Tag }}"
     description: |-
      SGPT is a command-line tool that provides a convenient way to interact with OpenAI models,
@@ -315,8 +315,8 @@ brews:
       name: "{{ .Env.HOMEBREW_TAP }}"
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     commit_author:
-      name: "goreleaserbot"
-      email: "11543666+tbckr@users.noreply.github.com"
+      name: "tbckr-automation[bot]"
+      email: "gh-automation@tb5.dev"
     commit_msg_template: "chore: Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     folder: Formula
     description: |-

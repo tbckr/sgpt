@@ -92,5 +92,5 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-          SCOOP_TAP_GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          SCOOP_TAP_GITHUB_TOKEN: ${{ secrets.SCOOP_TAP_GITHUB_TOKEN }}
