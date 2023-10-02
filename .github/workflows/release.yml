@@ -38,6 +38,8 @@ concurrency:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - uses: actions/create-github-app-token@49ce228ea7cddec9f88dd09c5b7740dbac82d7ba # v1
         id: generate_token
@@ -51,8 +53,6 @@ jobs:
           token: ${{ steps.generate_token.outputs.token }}
           release-type: go
           package-name: sgpt
-          extra-files: |
-            internal/buildinfo/version.go
           skip-github-release: false
 
       # Checkout repo
@@ -81,7 +81,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ steps.generate_token.outputs.token }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # Release with goreleaser
       - uses: goreleaser/goreleaser-action@7ec5c2b0c6cdda6e8bbb49444bc797dd33d74dd8 # v5
