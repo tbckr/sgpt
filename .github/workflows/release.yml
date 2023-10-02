@@ -95,3 +95,24 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
           SCOOP_TAP_GITHUB_TOKEN: ${{ secrets.SCOOP_TAP_GITHUB_TOKEN }}
+
+      - uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          github-token: ${{ steps.generate_token.outputs.token }}
+          script: |
+            # Remove 'autorelease: tagged' label from the PR that triggered the release
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              name: 'autorelease: tagged'
+            });
+            
+            # Add 'autorelease: published' label to the PR that triggered the release
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['autorelease: published']
+            });
