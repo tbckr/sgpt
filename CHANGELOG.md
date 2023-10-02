@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0](https://github.com/tbckr/sgpt/compare/v2.1.2...v2.2.0) (2023-10-02)
+
+
+### Features
+
+* **release:** automatically add "autorelease: published" label on success ([6c44f1a](https://github.com/tbckr/sgpt/commit/6c44f1ad6d9695803ea9ec7361fbafc459e75626))
+
+
+### Bug Fixes
+
+* **release:** update internal version info via release please ([47f78c4](https://github.com/tbckr/sgpt/commit/47f78c4add36993f1e2cde22a8f60dfcb776a6ba))
+
 ## [2.1.2](https://github.com/tbckr/sgpt/compare/v2.1.1...v2.1.2) (2023-10-02)
 
 
