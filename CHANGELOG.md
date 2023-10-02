@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/tbckr/sgpt/compare/v2.1.1...v2.1.2) (2023-10-02)
+
+
+### Bug Fixes
+
+* **release:** use PAT to update scoop bucket and homebrew formula ([22f23e1](https://github.com/tbckr/sgpt/commit/22f23e10ec751e874adc72c5dc63819005380f2d))
+
 ## [2.1.1](https://github.com/tbckr/sgpt/compare/v2.1.0...v2.1.1) (2023-10-02)
 
 
