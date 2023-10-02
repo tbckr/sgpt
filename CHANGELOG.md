@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/tbckr/sgpt/compare/v2.1.0...v2.1.1) (2023-10-02)
+
+
+### Bug Fixes
+
+* **release:** use the workflow permissions for pushing to ghcr.io ([3a335d6](https://github.com/tbckr/sgpt/commit/3a335d6589d84abc76507e68524f19a7fca3cfee))
+
 ## [2.1.0](https://github.com/tbckr/sgpt/compare/v2.0.0...v2.1.0) (2023-10-02)
 
 
