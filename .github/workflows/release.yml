@@ -54,6 +54,7 @@ jobs:
           release-type: go
           package-name: sgpt
           skip-github-release: false
+          extra-files: internal/buildinfo/version.go
 
       # Checkout repo
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
