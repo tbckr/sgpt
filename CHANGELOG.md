@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/tbckr/sgpt/compare/v2.2.0...v2.2.1) (2023-10-02)
+
+
+### Bug Fixes
+
+* **release:** syntax error in label update ([87f70e0](https://github.com/tbckr/sgpt/commit/87f70e07642497b9a8f9b6bdb2e353bf9452c221))
+
 ## [2.2.0](https://github.com/tbckr/sgpt/compare/v2.1.2...v2.2.0) (2023-10-02)
 
 
