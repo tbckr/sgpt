@@ -75,8 +75,8 @@ jobs:
         uses: peter-evans/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38 # v5.0.2
         with:
           token: ${{ steps.generate_token.outputs.token }}
-          author: tbckr-automation[bot] <actions@github.com>
-          committer: tbckr-automation[bot] <actions@github.com>
+          author: tbckr-automation[bot] <gh-automation@tb5.dev>
+          committer: tbckr-automation[bot] <gh-automation@tb5.dev>
           branch: licenses/oss-licenses
           commit-message: "chore(licenses): update oss licenses"
           title: "licenses: update oss licenses"

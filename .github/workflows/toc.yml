@@ -50,4 +50,6 @@ jobs:
         uses: technote-space/toc-generator@9e238e7974de5fcf7b17b7acc54c896160dda0a3 # v4
         with:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          COMMIT_NAME: tbckr-automation[bot]
+          COMMIT_EMAIL: gh-automation@tb5.dev
           TARGET_PATHS: "README.md,CONTRIBUTING.md"
