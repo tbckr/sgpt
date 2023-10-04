@@ -45,7 +45,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       # Checkout repo
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
@@ -66,16 +66,10 @@ jobs:
           task setup:docs
           task docs:requirements
 
-      - uses: actions/create-github-app-token@49ce228ea7cddec9f88dd09c5b7740dbac82d7ba # v1
-        id: generate_token
-        with:
-          app_id: ${{ secrets.AUTOMATION_APP_ID }}
-          private_key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
-
       - name: Commit updated requirements.txt
         uses: stefanzweifel/git-auto-commit-action@3ea6ae190baf489ba007f7c92608f33ce20ef04a # v4
         with:
-          token: ${{ steps.generate_token.outputs.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit_message: "chore: update requirements.txt for readthedocs"
           commit_user_name: tbckr-automation[bot]
           commit_user_email: gh-automation@tb5.dev
