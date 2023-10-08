@@ -67,7 +67,7 @@ func Execute(args []string) {
 func (r *rootCmd) Execute(args []string) {
 	defer func() {
 		if err := recover(); err != nil {
-			slog.Error("Panic occured", "error", err)
+			slog.Error("Panic occurred", "error", err)
 		}
 	}()
 
