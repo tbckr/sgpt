@@ -28,9 +28,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/tbckr/sgpt/v2/chat"
+
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/v2/chat"
 	"github.com/tbckr/sgpt/v2/modifiers"
 )
 
@@ -85,7 +86,7 @@ func CreateClient() (*OpenAIClient, error) {
 	return client, nil
 }
 
-func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper, prompt, modifier string) (string, error) {
+func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper, chatID, prompt, modifier string) (string, error) {
 	var err error
 	var chatSessionManager chat.SessionManager
 	var messages []openai.ChatCompletionMessage
@@ -95,10 +96,8 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 		return "", err
 	}
 
-	var chatID string
-	var isChat bool
-	if config.IsSet("chat") {
-		chatID = config.GetString("chat")
+	isChat := false
+	if chatID != "" {
 		isChat = true
 	}
 	chatExists := false
