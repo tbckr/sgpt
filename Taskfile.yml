@@ -81,7 +81,7 @@ tasks:
   docs:
     desc: Start documentation server
     cmds:
-      - "{{.DOCKER}} run --rm -it -p 8000:8000 -v $PWD:/docs:ro squidfunk/mkdocs-material"
+      - "{{.DOCKER}} run --rm -it -p 8000:8000 -v $PWD:/docs:ro --pull=always squidfunk/mkdocs-material"
 
   license-header:
     desc: Add license header to all files
