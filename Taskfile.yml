@@ -162,7 +162,8 @@ tasks:
   ci:
     desc: Run all CI steps
     cmds:
-      - task: setup
+      - task: clean
+      - task: prepare
       - task: build
       - task: test
 

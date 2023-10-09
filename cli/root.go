@@ -37,8 +37,13 @@ import (
 )
 
 type rootCmd struct {
-	cmd     *cobra.Command
-	exit    func(int)
+	cmd  *cobra.Command
+	exit func(int)
+
+	chat            string
+	execute         bool
+	copyToClipboard bool
+
 	verbose bool
 }
 
@@ -209,7 +214,7 @@ ls | sort
 			}
 
 			var response string
-			response, err = client.GetChatCompletion(cmd.Context(), config, prompt, mode)
+			response, err = client.GetChatCompletion(cmd.Context(), config, root.chat, prompt, mode)
 			if err != nil {
 				return err
 			}
@@ -218,7 +223,7 @@ ls | sort
 				return err
 			}
 
-			if config.GetBool("clipboard") {
+			if root.copyToClipboard {
 				slog.Debug("Sending client response to clipboard")
 				err = clipboard.WriteAll(response)
 				if err != nil {
@@ -227,7 +232,7 @@ ls | sort
 				}
 			}
 
-			if config.GetBool("execute") {
+			if root.execute {
 				slog.Debug("Trying to execute response in shell")
 				return shell.ExecuteCommandWithConfirmation(cmd.Context(), cmd.InOrStdin(), cmd.OutOrStdout(), response)
 			}
@@ -235,10 +240,17 @@ ls | sort
 		},
 	}
 
+	// flags
+	cmd.Flags().BoolVarP(&root.execute, "execute", "e", false, "execute a response in the shell")
+	cmd.Flags().BoolVarP(&root.copyToClipboard, "clipboard", "b", false, "send client response to clipboard")
+	cmd.Flags().StringVarP(&root.chat, "chat", "c", "", "use an existing chat session or create a new one")
+
+	// flags with config binding
+	createFlagsWithConfigBinding(cmd, config)
+
+	// verbose persistent flag
 	cmd.PersistentFlags().BoolVarP(&root.verbose, "verbose", "v", false,
 		"enable more verbose output for debugging")
-
-	createFlags(cmd, config)
 
 	cmd.AddCommand(
 		newChatCmd(config).cmd,
@@ -253,7 +265,7 @@ ls | sort
 	return root
 }
 
-func createFlags(cmd *cobra.Command, config *viper.Viper) {
+func createFlagsWithConfigBinding(cmd *cobra.Command, config *viper.Viper) {
 	var bindErrors []error
 	var err error
 	// text based commands
@@ -277,27 +289,6 @@ func createFlags(cmd *cobra.Command, config *viper.Viper) {
 
 	cmd.Flags().Float64P("top-p", "p", 1, "limits highest probable tokens")
 	err = config.BindPFlag("topP", cmd.Flags().Lookup("top-p"))
-	if err != nil {
-		bindErrors = append(bindErrors, err)
-	}
-
-	// shell command
-	cmd.Flags().BoolP("execute", "e", false, "execute a response in the shell")
-	err = config.BindPFlag("execute", cmd.Flags().Lookup("execute"))
-	if err != nil {
-		bindErrors = append(bindErrors, err)
-	}
-
-	// clipboard flags
-	cmd.Flags().BoolP("clipboard", "b", false, "send client response to clipboard")
-	err = config.BindPFlag("clipboard", cmd.Flags().Lookup("clipboard"))
-	if err != nil {
-		bindErrors = append(bindErrors, err)
-	}
-
-	// chat flags
-	cmd.Flags().StringP("chat", "c", "", "use an existing chat session or create a new one")
-	err = config.BindPFlag("chat", cmd.Flags().Lookup("chat"))
 	if err != nil {
 		bindErrors = append(bindErrors, err)
 	}

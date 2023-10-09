@@ -91,7 +91,7 @@ func TestSimplePrompt(t *testing.T) {
 	config := createTestConfig(t)
 
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, prompt, "txt")
+	result, err = client.GetChatCompletion(context.Background(), config, "", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
@@ -117,10 +117,8 @@ func TestPromptSaveAsChat(t *testing.T) {
 	require.NoError(t, err)
 	config := createTestConfig(t)
 
-	config.Set("chat", "test_chat")
-
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, prompt, "txt")
+	result, err = client.GetChatCompletion(context.Background(), config, "test_chat", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
@@ -152,8 +150,6 @@ func TestPromptLoadChat(t *testing.T) {
 	require.NoError(t, err)
 	config := createTestConfig(t)
 
-	config.Set("chat", "test_chat")
-
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
@@ -171,7 +167,7 @@ func TestPromptLoadChat(t *testing.T) {
 	require.NoError(t, err)
 
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, prompt, "txt")
+	result, err = client.GetChatCompletion(context.Background(), config, "test_chat", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
@@ -206,7 +202,7 @@ func TestPromptWithModifier(t *testing.T) {
 	config.Set("chat", "test_chat")
 
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, prompt, "sh")
+	result, err = client.GetChatCompletion(context.Background(), config, "test_chat", prompt, "sh")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
