@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.3.0](https://github.com/tbckr/sgpt/compare/v2.2.1...v2.3.0) (2023-10-09)
+
+
+### Features
+
+* **release:** label "autorelease: published" on success ([bfd7b29](https://github.com/tbckr/sgpt/commit/bfd7b295ba9c21c969a7dd91378b8aaf0c46434d))
+
+
+### Bug Fixes
+
+* config init writes unnecessary values to config file ([#153](https://github.com/tbckr/sgpt/issues/153)) ([1acacb6](https://github.com/tbckr/sgpt/commit/1acacb6a2be258932cf174a251476749b7cb2f7b))
+* **workflow/docs:** use repo token ([66ce7b9](https://github.com/tbckr/sgpt/commit/66ce7b98e8d6ddd3bf2157416d21920b3f620f7d))
+
 ## [2.2.1](https://github.com/tbckr/sgpt/compare/v2.2.0...v2.2.1) (2023-10-02)
 
 
