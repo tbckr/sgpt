@@ -78,18 +78,7 @@ tasks:
       - which svu 1>/dev/null || (echo "svu is not installed" && exit 1)
       - which goreleaser 1>/dev/null || (echo "goreleaser is not installed" && exit 1)
 
-  docs:requirements:
-    desc: Create requirements.txt
-    cmds:
-      - pipenv requirements > docs/requirements.txt
-
   docs:
-    desc: Serve documentation locally
-    cmds:
-      - pipenv sync
-      - pipenv run mkdocs serve
-
-  docs:serve:
     desc: Start documentation server
     cmds:
       - "{{.DOCKER}} run --rm -it -p 8000:8000 -v $PWD:/docs:ro squidfunk/mkdocs-material"
