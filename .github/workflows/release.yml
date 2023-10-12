@@ -105,13 +105,13 @@ jobs:
             github.rest.issues.removeLabel({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{ steps.release.outputs.pr.number }},
+              issue_number: ${{ steps.release.outputs.pr }},
               name: 'autorelease: tagged'
             });
 
             github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{ steps.release.outputs.pr.number }},
+              issue_number: ${{ steps.release.outputs.pr }},
               labels: ['autorelease: published']
             });
