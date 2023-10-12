@@ -75,8 +75,18 @@ func CreateClient() (*OpenAIClient, error) {
 	if !exists {
 		return nil, ErrMissingAPIKey
 	}
+	clientConfig := openai.DefaultConfig(apiKey)
+
+	// Check, if API base url was set
+	baseURL, isSet := os.LookupEnv("OPENAI_API_BASE")
+	if isSet {
+		// Set base url
+		clientConfig.BaseURL = baseURL
+		slog.Debug("Setting API base url to " + baseURL)
+	}
+	// Create client
 	client := &OpenAIClient{
-		api: openai.NewClient(apiKey),
+		api: openai.NewClientWithConfig(clientConfig),
 		// This is necessary to be able to mock the api in tests
 		retrieveResponseFn: func(api *openai.Client, ctx context.Context, req openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
 			return api.CreateChatCompletion(ctx, req)

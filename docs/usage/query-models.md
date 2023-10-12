@@ -61,3 +61,11 @@ $ sgpt sh --execute "make all files in current directory read only"
 chmod -R 444 *
 Do you want to execute this command? (Y/n) y
 ```
+
+## Override OpenAI API base URL
+
+You can override the OpenAI base URL by setting the `OPENAI_API_BASE` environment variable:
+
+```shell
+export OPENAI_API_BASE=https://api.openai.com/v1
+```
