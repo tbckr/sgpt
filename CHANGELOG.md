@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/tbckr/sgpt/compare/v2.3.0...v2.4.0) (2023-10-12)
+
+
+### Features
+
+* override API base url via env var ([#154](https://github.com/tbckr/sgpt/issues/154)) ([90ca04e](https://github.com/tbckr/sgpt/commit/90ca04e71a43edae0b0b89c043c2f74aab031c0a))
+
 ## [2.3.0](https://github.com/tbckr/sgpt/compare/v2.2.1...v2.3.0) (2023-10-09)
 
 
