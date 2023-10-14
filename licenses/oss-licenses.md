@@ -15,17 +15,17 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
 - [github.com/muesli/mango-pflag](https://pkg.go.dev/github.com/muesli/mango-pflag) ([MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE))
 - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
-- [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.0.8/LICENSE))
+- [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.1.0/LICENSE))
+- [github.com/sagikazarmark/slog-shim](https://pkg.go.dev/github.com/sagikazarmark/slog-shim) ([BSD-3-Clause](https://github.com/sagikazarmark/slog-shim/blob/v0.1.0/LICENSE))
 - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.15.4/LICENSE))
-- [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.9.5/LICENSE.txt))
+- [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.10.0/LICENSE.txt))
 - [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.5.1/LICENSE))
 - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.7.0/LICENSE.txt))
-- [github.com/spf13/jwalterweatherman](https://pkg.go.dev/github.com/spf13/jwalterweatherman) ([MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE))
 - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
-- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.16.0/LICENSE))
-- [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.4.2/LICENSE))
-- [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.8.0:LICENSE))
-- [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.9.0:LICENSE))
+- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.17.0/LICENSE))
+- [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE))
+- [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.12.0:LICENSE))
+- [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.13.0:LICENSE))
 - [gopkg.in/ini.v1](https://pkg.go.dev/gopkg.in/ini.v1) ([Apache-2.0](https://github.com/go-ini/ini/blob/v1.67.0/LICENSE))
 - [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE))
 
@@ -870,13 +870,14 @@ SOFTWARE.
 ### github.com/pelletier/go-toml/v2
 
 - Name: github.com/pelletier/go-toml/v2
-- Version: v2.0.8
-- License: [MIT](https://github.com/pelletier/go-toml/blob/v2.0.8/LICENSE)
+- Version: v2.1.0
+- License: [MIT](https://github.com/pelletier/go-toml/blob/v2.1.0/LICENSE)
 
 ```text
 The MIT License (MIT)
 
-Copyright (c) 2013 - 2022 Thomas Pelletier, Eric Anderton
+go-toml v2
+Copyright (c) 2021 - 2023 Thomas Pelletier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -895,6 +896,43 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+```
+
+### github.com/sagikazarmark/slog-shim
+
+- Name: github.com/sagikazarmark/slog-shim
+- Version: v0.1.0
+- License: [BSD-3-Clause](https://github.com/sagikazarmark/slog-shim/blob/v0.1.0/LICENSE)
+
+```text
+Copyright (c) 2009 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ```
 
@@ -1112,8 +1150,8 @@ SOFTWARE.
 ### github.com/spf13/afero
 
 - Name: github.com/spf13/afero
-- Version: v1.9.5
-- License: [Apache-2.0](https://github.com/spf13/afero/blob/v1.9.5/LICENSE.txt)
+- Version: v1.10.0
+- License: [Apache-2.0](https://github.com/spf13/afero/blob/v1.10.0/LICENSE.txt)
 
 ```text
                                 Apache License
@@ -1507,36 +1545,6 @@ SOFTWARE.
 
 ```
 
-### github.com/spf13/jwalterweatherman
-
-- Name: github.com/spf13/jwalterweatherman
-- Version: v1.1.0
-- License: [MIT](https://github.com/spf13/jwalterweatherman/blob/v1.1.0/LICENSE)
-
-```text
-The MIT License (MIT)
-
-Copyright (c) 2014 Steve Francia
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
 ### github.com/spf13/pflag
 
 - Name: github.com/spf13/pflag
@@ -1578,8 +1586,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/spf13/viper
 
 - Name: github.com/spf13/viper
-- Version: v1.16.0
-- License: [MIT](https://github.com/spf13/viper/blob/v1.16.0/LICENSE)
+- Version: v1.17.0
+- License: [MIT](https://github.com/spf13/viper/blob/v1.17.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1608,8 +1616,8 @@ SOFTWARE.
 ### github.com/subosito/gotenv
 
 - Name: github.com/subosito/gotenv
-- Version: v1.4.2
-- License: [MIT](https://github.com/subosito/gotenv/blob/v1.4.2/LICENSE)
+- Version: v1.6.0
+- License: [MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1639,8 +1647,8 @@ THE SOFTWARE.
 ### golang.org/x/sys
 
 - Name: golang.org/x/sys
-- Version: v0.8.0
-- License: [BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.8.0:LICENSE)
+- Version: v0.12.0
+- License: [BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.12.0:LICENSE)
 
 ```text
 Copyright (c) 2009 The Go Authors. All rights reserved.
@@ -1676,8 +1684,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### golang.org/x/text
 
 - Name: golang.org/x/text
-- Version: v0.9.0
-- License: [BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.9.0:LICENSE)
+- Version: v0.13.0
+- License: [BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.13.0:LICENSE)
 
 ```text
 Copyright (c) 2009 The Go Authors. All rights reserved.
