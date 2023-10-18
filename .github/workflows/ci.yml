@@ -40,6 +40,8 @@ on:
   pull_request:
     branches:
       - main
+    branches-ignore:
+      - 'release-please--*'
     paths:
       - '**/*.go'
       - '.golangci.yaml'
