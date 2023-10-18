@@ -38,8 +38,6 @@ on:
       - 'taskfile.yml'
       - 'scripts/gha-test.sh'
   pull_request:
-    branches:
-      - main
     branches-ignore:
       - 'release-please--*'
     paths:
