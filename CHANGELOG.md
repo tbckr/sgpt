@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.5.0](https://github.com/tbckr/sgpt/compare/v2.4.0...v2.5.0) (2023-10-20)
+
+
+### Features
+
+* added personas for golang, java and python ([#159](https://github.com/tbckr/sgpt/issues/159)) ([f64e7e9](https://github.com/tbckr/sgpt/commit/f64e7e9efe0e2f2ebbc7f6e24ae167f583829481))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.16.0 ([8ac1307](https://github.com/tbckr/sgpt/commit/8ac13076b2efec1c416f90f292a3882a2e359704))
+* **deps:** update module github.com/spf13/viper to v1.17.0 ([1c6d9f8](https://github.com/tbckr/sgpt/commit/1c6d9f8f3ab8658c8e2bcde363fc722e6e825630))
+
 ## [2.4.0](https://github.com/tbckr/sgpt/compare/v2.3.0...v2.4.0) (2023-10-12)
 
 
