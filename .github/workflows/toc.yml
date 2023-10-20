@@ -44,8 +44,8 @@ jobs:
       - uses: actions/create-github-app-token@9d97a4282b2c51a2f4f0465b9326399f53c890d4 # v1
         id: generate_token
         with:
-          app_id: ${{ secrets.AUTOMATION_APP_ID }}
-          private_key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
       - name: TOC Generator
         uses: technote-space/toc-generator@9e238e7974de5fcf7b17b7acc54c896160dda0a3 # v4
         with:
