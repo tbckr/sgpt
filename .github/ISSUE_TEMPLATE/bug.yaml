@@ -60,6 +60,14 @@ body:
         - label: I did search for other open and closed issues before opening this
           required: true
   - type: checkboxes
+    id: is-it-this-project
+    attributes:
+      label: SGPT Project
+      description: There are several implementations of SGPT. Please make sure you are using the Go implementation of SGPT and not some other project (like [shell_gpt](https://github.com/TheR1D/shell_gpt) written in Python).
+      options:
+        - label: I have verified that I am using the Go implementation of SGPT (this project) and that it is not another project
+          required: true
+  - type: checkboxes
     id: terms
     attributes:
       label: Code of Conduct
