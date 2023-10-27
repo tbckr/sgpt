@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.1](https://github.com/tbckr/sgpt/compare/v2.5.0...v2.5.1) (2023-10-27)
+
+
+### Bug Fixes
+
+* example personas ([#160](https://github.com/tbckr/sgpt/issues/160)) ([49cdc65](https://github.com/tbckr/sgpt/commit/49cdc6523949f390c720d829a0b35d1b5b62baee))
+
 ## [2.5.0](https://github.com/tbckr/sgpt/compare/v2.4.0...v2.5.0) (2023-10-20)
 
 
