@@ -25,6 +25,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"strings"
 
@@ -77,6 +78,14 @@ func CreateClient() (*OpenAIClient, error) {
 	}
 	clientConfig := openai.DefaultConfig(apiKey)
 
+	// Set HTTP Proxy
+	transport := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+	}
+	clientConfig.HTTPClient = &http.Client{
+		Transport: transport,
+	}
+
 	// Check, if API base url was set
 	baseURL, isSet := os.LookupEnv("OPENAI_API_BASE")
 	if isSet {
@@ -84,6 +93,7 @@ func CreateClient() (*OpenAIClient, error) {
 		clientConfig.BaseURL = baseURL
 		slog.Debug("Setting API base url to " + baseURL)
 	}
+
 	// Create client
 	client := &OpenAIClient{
 		api: openai.NewClientWithConfig(clientConfig),
@@ -92,6 +102,7 @@ func CreateClient() (*OpenAIClient, error) {
 			return api.CreateChatCompletion(ctx, req)
 		},
 	}
+
 	slog.Debug("OpenAI client created")
 	return client, nil
 }
