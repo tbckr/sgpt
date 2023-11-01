@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/tbckr/sgpt/compare/v2.5.1...v2.6.0) (2023-11-01)
+
+
+### Features
+
+* proxy support ([#164](https://github.com/tbckr/sgpt/issues/164)) ([829a503](https://github.com/tbckr/sgpt/commit/829a503333d59a678af9b6fb1e672c4262136e88))
+
 ## [2.5.1](https://github.com/tbckr/sgpt/compare/v2.5.0...v2.5.1) (2023-10-27)
 
 
