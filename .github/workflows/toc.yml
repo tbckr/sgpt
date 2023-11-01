@@ -41,7 +41,7 @@ jobs:
     name: TOC Generator
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/create-github-app-token@9d97a4282b2c51a2f4f0465b9326399f53c890d4 # v1
+      - uses: actions/create-github-app-token@eaddb9eb7e4226c68cf4b39f167c83e5bd132b3e # v1
         id: generate_token
         with:
           app-id: ${{ secrets.AUTOMATION_APP_ID }}
