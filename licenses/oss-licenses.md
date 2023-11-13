@@ -20,7 +20,7 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.16.0/LICENSE))
 - [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.10.0/LICENSE.txt))
 - [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.5.1/LICENSE))
-- [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.7.0/LICENSE.txt))
+- [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.8.0/LICENSE.txt))
 - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
 - [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.17.0/LICENSE))
 - [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE))
@@ -1364,8 +1364,8 @@ SOFTWARE.
 ### github.com/spf13/cobra
 
 - Name: github.com/spf13/cobra
-- Version: v1.7.0
-- License: [Apache-2.0](https://github.com/spf13/cobra/blob/v1.7.0/LICENSE.txt)
+- Version: v1.8.0
+- License: [Apache-2.0](https://github.com/spf13/cobra/blob/v1.8.0/LICENSE.txt)
 
 ```text
                                 Apache License
