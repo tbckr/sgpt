@@ -1,7 +1,7 @@
 # Configuration
 
 SGPT can be configured via a config file in your default config directory. The default config directory
-is `~/.config/sgpt/` on Linux and MacOS and `%APPDATA%/sgpt/` on Windows. The config file is named `config.yaml`.
+is `~/.config/sgpt/` on Linux, `~/Library/Application Support/sgpt/` on MacOS and `%APPDATA%/sgpt/` on Windows. The config file is named `config.yaml`.
 
 The config file is a YAML file with the following structure:
 
