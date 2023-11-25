@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.6.1](https://github.com/tbckr/sgpt/compare/v2.6.0...v2.6.1) (2023-11-25)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.16.1 ([6f75f03](https://github.com/tbckr/sgpt/commit/6f75f03955b92a961232b6abfca3990d2015ce7b))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.1 ([760f00c](https://github.com/tbckr/sgpt/commit/760f00cb03be2d6024cbefda78a33038fabf0622))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.2 ([b8ed1ac](https://github.com/tbckr/sgpt/commit/b8ed1ac79cf0fd119d0da4aa9618e4455d89d7dc))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.3 ([3512ecc](https://github.com/tbckr/sgpt/commit/3512ecc6fa55adbd4d6fb1fd5ce721f3049ad616))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.4 ([15813bc](https://github.com/tbckr/sgpt/commit/15813bc509ad954e083bf72e91aebb86e389619d))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.5 ([0d07ae8](https://github.com/tbckr/sgpt/commit/0d07ae88f3b8c3c8beaa230fbf5b9910565c7810))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.6 ([2d97566](https://github.com/tbckr/sgpt/commit/2d97566309f6e4fe9ce3588687cc485362f84f42))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.7 ([8457051](https://github.com/tbckr/sgpt/commit/845705103ee6602f03feb44046aff26560b664bf))
+* **deps:** update module github.com/spf13/cobra to v1.8.0 ([#167](https://github.com/tbckr/sgpt/issues/167)) ([aad7159](https://github.com/tbckr/sgpt/commit/aad71592aae3439dac456921db5886ec3790173e))
+* **docs:** config location on MacOS ([#177](https://github.com/tbckr/sgpt/issues/177)) ([f208f49](https://github.com/tbckr/sgpt/commit/f208f491730abf3ac66767e25e30efa0974733f8))
+
 ## [2.6.0](https://github.com/tbckr/sgpt/compare/v2.5.1...v2.6.0) (2023-11-01)
 
 
