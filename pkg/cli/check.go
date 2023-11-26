@@ -23,6 +23,7 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/tbckr/sgpt/v2/pkg/api"
@@ -35,7 +36,7 @@ type checkCmd struct {
 	cmd *cobra.Command
 }
 
-func newCheckCmd(config *viper.Viper, createClientFn func() (*api.OpenAIClient, error)) *checkCmd {
+func newCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *checkCmd {
 	check := &checkCmd{}
 	cmd := &cobra.Command{
 		Use:   "check",
@@ -50,7 +51,7 @@ This command will return an error if the API key is not set or invalid.
 			if err != nil {
 				return err
 			}
-			_, err = createClientFn()
+			_, err = createClientFn(config, cmd.OutOrStdout())
 			if err != nil {
 				return err
 			}

@@ -23,54 +23,42 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
 
-	chat2 "github.com/tbckr/sgpt/v2/pkg/chat"
-	"github.com/tbckr/sgpt/v2/pkg/modifiers"
-
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
+	"github.com/tbckr/sgpt/v2/pkg/chat"
+	"github.com/tbckr/sgpt/v2/pkg/modifiers"
 )
 
 const (
+	// envKeyOpenAIApi is the environment variable key for the OpenAI API key.
 	envKeyOpenAIApi = "OPENAI_API_KEY"
 )
 
 var (
-	DefaultModel     = strings.Clone(openai.GPT3Dot5Turbo)
+	// DefaultModel is the default model used for chat completions.
+	DefaultModel = strings.Clone(openai.GPT3Dot5Turbo)
+	// ErrMissingAPIKey is returned, if the OPENAI_API_KEY environment variable is not set.
 	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
 )
 
+// OpenAIClient is a client for the OpenAI API.
 type OpenAIClient struct {
-	api                *openai.Client
-	retrieveResponseFn func(*openai.Client, context.Context, openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error)
+	HTTPClient *http.Client
+	config     *viper.Viper
+	api        *openai.Client
+	out        io.Writer
 }
 
-func MockClient(response string, err error) func() (*OpenAIClient, error) {
-	return func() (*OpenAIClient, error) {
-		return &OpenAIClient{
-			api: nil,
-			retrieveResponseFn: func(_ *openai.Client, _ context.Context, _ openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
-				return openai.ChatCompletionResponse{
-					Choices: []openai.ChatCompletionChoice{
-						{
-							Message: openai.ChatCompletionMessage{
-								Role:    openai.ChatMessageRoleAssistant,
-								Content: response,
-							},
-						},
-					},
-				}, nil
-			},
-		}, err
-	}
-}
-
-func CreateClient() (*OpenAIClient, error) {
+// CreateClient creates a new OpenAI client with the given config and output writer.
+func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
 	if !exists {
@@ -82,9 +70,10 @@ func CreateClient() (*OpenAIClient, error) {
 	transport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 	}
-	clientConfig.HTTPClient = &http.Client{
+	httpClient := &http.Client{
 		Transport: transport,
 	}
+	clientConfig.HTTPClient = httpClient
 
 	// Check, if API base url was set
 	baseURL, isSet := os.LookupEnv("OPENAI_API_BASE")
@@ -96,23 +85,24 @@ func CreateClient() (*OpenAIClient, error) {
 
 	// Create client
 	client := &OpenAIClient{
-		api: openai.NewClientWithConfig(clientConfig),
-		// This is necessary to be able to mock the api in tests
-		retrieveResponseFn: func(api *openai.Client, ctx context.Context, req openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
-			return api.CreateChatCompletion(ctx, req)
-		},
+		HTTPClient: httpClient,
+		config:     config,
+		api:        openai.NewClientWithConfig(clientConfig),
+		out:        out,
 	}
-
 	slog.Debug("OpenAI client created")
 	return client, nil
 }
 
-func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper, chatID, prompt, modifier string) (string, error) {
+// CreateCompletion creates a completion for the given prompt and modifier. If chatID is provided, the chat is reused
+// and the completion is added to the chat with this ID. If no chatID is provided, only the modifier and prompt are
+// used to create the completion. The completion is printed to the out writer of the client and returned as a string.
+func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, modifier string) (string, error) {
 	var err error
-	var chatSessionManager chat2.SessionManager
+	var chatSessionManager chat.SessionManager
 	var messages []openai.ChatCompletionMessage
 
-	chatSessionManager, err = chat2.NewFilesystemChatSessionManager(config)
+	chatSessionManager, err = chat.NewFilesystemChatSessionManager(c.config)
 	if err != nil {
 		return "", err
 	}
@@ -146,7 +136,7 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 	// then add modifier message
 	if !isChat || (isChat && !chatExists) {
 		var modifierPrompt string
-		modifierPrompt, err = modifiers.GetChatModifier(config, modifier)
+		modifierPrompt, err = modifiers.GetChatModifier(c.config, modifier)
 		if err != nil {
 			return "", err
 		}
@@ -166,24 +156,28 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 	})
 	slog.Debug("Added prompt message")
 
-	// Do request
+	// Create request
 	req := openai.ChatCompletionRequest{
 		Messages:    messages,
-		Model:       config.GetString("model"),
-		MaxTokens:   config.GetInt("max-tokens"),
-		Temperature: float32(config.GetFloat64("temperature")),
-		TopP:        float32(config.GetFloat64("top-p")),
+		Model:       c.config.GetString("model"),
+		MaxTokens:   c.config.GetInt("max-tokens"),
+		Temperature: float32(c.config.GetFloat64("temperature")),
+		TopP:        float32(c.config.GetFloat64("top-p")),
+		Stream:      c.config.GetBool("stream"),
 	}
-	var resp openai.ChatCompletionResponse
-	resp, err = c.retrieveResponseFn(c.api, ctx, req)
+
+	// Retrieve response
+	var receivedMessage openai.ChatCompletionMessage
+	if c.config.GetBool("stream") {
+		receivedMessage, err = c.retrieveChatCompletionStream(ctx, req)
+	} else {
+		receivedMessage, err = c.retrieveChatCompletion(ctx, req)
+	}
 	if err != nil {
 		return "", err
 	}
-	receivedMessage := resp.Choices[0].Message
-	slog.Debug("Received message from OpenAI API")
 
-	// Remove surrounding white spaces
-	receivedMessage.Content = strings.TrimSpace(receivedMessage.Content)
+	slog.Debug("Received message from OpenAI API")
 
 	// If a session was provided, save received message to this chat
 	if isChat {
@@ -195,4 +189,56 @@ func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Vipe
 	}
 	// Return received message
 	return receivedMessage.Content, nil
+}
+
+func (c *OpenAIClient) retrieveChatCompletion(ctx context.Context, req openai.ChatCompletionRequest) (openai.ChatCompletionMessage, error) {
+	resp, err := c.api.CreateChatCompletion(ctx, req)
+	if err != nil {
+		return openai.ChatCompletionMessage{}, err
+	}
+	receivedMessage := resp.Choices[0].Message
+
+	// Remove surrounding white spaces
+	receivedMessage.Content = strings.TrimSpace(receivedMessage.Content)
+
+	return receivedMessage, nil
+}
+
+func (c *OpenAIClient) retrieveChatCompletionStream(ctx context.Context, req openai.ChatCompletionRequest) (openai.ChatCompletionMessage, error) {
+	stream, err := c.api.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		return openai.ChatCompletionMessage{}, err
+	}
+	defer stream.Close()
+	slog.Debug("Streaming response")
+
+	// Print initial linebreak
+	_, err = fmt.Fprintf(c.out, "\n")
+	if err != nil {
+		return openai.ChatCompletionMessage{}, err
+	}
+
+	var receivedMessage openai.ChatCompletionMessage
+	for {
+		response, streamErr := stream.Recv()
+		if errors.Is(streamErr, io.EOF) {
+			slog.Debug("Stream finished")
+			break
+		}
+		if streamErr != nil {
+			slog.Debug("Stream error encountered")
+			return openai.ChatCompletionMessage{}, streamErr
+		}
+
+		receivedContent := response.Choices[0].Delta.Content
+		// 1. Append received content to message
+		receivedMessage.Content += receivedContent
+		// 2. Print received content
+		_, err = fmt.Fprint(c.out, receivedContent)
+		if err != nil {
+			return openai.ChatCompletionMessage{}, err
+		}
+	}
+	// Return received message to save it to the chat session
+	return receivedMessage, nil
 }
