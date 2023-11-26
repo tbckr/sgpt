@@ -51,22 +51,6 @@ func mockIsPipedShell(isPiped bool, err error) func() (bool, error) {
 	}
 }
 
-func createTestConfig(t *testing.T) *viper.Viper {
-	configDir := t.TempDir()
-	cacheDir := t.TempDir()
-	personasDir := t.TempDir()
-
-	config := viper.New()
-	config.AddConfigPath(configDir)
-	config.SetConfigName("config")
-	config.SetConfigType("yaml")
-	config.Set("cacheDir", cacheDir)
-	config.Set("personas", personasDir)
-	config.Set("TESTING", 1)
-
-	return config
-}
-
 func skipInCI(t *testing.T) {
 	if os.Getenv("CI") != "" {
 		t.Skip("Skipping test on CI")

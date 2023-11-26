@@ -25,26 +25,26 @@ import (
 	"io"
 	"testing"
 
+	"github.com/tbckr/sgpt/v2/internal/testlib"
+
 	"github.com/stretchr/testify/require"
 )
 
 func TestManCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"man"})
 
 	require.Equal(t, 0, mem.code)
 }
 func TestManCmdUnknowArgs(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"man", "abcd"})
 
