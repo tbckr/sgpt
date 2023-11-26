@@ -198,8 +198,10 @@ func (c *OpenAIClient) retrieveChatCompletion(ctx context.Context, req openai.Ch
 	}
 	receivedMessage := resp.Choices[0].Message
 
-	// Remove surrounding white spaces
-	receivedMessage.Content = strings.TrimSpace(receivedMessage.Content)
+	_, err = fmt.Fprintln(c.out, receivedMessage.Content)
+	if err != nil {
+		return openai.ChatCompletionMessage{}, err
+	}
 
 	return receivedMessage, nil
 }
@@ -238,6 +240,11 @@ func (c *OpenAIClient) retrieveChatCompletionStream(ctx context.Context, req ope
 		if err != nil {
 			return openai.ChatCompletionMessage{}, err
 		}
+	}
+	// Print final linebreak
+	_, err = fmt.Fprintf(c.out, "\n")
+	if err != nil {
+		slog.Warn("Could not print final linebreak")
 	}
 	// Return received message to save it to the chat session
 	return receivedMessage, nil
