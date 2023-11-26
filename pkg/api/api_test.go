@@ -62,7 +62,11 @@ func TestCreateClientMissingApiKey(t *testing.T) {
 func TestSimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetApiKey(t)
-	client, err := CreateClient(testCtx.Config, nil)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -72,10 +76,21 @@ func TestSimplePrompt(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err = io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
 	var result string
 	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
 
 	// Cache dir should be empty
 	cacheDir := testCtx.Config.GetString("cacheDir")
@@ -89,6 +104,8 @@ func TestSimplePrompt(t *testing.T) {
 		return nil
 	})
 	require.NoError(t, err)
+
+	wg.Wait()
 }
 
 func TestStreamSimplePrompt(t *testing.T) {
@@ -117,7 +134,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 		_, err = io.Copy(&buf, reader)
 		require.NoError(t, err)
 		require.NoError(t, reader.Close())
-		require.Equal(t, "\n"+expected, buf.String())
+		require.Equal(t, "\n"+expected+"\n", buf.String())
 	}()
 
 	var result string
@@ -132,7 +149,11 @@ func TestStreamSimplePrompt(t *testing.T) {
 func TestPromptSaveAsChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetApiKey(t)
-	client, err := CreateClient(testCtx.Config, nil)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -142,10 +163,21 @@ func TestPromptSaveAsChat(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err = io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
 	var result string
 	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
 
 	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
 
@@ -165,12 +197,18 @@ func TestPromptSaveAsChat(t *testing.T) {
 	// Check if the response was added
 	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
 	require.Equal(t, expected, messages[1].Content)
+
+	wg.Wait()
 }
 
 func TestPromptLoadChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetApiKey(t)
-	client, err := CreateClient(testCtx.Config, nil)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Repeat last message"
@@ -196,10 +234,21 @@ func TestPromptLoadChat(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err = io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
 	var result string
 	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
 
 	var messages []openai.ChatCompletionMessage
 	messages, err = manager.GetSession("test_chat")
@@ -213,12 +262,18 @@ func TestPromptLoadChat(t *testing.T) {
 	// Check if the response was added
 	require.Equal(t, openai.ChatMessageRoleAssistant, messages[3].Role)
 	require.Equal(t, expected, messages[3].Content)
+
+	wg.Wait()
 }
 
 func TestPromptWithModifier(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetApiKey(t)
-	client, err := CreateClient(testCtx.Config, nil)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Print Hello World"
@@ -237,10 +292,21 @@ func TestPromptWithModifier(t *testing.T) {
 
 	testCtx.Config.Set("chat", "test_chat")
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err = io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
 	var result string
 	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "sh")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
 
 	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
 
@@ -263,4 +329,6 @@ func TestPromptWithModifier(t *testing.T) {
 	// Check if the response was added
 	require.Equal(t, openai.ChatMessageRoleAssistant, messages[2].Role)
 	require.Equal(t, expected, messages[2].Content)
+
+	wg.Wait()
 }
