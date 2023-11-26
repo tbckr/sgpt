@@ -31,9 +31,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/spf13/viper"
+	"github.com/tbckr/sgpt/v2/pkg/fs"
 
-	"github.com/tbckr/sgpt/v2/fs"
+	"github.com/spf13/viper"
 )
 
 const (

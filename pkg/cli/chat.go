@@ -27,10 +27,11 @@ import (
 	"io"
 	"strings"
 
+	chat2 "github.com/tbckr/sgpt/v2/pkg/chat"
+
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/v2/chat"
 )
 
 const (
@@ -96,7 +97,7 @@ List all chat sessions.
 		Args:                  cobra.NoArgs,
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+			chatSessionManager, err := chat2.NewFilesystemChatSessionManager(config)
 			if err != nil {
 				return err
 			}
@@ -129,7 +130,7 @@ Show the conversation for the given chat session.
 		Args:                  cobra.ExactArgs(1),
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+			chatSessionManager, err := chat2.NewFilesystemChatSessionManager(config)
 			if err != nil {
 				return err
 			}
@@ -166,7 +167,7 @@ Remove the specified chat session. The --all flag removes all chat sessions.
 		Args:                  cobra.RangeArgs(0, 1),
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+			chatSessionManager, err := chat2.NewFilesystemChatSessionManager(config)
 			if err != nil {
 				return err
 			}
@@ -203,7 +204,7 @@ func showConversation(out io.Writer, messages []openai.ChatCompletionMessage) er
 	return nil
 }
 
-func deleteChatSessions(manager chat.SessionManager, out io.Writer, chatSessions []string) error {
+func deleteChatSessions(manager chat2.SessionManager, out io.Writer, chatSessions []string) error {
 	for _, chatSession := range chatSessions {
 		err := manager.DeleteSession(chatSession)
 		if err != nil {

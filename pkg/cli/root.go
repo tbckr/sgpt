@@ -24,6 +24,9 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/pkg/fs"
+	"github.com/tbckr/sgpt/v2/pkg/shell"
 	"log/slog"
 	"os"
 	"strings"
@@ -31,9 +34,6 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/v2/api"
-	"github.com/tbckr/sgpt/v2/fs"
-	"github.com/tbckr/sgpt/v2/shell"
 )
 
 type rootCmd struct {

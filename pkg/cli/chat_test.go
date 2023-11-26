@@ -28,11 +28,11 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt/v2/chat"
+	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/pkg/chat"
 
+	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/v2/api"
 )
 
 func TestChatCmd(t *testing.T) {

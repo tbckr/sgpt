@@ -28,10 +28,11 @@ import (
 	"strings"
 	"testing"
 
+	chat2 "github.com/tbckr/sgpt/v2/pkg/chat"
+
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/v2/chat"
 )
 
 func createTestConfig(t *testing.T) *viper.Viper {
@@ -124,8 +125,8 @@ func TestPromptSaveAsChat(t *testing.T) {
 
 	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
 
-	var manager chat.SessionManager
-	manager, err = chat.NewFilesystemChatSessionManager(config)
+	var manager chat2.SessionManager
+	manager, err = chat2.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
 
 	var messages []openai.ChatCompletionMessage
@@ -150,8 +151,8 @@ func TestPromptLoadChat(t *testing.T) {
 	require.NoError(t, err)
 	config := createTestConfig(t)
 
-	var manager chat.SessionManager
-	manager, err = chat.NewFilesystemChatSessionManager(config)
+	var manager chat2.SessionManager
+	manager, err = chat2.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
 
 	err = manager.SaveSession("test_chat", []openai.ChatCompletionMessage{
@@ -208,8 +209,8 @@ func TestPromptWithModifier(t *testing.T) {
 
 	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
 
-	var manager chat.SessionManager
-	manager, err = chat.NewFilesystemChatSessionManager(config)
+	var manager chat2.SessionManager
+	manager, err = chat2.NewFilesystemChatSessionManager(config)
 	require.NoError(t, err)
 
 	var messages []openai.ChatCompletionMessage

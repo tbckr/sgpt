@@ -22,42 +22,45 @@
 package cli
 
 import (
-	"bytes"
-	"io"
+	"fmt"
 	"strings"
-	"sync"
-	"testing"
 
-	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/v2/api"
+	"github.com/tbckr/sgpt/v2/pkg/api"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-func TestLicensesCmd(t *testing.T) {
-	mem := &exitMemento{}
-	expected := `To see the open source packages included in SGPT and
-their respective license information, visit:
-`
-	var wg sync.WaitGroup
-	reader, writer := io.Pipe()
+type checkCmd struct {
+	cmd *cobra.Command
+}
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
-	root.cmd.SetOut(writer)
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
-		require.NoError(t, reader.Close())
-		require.True(t, strings.HasPrefix(buf.String(), expected))
-	}()
-
-	root.Execute([]string{"licenses"})
-	require.Equal(t, 0, mem.code)
-	require.NoError(t, writer.Close())
-
-	wg.Wait()
+func newCheckCmd(config *viper.Viper, createClientFn func() (*api.OpenAIClient, error)) *checkCmd {
+	check := &checkCmd{}
+	cmd := &cobra.Command{
+		Use:   "check",
+		Short: "Verify the API key was set correctly",
+		Long: strings.TrimSpace(`
+This command will return an error if the API key is not set or invalid.
+`),
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			err := loadViperConfig(config)
+			if err != nil {
+				return err
+			}
+			_, err = createClientFn()
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), "configuration is valid")
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	check.cmd = cmd
+	return check
 }

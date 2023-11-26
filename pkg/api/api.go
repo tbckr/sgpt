@@ -29,11 +29,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tbckr/sgpt/v2/chat"
+	chat2 "github.com/tbckr/sgpt/v2/pkg/chat"
+	"github.com/tbckr/sgpt/v2/pkg/modifiers"
 
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/v2/modifiers"
 )
 
 const (
@@ -109,10 +109,10 @@ func CreateClient() (*OpenAIClient, error) {
 
 func (c *OpenAIClient) GetChatCompletion(ctx context.Context, config *viper.Viper, chatID, prompt, modifier string) (string, error) {
 	var err error
-	var chatSessionManager chat.SessionManager
+	var chatSessionManager chat2.SessionManager
 	var messages []openai.ChatCompletionMessage
 
-	chatSessionManager, err = chat.NewFilesystemChatSessionManager(config)
+	chatSessionManager, err = chat2.NewFilesystemChatSessionManager(config)
 	if err != nil {
 		return "", err
 	}

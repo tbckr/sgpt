@@ -24,7 +24,7 @@ package main
 import (
 	"os"
 
-	"github.com/tbckr/sgpt/v2/cli"
+	"github.com/tbckr/sgpt/v2/pkg/cli"
 )
 
 func main() {
