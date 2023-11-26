@@ -25,41 +25,14 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
-	chat2 "github.com/tbckr/sgpt/v2/pkg/chat"
-
+	"github.com/jarcoal/httpmock"
 	"github.com/sashabaranov/go-openai"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
+	"github.com/tbckr/sgpt/v2/internal/testlib"
+	"github.com/tbckr/sgpt/v2/pkg/chat"
 )
-
-func createTestConfig(t *testing.T) *viper.Viper {
-	cacheDir := createTempDir(t, "cache")
-	configDir := createTempDir(t, "config")
-
-	config := viper.New()
-	config.AddConfigPath(configDir)
-	config.SetConfigName("config")
-	config.SetConfigType("yaml")
-	config.Set("cacheDir", cacheDir)
-	config.Set("TESTING", 1)
-
-	return config
-}
-
-func createTempDir(t *testing.T, suffix string) string {
-	if suffix != "" {
-		suffix = "_" + suffix
-	}
-	tempFilepath, err := os.MkdirTemp("", strings.Join([]string{"sgpt_temp_*", suffix}, ""))
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		require.NoError(t, os.RemoveAll(tempFilepath))
-	})
-	return tempFilepath
-}
 
 func TestCreateClient(t *testing.T) {
 	// Set the api key
@@ -67,7 +40,7 @@ func TestCreateClient(t *testing.T) {
 	require.NoError(t, err)
 
 	var client *OpenAIClient
-	client, err = CreateClient()
+	client, err = CreateClient(nil, nil)
 	require.NoError(t, err)
 	require.NotNil(t, client)
 }
@@ -77,27 +50,32 @@ func TestCreateClientMissingApiKey(t *testing.T) {
 	require.NoError(t, err)
 
 	var client *OpenAIClient
-	client, err = CreateClient()
+	client, err = CreateClient(nil, nil)
 	require.Error(t, err)
 	require.ErrorIs(t, err, ErrMissingAPIKey)
 	require.Nil(t, client)
 }
 
 func TestSimplePrompt(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	client, err := CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
 	prompt := "Say: Hello World!"
 	expected := "Hello World!"
 
-	client, err := MockClient(strings.Clone(expected), nil)()
-	require.NoError(t, err)
-	config := createTestConfig(t)
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
 
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, "", prompt, "txt")
+	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
 	// Cache dir should be empty
-	cacheDir := config.GetString("cacheDir")
+	cacheDir := testCtx.Config.GetString("cacheDir")
 	err = filepath.Walk(cacheDir, func(path string, info os.FileInfo, err error) error {
 		if path == cacheDir {
 			// Skip the root dir
@@ -111,22 +89,27 @@ func TestSimplePrompt(t *testing.T) {
 }
 
 func TestPromptSaveAsChat(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	client, err := CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
 	prompt := "Say: Hello World!"
 	expected := "Hello World!"
 
-	client, err := MockClient(strings.Clone(expected), nil)()
-	require.NoError(t, err)
-	config := createTestConfig(t)
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
 
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, "test_chat", prompt, "txt")
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
 
-	var manager chat2.SessionManager
-	manager, err = chat2.NewFilesystemChatSessionManager(config)
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	var messages []openai.ChatCompletionMessage
@@ -144,15 +127,20 @@ func TestPromptSaveAsChat(t *testing.T) {
 }
 
 func TestPromptLoadChat(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	client, err := CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
 	prompt := "Repeat last message"
 	expected := "World!"
 
-	client, err := MockClient(strings.Clone(expected), nil)()
-	require.NoError(t, err)
-	config := createTestConfig(t)
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
 
-	var manager chat2.SessionManager
-	manager, err = chat2.NewFilesystemChatSessionManager(config)
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	err = manager.SaveSession("test_chat", []openai.ChatCompletionMessage{
@@ -168,7 +156,7 @@ func TestPromptLoadChat(t *testing.T) {
 	require.NoError(t, err)
 
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, "test_chat", prompt, "txt")
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
@@ -187,12 +175,18 @@ func TestPromptLoadChat(t *testing.T) {
 }
 
 func TestPromptWithModifier(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	client, err := CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
 	prompt := "Print Hello World"
+	response := `echo \"Hello World\"`
 	expected := `echo "Hello World"`
 
-	client, err := MockClient(strings.Clone(expected), nil)()
-	require.NoError(t, err)
-	config := createTestConfig(t)
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
 
 	err = os.Setenv("SHELL", "/bin/bash")
 	require.NoError(t, err)
@@ -200,17 +194,17 @@ func TestPromptWithModifier(t *testing.T) {
 		require.NoError(t, os.Unsetenv("SHELL"))
 	})
 
-	config.Set("chat", "test_chat")
+	testCtx.Config.Set("chat", "test_chat")
 
 	var result string
-	result, err = client.GetChatCompletion(context.Background(), config, "test_chat", prompt, "sh")
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "sh")
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
 
-	var manager chat2.SessionManager
-	manager, err = chat2.NewFilesystemChatSessionManager(config)
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	var messages []openai.ChatCompletionMessage
