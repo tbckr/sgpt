@@ -22,11 +22,20 @@
 package cli
 
 import (
+	"io"
 	"os"
 	"testing"
 
+	"github.com/tbckr/sgpt/v2/pkg/api"
+
 	"github.com/spf13/viper"
 )
+
+var useMockClient = func(mockClient *api.OpenAIClient) func(*viper.Viper, io.Writer) (*api.OpenAIClient, error) {
+	return func(_ *viper.Viper, _ io.Writer) (*api.OpenAIClient, error) {
+		return mockClient, nil
+	}
+}
 
 type exitMemento struct {
 	code int
