@@ -22,7 +22,9 @@
 package testlib
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
 
 	"github.com/jarcoal/httpmock"
 )
@@ -52,4 +54,39 @@ func RegisterExpectedChatResponse(response string) {
 			}`, response),
 		),
 	)
+}
+
+func RegisterExpectedChatResponseStream(response string) {
+	httpmock.RegisterResponder(
+		"POST",
+		fmt.Sprintf("%s%s", baseURL, chatCompletionSuffix),
+		func(request *http.Request) (*http.Response, error) {
+			// Reference: https://github.com/sashabaranov/go-openai/blob/a09cb0c528c110a6955a9ee9a5d021a57ed44b90/chat_stream_test.go#L39
+			data := createStreamedMessages(response)
+			resp := httpmock.NewBytesResponse(200, data)
+			resp.Header.Set("Content-Type", "text/event-stream")
+			return resp, nil
+		},
+	)
+}
+
+func createStreamedMessages(response string) []byte {
+	const (
+		eventMessage = "event: message\n"
+
+		dataMessageTemplate = "data: %s\n\n"
+		messageTemplate     = `{"id":"1","object":"completion","created":1598069254,"model":"gpt-3.5-turbo","choices":[{"index":0,"delta":{"content":"%c"},"finish_reason":"max_tokens"}]}`
+
+		eventDone = "event: done\n"
+		dataDone  = "data: [DONE]\n\n"
+	)
+	var buff bytes.Buffer
+	for _, char := range response {
+		buff.WriteString(eventMessage)
+		buff.WriteString(fmt.Sprintf(dataMessageTemplate, fmt.Sprintf(messageTemplate, char)))
+	}
+	buff.WriteString(eventDone)
+	buff.WriteString(dataDone)
+
+	return buff.Bytes()
 }

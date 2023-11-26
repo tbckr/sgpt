@@ -22,9 +22,12 @@
 package api
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
@@ -86,6 +89,44 @@ func TestSimplePrompt(t *testing.T) {
 		return nil
 	})
 	require.NoError(t, err)
+}
+
+func TestStreamSimplePrompt(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	expected := "Hello World!"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponseStream(expected)
+
+	testCtx.Config.Set("stream", true)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err = io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.Equal(t, "\n"+expected, buf.String())
+	}()
+
+	var result string
+	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt")
+	require.NoError(t, err)
+	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
 }
 
 func TestPromptSaveAsChat(t *testing.T) {
