@@ -61,7 +61,7 @@ func TestCreateClientMissingApiKey(t *testing.T) {
 
 func TestSimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -110,7 +110,7 @@ func TestSimplePrompt(t *testing.T) {
 
 func TestStreamSimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -148,7 +148,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 
 func TestPromptSaveAsChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -203,7 +203,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 
 func TestPromptLoadChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -268,7 +268,7 @@ func TestPromptLoadChat(t *testing.T) {
 
 func TestPromptWithModifier(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()

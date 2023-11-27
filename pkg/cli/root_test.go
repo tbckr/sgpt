@@ -45,7 +45,7 @@ import (
 
 func TestRootCmd_SimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -84,7 +84,7 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 
 func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -125,7 +125,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 	skipInCI(t)
 
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -168,7 +168,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 
 func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -215,7 +215,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 
 func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	client, err := api.CreateClient(testCtx.Config, nil)
@@ -229,7 +229,7 @@ func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 
 func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -268,7 +268,7 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 
 func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -318,7 +318,7 @@ func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 
 func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -360,7 +360,7 @@ func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 
 func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -393,7 +393,7 @@ func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
 
 func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -443,7 +443,7 @@ func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 
 func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -488,7 +488,7 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 
 func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -546,7 +546,7 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 
 func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -603,7 +603,7 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 
 func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -679,7 +679,7 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 
 func TestRootCmd_ChatConversation(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup

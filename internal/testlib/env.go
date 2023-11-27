@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func SetApiKey(t *testing.T) {
+func SetAPIKey(t *testing.T) {
 	err := os.Setenv("OPENAI_API_KEY", "test")
 	require.NoError(t, err)
 

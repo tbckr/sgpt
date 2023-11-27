@@ -33,10 +33,10 @@ import (
 
 func TestCheckCmd(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
-	testlib.SetApiKey(t)
+	testlib.SetAPIKey(t)
 
 	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil).Execute([]string{"check"})
 	require.Equal(t, 0, mem.code)
