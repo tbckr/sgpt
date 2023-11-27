@@ -198,12 +198,14 @@ func (c *OpenAIClient) retrieveChatCompletion(ctx context.Context, req openai.Ch
 	if err != nil {
 		return openai.ChatCompletionMessage{}, err
 	}
+	slog.Debug("Received response")
 	receivedMessage := resp.Choices[0].Message
 
 	_, err = fmt.Fprintln(c.out, receivedMessage.Content)
 	if err != nil {
 		return openai.ChatCompletionMessage{}, err
 	}
+	slog.Debug("Printed response")
 
 	return receivedMessage, nil
 }
