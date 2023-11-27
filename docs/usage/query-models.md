@@ -9,6 +9,9 @@ $ sgpt "mass of sun"
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
+If you want to stream the completion to the command line, you can add the `--stream` flag. This will stream the output
+to the command line as it is generated.
+
 You can also pass prompts to SGPT using pipes:
 
 ```shell
