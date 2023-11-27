@@ -28,12 +28,13 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/internal/testlib"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestLicensesCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 	expected := `To see the open source packages included in SGPT and
 their respective license information, visit:
@@ -41,9 +42,7 @@ their respective license information, visit:
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)

@@ -23,9 +23,19 @@ package cli
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"io"
+	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
+
+	"github.com/tbckr/sgpt/v2/pkg/chat"
+
+	"github.com/atotto/clipboard"
+	"github.com/sashabaranov/go-openai"
 
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -59,8 +69,8 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, expected, buf.String())
 	}()
@@ -72,497 +82,667 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	wg.Wait()
 }
 
-//func TestRootCmd_SimplePromptOnly(t *testing.T) {
-//	prompt := "Say: Hello World!"
-//	expected := "Hello World!\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	reader, writer := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetOut(writer)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, reader)
-//		require.NoError(t, err)
-//		require.NoError(t, reader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{prompt})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, writer.Close())
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_SimpleClipboard(t *testing.T) {
-//	skipInCI(t)
-//
-//	prompt := "Say: Hello World!"
-//	expected := "Hello World!"
-//
-//	mem := &exitMemento{}
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//
-//	root.Execute([]string{"--clipboard", prompt})
-//	require.Equal(t, 0, mem.code)
-//	textInClipboard, _ := clipboard.ReadAll()
-//	require.Equal(t, expected, textInClipboard)
-//}
-//
-//func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
-//	prompt := "Say: Hello World!"
-//	mem := &exitMemento{}
-//
-//	configDir := t.TempDir()
-//
-//	config, err := createViperConfig()
-//	require.NoError(t, err)
-//
-//	config.SetConfigFile(filepath.Join(configDir, "config.yaml"))
-//	config.Set("TESTING", 1)
-//
-//	var configFile *os.File
-//	configFile, err = os.Create(filepath.Join(configDir, "config.yaml"))
-//	require.NoError(t, err)
-//
-//	_, err = configFile.WriteString(fmt.Sprintf("model: \"%s\"\n", openai.GPT4))
-//	require.NoError(t, err)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("Hello World", nil))
-//
-//	root.Execute([]string{"txt", prompt})
-//	require.Equal(t, 0, mem.code)
-//
-//	require.Equal(t, openai.GPT4, config.GetString("model"))
-//}
-//
-//func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
-//	mem := &exitMemento{}
-//
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
-//
-//	root.Execute([]string{})
-//	require.Equal(t, 1, mem.code)
-//}
-//
-//func TestRootCmd_SimplePromptVerbose(t *testing.T) {
-//	prompt := "Say: Hello World!"
-//	expected := "Hello World!\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	reader, writer := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetOut(writer)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, reader)
-//		require.NoError(t, err)
-//		require.NoError(t, reader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{"txt", prompt, "--verbose"})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, writer.Close())
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
-//	prompt := "Say: Hello World!"
-//	expected := "Hello World!\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	stdinReader, stdinWriter := io.Pipe()
-//	stdoutReader, stdoutWriter := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetIn(stdinReader)
-//	root.cmd.SetOut(stdoutWriter)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		_, errWrite := stdinWriter.Write([]byte(prompt))
-//		require.NoError(t, stdinWriter.Close())
-//		require.NoError(t, errWrite)
-//	}()
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, stdoutReader)
-//		require.NoError(t, err)
-//		require.NoError(t, stdoutReader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, stdinReader.Close())
-//	require.NoError(t, stdoutWriter.Close())
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_PipedShell_NoInput(t *testing.T) {
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	stdinReader, stdinWriter := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient("", nil))
-//	root.cmd.SetIn(stdinReader)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		_, errWrite := stdinWriter.Write([]byte(""))
-//		require.NoError(t, stdinWriter.Close())
-//		require.NoError(t, errWrite)
-//	}()
-//
-//	root.Execute([]string{})
-//	require.Equal(t, 1, mem.code)
-//	require.NoError(t, stdinReader.Close())
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
-//	prompt := "Say: Hello World!"
-//
-//	mem := &exitMemento{}
-//	config := createTestConfig(t)
-//
-//	testError := errors.New("test error")
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, testError), api.MockClient("", nil))
-//
-//	root.Execute([]string{prompt})
-//	require.Equal(t, 1, mem.code)
-//}
-//
-//func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
-//	prompt := "Say: Hello World!"
-//	expected := "Hello World!\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	stdinReader, stdinWriter := io.Pipe()
-//	stdoutReader, stdoutWriter := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(true, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetIn(stdinReader)
-//	root.cmd.SetOut(stdoutWriter)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		_, errWrite := stdinWriter.Write([]byte(prompt))
-//		require.NoError(t, stdinWriter.Close())
-//		require.NoError(t, errWrite)
-//	}()
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, stdoutReader)
-//		require.NoError(t, err)
-//		require.NoError(t, stdoutReader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{"txt"})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, stdinReader.Close())
-//	require.NoError(t, stdoutWriter.Close())
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_SimpleShellPrompt(t *testing.T) {
-//	prompt := `echo "Hello World"`
-//	expected := "Hello World\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	reader, writer := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	err := os.Setenv("SHELL", "/bin/bash")
-//	require.NoError(t, err)
-//	t.Cleanup(func() {
-//		require.NoError(t, os.Unsetenv("SHELL"))
-//	})
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetOut(writer)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, reader)
-//		require.NoError(t, err)
-//		require.NoError(t, reader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{"sh", prompt})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, writer.Close())
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
-//	prompt := `Print: Hello World`
-//	expected := "echo \"Hello World\"\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	stdinReader, stdinWriter := io.Pipe()
-//	stdoutReader, stdoutWriter := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	err := os.Setenv("SHELL", "/bin/bash")
-//	require.NoError(t, err)
-//	t.Cleanup(func() {
-//		require.NoError(t, os.Unsetenv("SHELL"))
-//	})
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetIn(stdinReader)
-//	root.cmd.SetOut(stdoutWriter)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		_, errWrite := stdinWriter.Write([]byte("\n"))
-//		require.NoError(t, stdinWriter.Close())
-//		require.NoError(t, errWrite)
-//	}()
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, stdoutReader)
-//		require.NoError(t, err)
-//		require.NoError(t, stdoutReader.Close())
-//		stdoutOutput := expected + "Do you want to execute this command? (Y/n) Hello World\n"
-//		require.Equal(t, stdoutOutput, buf.String())
-//	}()
-//
-//	root.Execute([]string{"sh", prompt, "--execute"})
-//	require.Equal(t, 0, mem.code)
-//
-//	require.NoError(t, stdinReader.Close())
-//	require.NoError(t, stdoutWriter.Close())
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_SimplePromptWithChat(t *testing.T) {
-//	prompt := "Say: Hello World!"
-//	expected := "Hello World!\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	reader, writer := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetOut(writer)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, reader)
-//		require.NoError(t, err)
-//		require.NoError(t, reader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{"txt", prompt, "--chat", "test_chat"})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, writer.Close())
-//
-//	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
-//
-//	manager, err := chat.NewFilesystemChatSessionManager(config)
-//	require.NoError(t, err)
-//
-//	var messages []openai.ChatCompletionMessage
-//	messages, err = manager.GetSession("test_chat")
-//	require.NoError(t, err)
-//	require.Len(t, messages, 2)
-//
-//	// Check if the prompt was added
-//	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
-//	require.Equal(t, prompt, messages[0].Content)
-//
-//	// Check if the response was added
-//	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
-//	require.Equal(t, strings.TrimSpace(expected), messages[1].Content)
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
-//	persona := "This is my custom persona"
-//	prompt := "Say: Hello World!"
-//	expected := "Hello World!\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	reader, writer := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	err := os.Setenv("SHELL", "/bin/bash")
-//	require.NoError(t, err)
-//	t.Cleanup(func() {
-//		require.NoError(t, os.Unsetenv("SHELL"))
-//	})
-//
-//	fileHandler, err := os.Create(filepath.Join(config.GetString("personas"), "my-persona"))
-//	require.NoError(t, err)
-//	_, err = fileHandler.WriteString(persona)
-//	require.NoError(t, err)
-//	require.NoError(t, fileHandler.Close())
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetOut(writer)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, reader)
-//		require.NoError(t, err)
-//		require.NoError(t, reader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{"my-persona", prompt, "--chat", "test_chat"})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, writer.Close())
-//
-//	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
-//
-//	var manager chat.SessionManager
-//	manager, err = chat.NewFilesystemChatSessionManager(config)
-//	require.NoError(t, err)
-//
-//	var messages []openai.ChatCompletionMessage
-//	messages, err = manager.GetSession("test_chat")
-//	require.NoError(t, err)
-//	require.Len(t, messages, 3)
-//
-//	// Check if the persona was added
-//	require.Equal(t, openai.ChatMessageRoleSystem, messages[0].Role)
-//	require.Equal(t, persona, messages[0].Content)
-//
-//	// Check if the prompt was added
-//	require.Equal(t, openai.ChatMessageRoleUser, messages[1].Role)
-//	require.Equal(t, prompt, messages[1].Content)
-//
-//	// Check if the response was added
-//	require.Equal(t, openai.ChatMessageRoleAssistant, messages[2].Role)
-//	require.Equal(t, strings.TrimSpace(expected), messages[2].Content)
-//
-//	wg.Wait()
-//}
-//
-//func TestRootCmd_ChatConversation(t *testing.T) {
-//	prompt := "Repeat last message"
-//	expected := "World!\n"
-//
-//	mem := &exitMemento{}
-//	var wg sync.WaitGroup
-//	reader, writer := io.Pipe()
-//
-//	config := createTestConfig(t)
-//
-//	// Create an existing chat session
-//	manager, err := chat.NewFilesystemChatSessionManager(config)
-//	require.NoError(t, err)
-//	err = manager.SaveSession("test_chat", []openai.ChatCompletionMessage{
-//		{
-//			Role:    openai.ChatMessageRoleUser,
-//			Content: "Hello",
-//		},
-//		{
-//			Role:    openai.ChatMessageRoleAssistant,
-//			Content: "World!",
-//		},
-//	})
-//	require.NoError(t, err)
-//
-//	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient(strings.Clone(expected), nil))
-//	root.cmd.SetOut(writer)
-//
-//	wg.Add(1)
-//	go func() {
-//		defer wg.Done()
-//		var buf bytes.Buffer
-//		_, err := io.Copy(&buf, reader)
-//		require.NoError(t, err)
-//		require.NoError(t, reader.Close())
-//		require.Equal(t, expected, buf.String())
-//	}()
-//
-//	root.Execute([]string{"txt", prompt, "--chat", "test_chat"})
-//	require.Equal(t, 0, mem.code)
-//	require.NoError(t, writer.Close())
-//
-//	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test_chat"))
-//
-//	var messages []openai.ChatCompletionMessage
-//	messages, err = manager.GetSession("test_chat")
-//	require.NoError(t, err)
-//	require.Len(t, messages, 4)
-//
-//	// Check if the prompt was added
-//	require.Equal(t, openai.ChatMessageRoleUser, messages[2].Role)
-//	require.Equal(t, prompt, messages[2].Content)
-//
-//	// Check if the response was added
-//	require.Equal(t, openai.ChatMessageRoleAssistant, messages[3].Role)
-//	require.Equal(t, strings.TrimSpace(expected), messages[3].Content)
-//
-//	wg.Wait()
-//}
+func TestRootCmd_SimplePromptOnly(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimpleClipboard(t *testing.T) {
+	skipInCI(t)
+
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"--clipboard", prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	textInClipboard, _ := clipboard.ReadAll()
+	// The clipboard should not have the trailing newline
+	require.Equal(t, response, textInClipboard)
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	var configFile *os.File
+	configFile, err = os.Create(filepath.Join(testCtx.ConfigDir, "config.yaml"))
+	require.NoError(t, err)
+
+	_, err = configFile.WriteString(fmt.Sprintf("model: \"%s\"\n", openai.GPT4))
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"txt", prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	require.Equal(t, openai.GPT4, testCtx.Config.GetString("model"))
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	client, err := api.CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+
+	root.Execute([]string{})
+	require.Equal(t, 1, mem.code)
+}
+
+func TestRootCmd_SimplePromptVerbose(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"txt", prompt, "--verbose"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(prompt))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_PipedShell_NoInput(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(""))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, "", buf.String())
+	}()
+
+	root.Execute([]string{})
+	require.Equal(t, 1, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, errors.New("test error")), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, "", buf.String())
+	}()
+
+	root.Execute([]string{prompt})
+	require.Equal(t, 1, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(prompt))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"txt"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimpleShellPrompt(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := `echo "Hello World"`
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	err = os.Setenv("SHELL", "/bin/bash")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Unsetenv("SHELL"))
+	})
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"sh", prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	prompt := "Print: Hello World"
+	response := `echo \"Hello World\"`
+	expected := "echo \"Hello World\"\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	err = os.Setenv("SHELL", "/bin/bash")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = os.Unsetenv("SHELL")
+	})
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte("\n"))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		stdoutOutput := expected + "Do you want to execute this command? (Y/n) Hello World\n"
+		require.Equal(t, stdoutOutput, buf.String())
+	}()
+
+	root.Execute([]string{"sh", prompt, "--execute"})
+	require.Equal(t, 0, mem.code)
+
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptWithChat(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"txt", prompt, "--chat", "test_chat"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 2)
+
+	// Check if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
+	require.Equal(t, prompt, messages[0].Content)
+
+	// Check if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
+	require.Equal(t, strings.TrimSpace(expected), messages[1].Content)
+
+	wg.Wait()
+}
+
+func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	persona := "This is my custom persona"
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	err = os.Setenv("SHELL", "/bin/bash")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Unsetenv("SHELL"))
+	})
+
+	var fileHandler *os.File
+	fileHandler, err = os.Create(filepath.Join(testCtx.Config.GetString("personas"), "my-persona"))
+	require.NoError(t, err)
+	_, err = fileHandler.WriteString(persona)
+	require.NoError(t, err)
+	require.NoError(t, fileHandler.Close())
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"my-persona", prompt, "--chat", "test_chat"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 3)
+
+	// Check if the persona was added
+	require.Equal(t, openai.ChatMessageRoleSystem, messages[0].Role)
+	require.Equal(t, persona, messages[0].Content)
+
+	// Check if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[1].Role)
+	require.Equal(t, prompt, messages[1].Content)
+
+	// Check if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[2].Role)
+	require.Equal(t, strings.TrimSpace(expected), messages[2].Content)
+
+	wg.Wait()
+}
+
+func TestRootCmd_ChatConversation(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetApiKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "Repeat last message"
+	response := "World!"
+	expected := "World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	// Create an existing chat session
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
+	require.NoError(t, err)
+	err = manager.SaveSession("test_chat", []openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "Hello",
+		},
+		{
+			Role:    openai.ChatMessageRoleAssistant,
+			Content: "World!",
+		},
+	})
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"txt", prompt, "--chat", "test_chat"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 4)
+
+	// Check if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[2].Role)
+	require.Equal(t, prompt, messages[2].Content)
+
+	// Check if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[3].Role)
+	require.Equal(t, strings.TrimSpace(expected), messages[3].Content)
+
+	wg.Wait()
+}

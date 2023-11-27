@@ -80,8 +80,8 @@ func TestSimplePrompt(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err = io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, expected+"\n", buf.String())
 	}()
@@ -131,8 +131,8 @@ func TestStreamSimplePrompt(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err = io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, "\n"+expected+"\n", buf.String())
 	}()
@@ -167,8 +167,8 @@ func TestPromptSaveAsChat(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err = io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, expected+"\n", buf.String())
 	}()
@@ -238,8 +238,8 @@ func TestPromptLoadChat(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err = io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, expected+"\n", buf.String())
 	}()
@@ -296,8 +296,8 @@ func TestPromptWithModifier(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err = io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, expected+"\n", buf.String())
 	}()

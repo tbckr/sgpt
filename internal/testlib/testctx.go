@@ -29,20 +29,29 @@ import (
 
 type TestCtx struct {
 	Config *viper.Viper
+
+	ConfigDir   string
+	CacheDir    string
+	PersonasDir string
 }
 
 func NewTestCtx(t *testing.T) *TestCtx {
 	cacheDir := t.TempDir()
 	configDir := t.TempDir()
+	personasDir := t.TempDir()
 
 	config := viper.New()
 	config.AddConfigPath(configDir)
 	config.SetConfigName("config")
 	config.SetConfigType("yaml")
 	config.Set("cacheDir", cacheDir)
+	config.Set("personas", personasDir)
 	config.Set("TESTING", 1)
 
 	return &TestCtx{
-		Config: config,
+		Config:      config,
+		ConfigDir:   configDir,
+		CacheDir:    cacheDir,
+		PersonasDir: personasDir,
 	}
 }

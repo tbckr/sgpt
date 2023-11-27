@@ -71,6 +71,9 @@ func RegisterExpectedChatResponseStream(response string) {
 }
 
 func createStreamedMessages(response string) []byte {
+	// Data is written in the format of Server-Sent Events (SSE).
+	// The first message is the event name, followed by the data.
+	// Right now, there are two events: "message" and "done". The "done" event is sent when the completion is finished.
 	const (
 		eventMessage = "event: message\n"
 

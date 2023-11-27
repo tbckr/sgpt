@@ -332,6 +332,13 @@ func setViperDefaults(config *viper.Viper) error {
 		return err
 	}
 	config.SetDefault("cacheDir", appCacheDir)
+	// personas dir
+	var personasDir string
+	personasDir, err = fs.GetPersonasPath()
+	if err != nil {
+		return err
+	}
+	config.SetDefault("personas", personasDir)
 
 	// model
 	config.SetDefault("model", api.DefaultModel)
@@ -341,8 +348,6 @@ func setViperDefaults(config *viper.Viper) error {
 	config.SetDefault("temperature", 1)
 	// top-p
 	config.SetDefault("topP", 1)
-	// execute
-	config.SetDefault("execute", false)
 	// stream
 	config.SetDefault("stream", false)
 
