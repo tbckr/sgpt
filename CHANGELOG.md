@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.7.0](https://github.com/tbckr/sgpt/compare/v2.6.1...v2.7.0) (2023-11-27)
+
+
+### Features
+
+* adds support for stream mode ([#183](https://github.com/tbckr/sgpt/issues/183)) ([463fa8b](https://github.com/tbckr/sgpt/commit/463fa8ba45392064f725cad20af2bf06ddbdb424))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.8 ([b90605c](https://github.com/tbckr/sgpt/commit/b90605cbe9dde8ffe7f68bb264f2d878184ef060))
+
 ## [2.6.1](https://github.com/tbckr/sgpt/compare/v2.6.0...v2.6.1) (2023-11-25)
 
 
