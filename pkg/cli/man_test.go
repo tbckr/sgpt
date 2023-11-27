@@ -22,65 +22,31 @@
 package cli
 
 import (
-	"bytes"
 	"io"
-	"strings"
 	"testing"
+
+	"github.com/tbckr/sgpt/v2/internal/testlib"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestVersionCmd(t *testing.T) {
+func TestManCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root.cmd.SetOut(io.Discard)
+	root.Execute([]string{"man"})
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
-	cmd := root.cmd
-
-	outBytes := bytes.NewBufferString("")
-	cmd.SetOut(outBytes)
-
-	root.Execute([]string{"version"})
 	require.Equal(t, 0, mem.code)
-
-	out, err := io.ReadAll(outBytes)
-	if err != nil {
-		t.Fatal(err)
-	}
-	printedVersion := string(out)
-	require.NotEmpty(t, printedVersion)
-	require.True(t, strings.HasPrefix(printedVersion, "v"))
 }
-
-func TestVersionCmdFull(t *testing.T) {
+func TestManCmdUnknowArgs(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root.cmd.SetOut(io.Discard)
+	root.Execute([]string{"man", "abcd"})
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
-	cmd := root.cmd
-
-	outBytes := bytes.NewBufferString("")
-	cmd.SetOut(outBytes)
-
-	root.Execute([]string{"version", "--full"})
-	require.Equal(t, 0, mem.code)
-
-	out, err := io.ReadAll(outBytes)
-	if err != nil {
-		t.Fatal(err)
-	}
-	printedVersion := string(out)
-	require.NotEmpty(t, printedVersion)
-	require.True(t, strings.HasPrefix(printedVersion, "version: "))
-}
-
-func TestVersionCmdUnknowArg(t *testing.T) {
-	mem := &exitMemento{}
-
-	config := createTestConfig(t)
-
-	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil).Execute([]string{"version", "abcd"})
 	require.Equal(t, 1, mem.code)
 }

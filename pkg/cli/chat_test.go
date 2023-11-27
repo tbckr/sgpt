@@ -29,33 +29,34 @@ import (
 	"testing"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/tbckr/sgpt/v2/chat"
+
+	"github.com/tbckr/sgpt/v2/pkg/chat"
+
+	"github.com/tbckr/sgpt/v2/internal/testlib"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/v2/api"
 )
 
 func TestChatCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat"})
 	require.Equal(t, 0, mem.code)
 }
 
 func TestChatCmdListEmptySessions(t *testing.T) {
-	expected := ""
-
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	config := createTestConfig(t)
+	expected := ""
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -76,30 +77,30 @@ func TestChatCmdListEmptySessions(t *testing.T) {
 }
 
 func TestChatCmdListOneSession(t *testing.T) {
-	expected := "test\n"
-
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	config := createTestConfig(t)
+	expected := "test\n"
 
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, expected, buf.String())
 	}()
@@ -112,15 +113,15 @@ func TestChatCmdListOneSession(t *testing.T) {
 }
 
 func TestChatCmdListTwoSessions(t *testing.T) {
-	expected := "test\ntest2\n"
-
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	config := createTestConfig(t)
+	expected := "test\ntest2\n"
 
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
@@ -129,15 +130,15 @@ func TestChatCmdListTwoSessions(t *testing.T) {
 	err = manager.SaveSession("test2", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Equal(t, expected, buf.String())
 	}()
@@ -150,28 +151,28 @@ func TestChatCmdListTwoSessions(t *testing.T) {
 }
 
 func TestChatCmdShowSession(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	config := createTestConfig(t)
-
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Contains(t, buf.String(), "You are a chat bot.")
 		require.Contains(t, buf.String(), "I am a chat bot.")
@@ -185,57 +186,55 @@ func TestChatCmdShowSession(t *testing.T) {
 }
 
 func TestChatCmdShowSessionMissingName(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "show"})
 	require.Equal(t, 1, mem.code)
 }
 
 func TestChatCmdShowSessionNonExistent(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "show", "test2"})
 	require.Equal(t, 1, mem.code)
 }
 
 func TestChatCmdShowSessionWithAlias(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	config := createTestConfig(t)
-
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
 		require.Contains(t, buf.String(), "You are a chat bot.")
 		require.Contains(t, buf.String(), "I am a chat bot.")
@@ -249,75 +248,71 @@ func TestChatCmdShowSessionWithAlias(t *testing.T) {
 }
 
 func TestChatCmdRmSession(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "rm", "test"})
 	require.Equal(t, 0, mem.code)
-	require.NoFileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	require.NoFileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
 }
 
 func TestChatCmdRmSessionNonExistent(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "rm", "test2"})
 	require.Equal(t, 0, mem.code)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
 }
 
 func TestChatCmdRmSessionAll(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	manager, err := chat.NewFilesystemChatSessionManager(config)
+	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
 	err = manager.SaveSession("test2", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test2"))
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test2"))
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "rm", "--all"})
 	require.Equal(t, 0, mem.code)
-	require.NoFileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
-	require.NoFileExists(t, filepath.Join(config.GetString("cacheDir"), "test2"))
+	require.NoFileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
+	require.NoFileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test2"))
 }
 
 func TestChatCmdRmSessionMissingName(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
+	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "rm"})
 	require.Equal(t, 1, mem.code)

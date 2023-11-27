@@ -22,35 +22,30 @@
 package cli
 
 import (
-	"os"
 	"testing"
 
+	"github.com/tbckr/sgpt/v2/pkg/api"
+
+	"github.com/tbckr/sgpt/v2/internal/testlib"
+
 	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/v2/api"
 )
 
 func TestCheckCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
+	testlib.SetAPIKey(t)
 
-	err := os.Setenv("OPENAI_API_KEY", "test")
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		os.Unsetenv("OPENAI_API_KEY")
-	})
-
-	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil)).Execute([]string{"check"})
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
 	require.Equal(t, 0, mem.code)
 }
 
 func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	config := createTestConfig(t)
-	err := os.Unsetenv("OPENAI_API_KEY")
-	require.NoError(t, err)
-
-	newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", api.ErrMissingAPIKey)).Execute([]string{"check"})
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
 	require.Equal(t, 1, mem.code)
 }

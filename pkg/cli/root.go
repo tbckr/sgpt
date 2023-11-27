@@ -23,17 +23,18 @@ package cli
 
 import (
 	"errors"
-	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"strings"
 
+	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/pkg/fs"
+	"github.com/tbckr/sgpt/v2/pkg/shell"
+
 	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/v2/api"
-	"github.com/tbckr/sgpt/v2/fs"
-	"github.com/tbckr/sgpt/v2/shell"
 )
 
 type rootCmd struct {
@@ -101,7 +102,7 @@ func (r *rootCmd) Execute(args []string) {
 	r.exit(0)
 }
 
-func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func() (*api.OpenAIClient, error)) *rootCmd {
+func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *rootCmd {
 	root := &rootCmd{
 		exit: exit,
 	}
@@ -208,17 +209,13 @@ ls | sort
 
 			// Create client
 			var client *api.OpenAIClient
-			client, err = createClientFn()
+			client, err = createClientFn(config, cmd.OutOrStdout())
 			if err != nil {
 				return err
 			}
 
 			var response string
-			response, err = client.GetChatCompletion(cmd.Context(), config, root.chat, prompt, mode)
-			if err != nil {
-				return err
-			}
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), response)
+			response, err = client.CreateCompletion(cmd.Context(), root.chat, prompt, mode)
 			if err != nil {
 				return err
 			}
@@ -293,6 +290,12 @@ func createFlagsWithConfigBinding(cmd *cobra.Command, config *viper.Viper) {
 		bindErrors = append(bindErrors, err)
 	}
 
+	cmd.Flags().Bool("stream", false, "stream output")
+	err = config.BindPFlag("stream", cmd.Flags().Lookup("stream"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
 	if len(bindErrors) > 0 {
 		for _, err = range bindErrors {
 			slog.Error("Failed to bind flag to viper", "error", err)
@@ -329,6 +332,13 @@ func setViperDefaults(config *viper.Viper) error {
 		return err
 	}
 	config.SetDefault("cacheDir", appCacheDir)
+	// personas dir
+	var personasDir string
+	personasDir, err = fs.GetPersonasPath()
+	if err != nil {
+		return err
+	}
+	config.SetDefault("personas", personasDir)
 
 	// model
 	config.SetDefault("model", api.DefaultModel)
@@ -338,8 +348,8 @@ func setViperDefaults(config *viper.Viper) error {
 	config.SetDefault("temperature", 1)
 	// top-p
 	config.SetDefault("topP", 1)
-	// execute
-	config.SetDefault("execute", false)
+	// stream
+	config.SetDefault("stream", false)
 
 	return nil
 }

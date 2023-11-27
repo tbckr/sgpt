@@ -19,15 +19,40 @@
 //
 // SPDX-License-Identifier: MIT
 
-package main
+package cli
 
 import (
+	"io"
 	"os"
+	"testing"
 
-	"github.com/tbckr/sgpt/v2/pkg/cli"
+	"github.com/tbckr/sgpt/v2/pkg/api"
+
+	"github.com/spf13/viper"
 )
 
-func main() {
-	args := os.Args[1:]
-	cli.Execute(args)
+var useMockClient = func(mockClient *api.OpenAIClient) func(*viper.Viper, io.Writer) (*api.OpenAIClient, error) {
+	return func(_ *viper.Viper, _ io.Writer) (*api.OpenAIClient, error) {
+		return mockClient, nil
+	}
+}
+
+type exitMemento struct {
+	code int
+}
+
+func (e *exitMemento) Exit(i int) {
+	e.code = i
+}
+
+func mockIsPipedShell(isPiped bool, err error) func() (bool, error) {
+	return func() (bool, error) {
+		return isPiped, err
+	}
+}
+
+func skipInCI(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test on CI")
+	}
 }

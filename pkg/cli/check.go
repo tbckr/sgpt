@@ -22,44 +22,46 @@
 package cli
 
 import (
-	"os"
-	"testing"
+	"fmt"
+	"io"
+	"strings"
 
+	"github.com/tbckr/sgpt/v2/pkg/api"
+
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-type exitMemento struct {
-	code int
+type checkCmd struct {
+	cmd *cobra.Command
 }
 
-func (e *exitMemento) Exit(i int) {
-	e.code = i
-}
-
-func mockIsPipedShell(isPiped bool, err error) func() (bool, error) {
-	return func() (bool, error) {
-		return isPiped, err
+func newCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *checkCmd {
+	check := &checkCmd{}
+	cmd := &cobra.Command{
+		Use:   "check",
+		Short: "Verify the API key was set correctly",
+		Long: strings.TrimSpace(`
+This command will return an error if the API key is not set or invalid.
+`),
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			err := loadViperConfig(config)
+			if err != nil {
+				return err
+			}
+			_, err = createClientFn(config, cmd.OutOrStdout())
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), "configuration is valid")
+			if err != nil {
+				return err
+			}
+			return nil
+		},
 	}
-}
-
-func createTestConfig(t *testing.T) *viper.Viper {
-	configDir := t.TempDir()
-	cacheDir := t.TempDir()
-	personasDir := t.TempDir()
-
-	config := viper.New()
-	config.AddConfigPath(configDir)
-	config.SetConfigName("config")
-	config.SetConfigType("yaml")
-	config.Set("cacheDir", cacheDir)
-	config.Set("personas", personasDir)
-	config.Set("TESTING", 1)
-
-	return config
-}
-
-func skipInCI(t *testing.T) {
-	if os.Getenv("CI") != "" {
-		t.Skip("Skipping test on CI")
-	}
+	check.cmd = cmd
+	return check
 }

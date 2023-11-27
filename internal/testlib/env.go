@@ -19,47 +19,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package testlib
 
 import (
-	"fmt"
-	"strings"
+	"os"
+	"testing"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/tbckr/sgpt/v2/api"
+	"github.com/stretchr/testify/require"
 )
 
-type checkCmd struct {
-	cmd *cobra.Command
-}
+func SetAPIKey(t *testing.T) {
+	err := os.Setenv("OPENAI_API_KEY", "test")
+	require.NoError(t, err)
 
-func newCheckCmd(config *viper.Viper, createClientFn func() (*api.OpenAIClient, error)) *checkCmd {
-	check := &checkCmd{}
-	cmd := &cobra.Command{
-		Use:   "check",
-		Short: "Verify the API key was set correctly",
-		Long: strings.TrimSpace(`
-This command will return an error if the API key is not set or invalid.
-`),
-		Args:              cobra.NoArgs,
-		ValidArgsFunction: cobra.NoFileCompletions,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			err := loadViperConfig(config)
-			if err != nil {
-				return err
-			}
-			_, err = createClientFn()
-			if err != nil {
-				return err
-			}
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), "configuration is valid")
-			if err != nil {
-				return err
-			}
-			return nil
-		},
-	}
-	check.cmd = cmd
-	return check
+	t.Cleanup(func() {
+		_ = os.Unsetenv("OPENAI_API_KEY")
+	})
 }

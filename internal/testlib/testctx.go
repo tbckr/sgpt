@@ -19,45 +19,39 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package testlib
 
 import (
-	"bytes"
-	"io"
-	"strings"
-	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-	"github.com/tbckr/sgpt/v2/api"
+	"github.com/spf13/viper"
 )
 
-func TestLicensesCmd(t *testing.T) {
-	mem := &exitMemento{}
-	expected := `To see the open source packages included in SGPT and
-their respective license information, visit:
-`
-	var wg sync.WaitGroup
-	reader, writer := io.Pipe()
+type TestCtx struct {
+	Config *viper.Viper
 
-	config := createTestConfig(t)
+	ConfigDir   string
+	CacheDir    string
+	PersonasDir string
+}
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), api.MockClient("", nil))
-	root.cmd.SetOut(writer)
+func NewTestCtx(t *testing.T) *TestCtx {
+	cacheDir := t.TempDir()
+	configDir := t.TempDir()
+	personasDir := t.TempDir()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
-		require.NoError(t, reader.Close())
-		require.True(t, strings.HasPrefix(buf.String(), expected))
-	}()
+	config := viper.New()
+	config.AddConfigPath(configDir)
+	config.SetConfigName("config")
+	config.SetConfigType("yaml")
+	config.Set("cacheDir", cacheDir)
+	config.Set("personas", personasDir)
+	config.Set("TESTING", 1)
 
-	root.Execute([]string{"licenses"})
-	require.Equal(t, 0, mem.code)
-	require.NoError(t, writer.Close())
-
-	wg.Wait()
+	return &TestCtx{
+		Config:      config,
+		ConfigDir:   configDir,
+		CacheDir:    cacheDir,
+		PersonasDir: personasDir,
+	}
 }

@@ -22,31 +22,42 @@
 package cli
 
 import (
+	"bytes"
 	"io"
+	"strings"
+	"sync"
 	"testing"
+
+	"github.com/tbckr/sgpt/v2/internal/testlib"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestManCmd(t *testing.T) {
+func TestLicensesCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
+	expected := `To see the open source packages included in SGPT and
+their respective license information, visit:
+`
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
 
-	config := createTestConfig(t)
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root.cmd.SetOut(writer)
 
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
-	root.cmd.SetOut(io.Discard)
-	root.Execute([]string{"man"})
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.True(t, strings.HasPrefix(buf.String(), expected))
+	}()
 
+	root.Execute([]string{"licenses"})
 	require.Equal(t, 0, mem.code)
-}
-func TestManCmdUnknowArgs(t *testing.T) {
-	mem := &exitMemento{}
+	require.NoError(t, writer.Close())
 
-	config := createTestConfig(t)
-
-	root := newRootCmd(mem.Exit, config, mockIsPipedShell(false, nil), nil)
-	root.cmd.SetOut(io.Discard)
-	root.Execute([]string{"man", "abcd"})
-
-	require.Equal(t, 1, mem.code)
+	wg.Wait()
 }

@@ -36,6 +36,9 @@ $ echo -n "mass of sun" | sgpt
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
+If you want to stream the completion to the command line, you can add the `--stream` flag. This will stream the output
+to the command line as it is generated.
+
 ## Code Generation Capabilities
 
 By adding the `code` command to your prompt, you can generate code based on given instructions by using the
