@@ -38,7 +38,7 @@ func TestCheckCmd(t *testing.T) {
 
 	testlib.SetAPIKey(t)
 
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil).Execute([]string{"check"})
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
 	require.Equal(t, 0, mem.code)
 }
 
