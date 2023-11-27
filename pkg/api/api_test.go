@@ -134,7 +134,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 		_, errReader := io.Copy(&buf, reader)
 		require.NoError(t, errReader)
 		require.NoError(t, reader.Close())
-		require.Equal(t, "\n"+expected+"\n", buf.String())
+		require.Equal(t, expected+"\n", buf.String())
 	}()
 
 	var result string
