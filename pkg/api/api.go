@@ -167,6 +167,8 @@ func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, mod
 	}
 
 	// Retrieve response
+	// Retrieve the completion and print to the out writer. The received message is returned to save it to the chat and
+	// to return it as a string (copy to clipboard).
 	var receivedMessage openai.ChatCompletionMessage
 	if c.config.GetBool("stream") {
 		receivedMessage, err = c.retrieveChatCompletionStream(ctx, req)
@@ -213,12 +215,6 @@ func (c *OpenAIClient) retrieveChatCompletionStream(ctx context.Context, req ope
 	}
 	defer stream.Close()
 	slog.Debug("Streaming response")
-
-	// Print initial linebreak
-	_, err = fmt.Fprintf(c.out, "\n")
-	if err != nil {
-		return openai.ChatCompletionMessage{}, err
-	}
 
 	var receivedMessage openai.ChatCompletionMessage
 	for {
