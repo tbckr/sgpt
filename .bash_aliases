@@ -21,3 +21,6 @@ gsum() {
         echo "Commit cancelled."
     fi
 }
+
+# Create a alias for access to the GPT-4 Vision API
+alias vision='sgpt -m "gpt-4-vision-preview"'

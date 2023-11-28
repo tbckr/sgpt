@@ -44,6 +44,7 @@ type rootCmd struct {
 	chat            string
 	execute         bool
 	copyToClipboard bool
+	input           []string
 
 	verbose bool
 }
@@ -215,7 +216,7 @@ ls | sort
 			}
 
 			var response string
-			response, err = client.CreateCompletion(cmd.Context(), root.chat, prompt, mode)
+			response, err = client.CreateCompletion(cmd.Context(), root.chat, prompt, mode, root.input)
 			if err != nil {
 				return err
 			}
@@ -241,6 +242,7 @@ ls | sort
 	cmd.Flags().BoolVarP(&root.execute, "execute", "e", false, "execute a response in the shell")
 	cmd.Flags().BoolVarP(&root.copyToClipboard, "clipboard", "b", false, "send client response to clipboard")
 	cmd.Flags().StringVarP(&root.chat, "chat", "c", "", "use an existing chat session or create a new one")
+	cmd.Flags().StringSliceVarP(&root.input, "input", "i", nil, "provide images via command line args to a file or url")
 
 	// flags with config binding
 	createFlagsWithConfigBinding(cmd, config)

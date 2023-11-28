@@ -23,9 +23,11 @@ package fs
 
 import (
 	"bufio"
+	"encoding/base64"
 	"errors"
 	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"path/filepath"
 )
@@ -83,4 +85,42 @@ func ReadString(in io.Reader) (string, error) {
 	}
 	input := string(buf)
 	return input, nil
+}
+
+// GetImageFileType returns the file type of images
+func GetImageFileType(inputFile string) (string, error) {
+	file, err := os.Open(inputFile)
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	// Only the first 512 bytes are used to sniff the content type.
+	buffer := make([]byte, 512)
+	_, err = file.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	// Reset the read pointer.
+	_, _ = file.Seek(0, 0)
+
+	// Always returns a valid content-type and "application/octet-stream" if no others seemed to match.
+	contentType := http.DetectContentType(buffer)
+
+	return contentType, nil
+}
+
+// LoadBase64ImageFromFile loads a base64 encoded image from a file
+func LoadBase64ImageFromFile(inputFile string) (string, error) {
+	// Load image from file
+	imageBytes, err := os.ReadFile(inputFile)
+	if err != nil {
+		return "", err
+	}
+	// Convert image to base64
+	b64Image := base64.StdEncoding.EncodeToString(imageBytes)
+	return b64Image, nil
 }

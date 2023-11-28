@@ -31,6 +31,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/tbckr/sgpt/v2/pkg/fs"
+
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/viper"
 	"github.com/tbckr/sgpt/v2/pkg/chat"
@@ -51,10 +53,11 @@ var (
 
 // OpenAIClient is a client for the OpenAI API.
 type OpenAIClient struct {
-	HTTPClient *http.Client
-	config     *viper.Viper
-	api        *openai.Client
-	out        io.Writer
+	HTTPClient         *http.Client
+	config             *viper.Viper
+	api                *openai.Client
+	out                io.Writer
+	chatSessionManager chat.SessionManager
 }
 
 // CreateClient creates a new OpenAI client with the given config and output writer.
@@ -83,12 +86,20 @@ func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
 		slog.Debug("Setting API base url to " + baseURL)
 	}
 
+	// Initialize chat session manager
+	chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+	if err != nil {
+		return nil, err
+	}
+	slog.Debug("Chat session manager initialized")
+
 	// Create client
 	client := &OpenAIClient{
-		HTTPClient: httpClient,
-		config:     config,
-		api:        openai.NewClientWithConfig(clientConfig),
-		out:        out,
+		HTTPClient:         httpClient,
+		config:             config,
+		api:                openai.NewClientWithConfig(clientConfig),
+		out:                out,
+		chatSessionManager: chatSessionManager,
 	}
 	slog.Debug("OpenAI client created")
 	return client, nil
@@ -97,63 +108,32 @@ func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
 // CreateCompletion creates a completion for the given prompt and modifier. If chatID is provided, the chat is reused
 // and the completion is added to the chat with this ID. If no chatID is provided, only the modifier and prompt are
 // used to create the completion. The completion is printed to the out writer of the client and returned as a string.
-func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, modifier string) (string, error) {
-	var err error
-	var chatSessionManager chat.SessionManager
+func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, modifier string, input []string) (string, error) {
 	var messages []openai.ChatCompletionMessage
-
-	chatSessionManager, err = chat.NewFilesystemChatSessionManager(c.config)
-	if err != nil {
-		return "", err
-	}
+	var err error
 
 	isChat := false
 	if chatID != "" {
 		isChat = true
 	}
-	chatExists := false
 
-	// Load existing chat messages
-	if isChat {
-		chatExists, err = chatSessionManager.SessionExists(chatID)
-		if err != nil {
-			return "", err
-		}
-		if chatExists {
-			var loadedMessages []openai.ChatCompletionMessage
-			loadedMessages, err = chatSessionManager.GetSession(chatID)
-			if err != nil {
-				return "", err
-			}
-			messages = append(messages, loadedMessages...)
-			slog.Debug("Loaded chat session")
-		}
+	// Load existing chat messages:
+	// If this is a chat, load existing messages from chat session.
+	// Optionally, adds a modifier message to the chat as well.
+	var loadedMessages []openai.ChatCompletionMessage
+	loadedMessages, err = c.loadChatMessages(isChat, chatID, modifier)
+	if err != nil {
+		return "", err
 	}
-
-	// If this message is not part of a chat
-	// OR
-	// if this is the initial message of a chat,
-	// then add modifier message
-	if !isChat || (isChat && !chatExists) {
-		var modifierPrompt string
-		modifierPrompt, err = modifiers.GetChatModifier(c.config, modifier)
-		if err != nil {
-			return "", err
-		}
-		if modifierPrompt != "" {
-			messages = append(messages, openai.ChatCompletionMessage{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: modifierPrompt,
-			})
-			slog.Debug("Added modifier message")
-		}
-	}
+	messages = append(messages, loadedMessages...)
 
 	// Add prompt to messages
-	messages = append(messages, openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleUser,
-		Content: prompt,
-	})
+	var promptMessage openai.ChatCompletionMessage
+	promptMessage, err = c.createPromptMessage(prompt, input)
+	if err != nil {
+		return "", err
+	}
+	messages = append(messages, promptMessage)
 	slog.Debug("Added prompt message")
 
 	// Create request
@@ -184,7 +164,7 @@ func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, mod
 	// If a session was provided, save received message to this chat
 	if isChat {
 		messages = append(messages, receivedMessage)
-		if err = chatSessionManager.SaveSession(chatID, messages); err != nil {
+		if err = c.chatSessionManager.SaveSession(chatID, messages); err != nil {
 			return "", err
 		}
 		slog.Debug("Saved chat session")
@@ -193,21 +173,129 @@ func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, mod
 	return receivedMessage.Content, nil
 }
 
-func (c *OpenAIClient) retrieveChatCompletion(ctx context.Context, req openai.ChatCompletionRequest) (openai.ChatCompletionMessage, error) {
-	resp, err := c.api.CreateChatCompletion(ctx, req)
+func (c *OpenAIClient) loadChatMessages(isChat bool, chatID, modifier string) (messages []openai.ChatCompletionMessage, err error) {
+	chatExists := false
+	// Load existing chat messages
+	if isChat {
+		chatExists, err = c.chatSessionManager.SessionExists(chatID)
+		if err != nil {
+			return
+		}
+		if chatExists {
+			var loadedMessages []openai.ChatCompletionMessage
+			loadedMessages, err = c.chatSessionManager.GetSession(chatID)
+			if err != nil {
+				return
+			}
+			messages = append(messages, loadedMessages...)
+			slog.Debug("Loaded chat session")
+		}
+	}
+
+	// If this message is not part of a chat
+	// OR
+	// if this is the initial message of a chat,
+	// then add modifier message
+	if !isChat || (isChat && !chatExists) {
+		var modifierPrompt string
+		modifierPrompt, err = modifiers.GetChatModifier(c.config, modifier)
+		if err != nil {
+			return
+		}
+		if modifierPrompt != "" {
+			messages = append(messages, openai.ChatCompletionMessage{
+				Role:    openai.ChatMessageRoleSystem,
+				Content: modifierPrompt,
+			})
+			slog.Debug("Added modifier message")
+		}
+	}
+	return
+}
+
+func (c *OpenAIClient) createPromptMessage(prompt string, input []string) (message openai.ChatCompletionMessage, err error) {
+	if len(input) > 0 {
+		// Request to the gpt-4-vision API
+
+		// Add prompt to message
+		messageParts := []openai.ChatMessagePart{
+			{
+				Type: openai.ChatMessagePartTypeText,
+				Text: prompt,
+			},
+		}
+
+		// Add images to message
+		for _, i := range input {
+			// By default, assume that the input is a URL
+			imageData := i
+
+			// Check, if input is a file
+			if !strings.HasPrefix(i, "http") || !strings.HasPrefix(i, "https") {
+				// Input is a file, load image data
+				imageData, err = c.buildImageFileData(i)
+				if err != nil {
+					return openai.ChatCompletionMessage{}, err
+				}
+			}
+
+			messageParts = append(messageParts, openai.ChatMessagePart{
+				Type: openai.ChatMessagePartTypeImageURL,
+				ImageURL: &openai.ChatMessageImageURL{
+					URL: imageData,
+				},
+			})
+		}
+
+		message = openai.ChatCompletionMessage{
+			Role:         openai.ChatMessageRoleUser,
+			MultiContent: messageParts,
+		}
+	} else {
+		// Normal prompt
+		message = openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: prompt,
+		}
+	}
+	slog.Debug("Added prompt message")
+	return message, nil
+}
+
+func (c *OpenAIClient) buildImageFileData(inputFile string) (imageData string, err error) {
+	// Get image filetype
+	var filetype string
+	filetype, err = fs.GetImageFileType(inputFile)
 	if err != nil {
-		return openai.ChatCompletionMessage{}, err
+		return
+	}
+
+	// Load image from file
+	var b64Image string
+	b64Image, err = fs.LoadBase64ImageFromFile(inputFile)
+	if err != nil {
+		return
+	}
+
+	imageData = fmt.Sprintf("data:%s;base64,%s", filetype, b64Image)
+	return
+}
+
+func (c *OpenAIClient) retrieveChatCompletion(ctx context.Context, req openai.ChatCompletionRequest) (message openai.ChatCompletionMessage, err error) {
+	var resp openai.ChatCompletionResponse
+	resp, err = c.api.CreateChatCompletion(ctx, req)
+	if err != nil {
+		return
 	}
 	slog.Debug("Received response")
-	receivedMessage := resp.Choices[0].Message
+	message = resp.Choices[0].Message
 
-	_, err = fmt.Fprintln(c.out, receivedMessage.Content)
+	_, err = fmt.Fprintln(c.out, message.Content)
 	if err != nil {
 		return openai.ChatCompletionMessage{}, err
 	}
 	slog.Debug("Printed response")
-
-	return receivedMessage, nil
+	return
 }
 
 func (c *OpenAIClient) retrieveChatCompletionStream(ctx context.Context, req openai.ChatCompletionRequest) (openai.ChatCompletionMessage, error) {

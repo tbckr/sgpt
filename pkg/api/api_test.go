@@ -27,6 +27,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 
@@ -87,7 +88,7 @@ func TestSimplePrompt(t *testing.T) {
 	}()
 
 	var result string
-	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt")
+	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt", nil)
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
@@ -138,7 +139,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 	}()
 
 	var result string
-	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt")
+	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt", nil)
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
@@ -174,7 +175,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 	}()
 
 	var result string
-	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt")
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt", nil)
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
@@ -245,7 +246,7 @@ func TestPromptLoadChat(t *testing.T) {
 	}()
 
 	var result string
-	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt")
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt", nil)
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
@@ -303,7 +304,7 @@ func TestPromptWithModifier(t *testing.T) {
 	}()
 
 	var result string
-	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "sh")
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "sh", nil)
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
@@ -329,6 +330,242 @@ func TestPromptWithModifier(t *testing.T) {
 	// Check if the response was added
 	require.Equal(t, openai.ChatMessageRoleAssistant, messages[2].Role)
 	require.Equal(t, expected, messages[2].Content)
+
+	wg.Wait()
+}
+
+func TestSimplePromptWithLocalImage(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "what can you see on the picture?"
+	expected := "The image shows a character that appears to be a stylized robot. It has"
+	inputImage := "testdata/marvin.jpg"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
+	var result string
+	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt", []string{inputImage})
+	require.NoError(t, err)
+	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
+func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "what can you see on the picture?"
+	expected := "The image shows a character that appears to be a stylized robot. It has"
+	inputImage := "testdata/marvin.jpg"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
+	var result string
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt", []string{inputImage})
+	require.NoError(t, err)
+	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 2)
+
+	// Check, if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
+	// The prompt should be empty, because it is a multi content message
+	require.Empty(t, messages[0].Content)
+	require.Len(t, messages[0].MultiContent, 2)
+	// Check, if the prompt is a multi content message
+	require.Equal(t, "text", string(messages[0].MultiContent[0].Type))
+	require.Equal(t, prompt, messages[0].MultiContent[0].Text)
+	// Check, if the image was added
+	require.Equal(t, "image_url", string(messages[0].MultiContent[1].Type))
+	require.NotEmpty(t, messages[0].MultiContent[1].ImageURL.URL)
+	require.True(t, strings.HasPrefix(messages[0].MultiContent[1].ImageURL.URL, "data:"))
+
+	// Check, if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
+	require.Equal(t, expected, messages[1].Content)
+
+	wg.Wait()
+}
+
+func TestSimplePromptWithURLImageAndChat(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "what can you see on the picture?"
+	expected := "The image shows a character that appears to be a stylized robot. It has"
+	inputImage := "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
+	var result string
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt", []string{inputImage})
+	require.NoError(t, err)
+	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 2)
+
+	// Check, if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
+	// The prompt should be empty, because it is a multi content message
+	require.Empty(t, messages[0].Content)
+	require.Len(t, messages[0].MultiContent, 2)
+	// Check, if the prompt is a multi content message
+	require.Equal(t, "text", string(messages[0].MultiContent[0].Type))
+	require.Equal(t, prompt, messages[0].MultiContent[0].Text)
+	// Check, if the image was added
+	require.Equal(t, "image_url", string(messages[0].MultiContent[1].Type))
+	require.Equal(t, inputImage, messages[0].MultiContent[1].ImageURL.URL)
+
+	// Check, if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
+	require.Equal(t, expected, messages[1].Content)
+
+	wg.Wait()
+}
+
+func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := "what is the difference between those two pictures?"
+	expected := "The two images provided appear to be identical. Both show the same depiction of a"
+	inputImageFile := "testdata/marvin.jpg"
+	inputImageURL := "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
+	var result string
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt", []string{inputImageURL, inputImageFile})
+	require.NoError(t, err)
+	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 2)
+
+	// Check, if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
+	// The prompt should be empty, because it is a multi content message
+	require.Empty(t, messages[0].Content)
+	require.Len(t, messages[0].MultiContent, 3)
+
+	// Check, if the prompt is a multi content message
+	require.Equal(t, "text", string(messages[0].MultiContent[0].Type))
+	require.Equal(t, prompt, messages[0].MultiContent[0].Text)
+	// Check, if the URL image was added
+	require.Equal(t, "image_url", string(messages[0].MultiContent[1].Type))
+	require.Equal(t, inputImageURL, messages[0].MultiContent[1].ImageURL.URL)
+	// Check, if the file image was added
+	require.Equal(t, "image_url", string(messages[0].MultiContent[2].Type))
+	require.NotEmpty(t, messages[0].MultiContent[2].ImageURL.URL)
+	require.True(t, strings.HasPrefix(messages[0].MultiContent[2].ImageURL.URL, "data:"))
+
+	// Check, if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
+	require.Equal(t, expected, messages[1].Content)
 
 	wg.Wait()
 }
