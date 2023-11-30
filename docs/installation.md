@@ -64,7 +64,7 @@ To install SGPT with Ansible, you can use the following ansible playbook as your
     set_fact:
       sgpt_latest_version: "{{ sgpt_release.json.tag_name }}"
 
-  - name: Install sgpt for amd64 based systems on Linux
+  - name: Install sgpt for debian based, amd64 systems
     ansible.builtin.apt:
       deb: https://github.com/tbckr/sgpt/releases/download/{{ sgpt_latest_version }}/sgpt_{{ sgpt_latest_version[1:] }}_amd64.deb
       allow_unauthenticated: true
