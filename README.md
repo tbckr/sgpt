@@ -109,6 +109,38 @@ docker pull ghcr.io/tbckr/sgpt:latest
 
 Examples on how to use SGPT with Docker can be found [here](https://sgpt.readthedocs.io/en/latest/usage/docker/).
 
+### Ansible
+
+To install SGPT with Ansible, you can use the following ansible playbook as your base and adapt accordingly:
+
+```yaml
+---
+- hosts: all
+  tasks:
+  - name: Get latest sgpt release
+    uri:
+      url: "https://api.github.com/repos/tbckr/sgpt/releases/latest"
+      return_content: yes
+    register: sgpt_release
+
+  - name: Set latest version of sgpt
+    set_fact:
+      sgpt_latest_version: "{{ sgpt_release.json.tag_name }}"
+
+  - name: Install sgpt for debian based, amd64 systems
+    ansible.builtin.apt:
+      deb: https://github.com/tbckr/sgpt/releases/download/{{ sgpt_latest_version }}/sgpt_{{ sgpt_latest_version[1:] }}_amd64.deb
+      allow_unauthenticated: true
+```
+
+The playbook can be run with the following command:
+
+```shell
+ansible-playbook -i <inventory> <playbook>.yml
+```
+
+The latest version of the playbook can be found [here](https://github.com/tbckr/sgpt/blob/main/playbook.yml).
+
 ### Other platforms
 
 For other platforms, visit the GitHub [release page](https://github.com/tbckr/sgpt/releases) and download the latest
