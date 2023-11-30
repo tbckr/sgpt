@@ -31,6 +31,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [Windows](#windows)
   - [Using Go](#using-go)
   - [Docker](#docker)
+  - [Ansible](#ansible)
   - [Other platforms](#other-platforms)
 - [Usage Guide](#usage-guide)
   - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
