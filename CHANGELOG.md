@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.8.0](https://github.com/tbckr/sgpt/compare/v2.7.0...v2.8.0) (2023-12-04)
+
+
+### Features
+
+* add example ansible playbook as install option ([#185](https://github.com/tbckr/sgpt/issues/185)) ([c8ec2f2](https://github.com/tbckr/sgpt/commit/c8ec2f26b442458579fd350a52d832d5b582e9fa))
+* adds initial support for gpt-4-vison ([#184](https://github.com/tbckr/sgpt/issues/184)) ([09b809a](https://github.com/tbckr/sgpt/commit/09b809a408f4da0d7c06b26d61a4a21674881c81))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.9 ([5d1c773](https://github.com/tbckr/sgpt/commit/5d1c773a9b7a6bc8f2b3305bad8355497974e6fd))
+
 ## [2.7.0](https://github.com/tbckr/sgpt/compare/v2.6.1...v2.7.0) (2023-11-27)
 
 
