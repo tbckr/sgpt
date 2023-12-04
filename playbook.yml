@@ -19,37 +19,20 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Table of Contents Generator
+---
+- hosts: all
+  tasks:
+  - name: Get latest sgpt release
+    uri:
+      url: "https://api.github.com/repos/tbckr/sgpt/releases/latest"
+      return_content: yes
+    register: sgpt_release
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'README.md'
-      - 'CONTRIBUTING.md'
-      - '.github/workflows/toc.yml'
+  - name: Set latest version of sgpt
+    set_fact:
+      sgpt_latest_version: "{{ sgpt_release.json.tag_name }}"
 
-permissions: { }
-
-concurrency:
-  group: ${{ github.workflow }}-$${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
-
-jobs:
-  generateTOC:
-    name: TOC Generator
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/create-github-app-token@46e4a501e119d39574a54e53a06c9a705efc55c9 # v1
-        id: generate_token
-        with:
-          app-id: ${{ secrets.AUTOMATION_APP_ID }}
-          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
-      - name: TOC Generator
-        uses: technote-space/toc-generator@9e238e7974de5fcf7b17b7acc54c896160dda0a3 # v4
-        with:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-          COMMIT_NAME: tbckr-automation[bot]
-          COMMIT_EMAIL: gh-automation@tb5.dev
-          TARGET_PATHS: "README.md,CONTRIBUTING.md"
+  - name: Install sgpt for debian based, amd64 systems
+    ansible.builtin.apt:
+      deb: https://github.com/tbckr/sgpt/releases/download/{{ sgpt_latest_version }}/sgpt_{{ sgpt_latest_version[1:] }}_amd64.deb
+      allow_unauthenticated: true
