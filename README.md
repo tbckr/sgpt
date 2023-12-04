@@ -49,6 +49,8 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
 
 - Instant Answers: Obtain quick and accurate responses to simple questions directly in your shell, streamlining your
   workflow.
+- GPT-4 Vision API: Leverage the capabilities of the [GPT-4 Vision API](https://platform.openai.com/docs/guides/vision)
+  to analyze and generate insights from images.
 - Shell Commands Generation: Effortlessly generate and execute shell commands, simplifying complex tasks and enhancing
   productivity.
 - Code Production: Generate code snippets in various programming languages, making it easier to learn new languages or
@@ -119,20 +121,20 @@ To install SGPT with Ansible, you can use the following ansible playbook as your
 ---
 - hosts: all
   tasks:
-  - name: Get latest sgpt release
-    uri:
-      url: "https://api.github.com/repos/tbckr/sgpt/releases/latest"
-      return_content: yes
-    register: sgpt_release
+    - name: Get latest sgpt release
+      uri:
+        url: "https://api.github.com/repos/tbckr/sgpt/releases/latest"
+        return_content: yes
+      register: sgpt_release
 
-  - name: Set latest version of sgpt
-    set_fact:
-      sgpt_latest_version: "{{ sgpt_release.json.tag_name }}"
+    - name: Set latest version of sgpt
+      set_fact:
+        sgpt_latest_version: "{{ sgpt_release.json.tag_name }}"
 
-  - name: Install sgpt for debian based, amd64 systems
-    ansible.builtin.apt:
-      deb: https://github.com/tbckr/sgpt/releases/download/{{ sgpt_latest_version }}/sgpt_{{ sgpt_latest_version[1:] }}_amd64.deb
-      allow_unauthenticated: true
+    - name: Install sgpt for debian based, amd64 systems
+      ansible.builtin.apt:
+        deb: https://github.com/tbckr/sgpt/releases/download/{{ sgpt_latest_version }}/sgpt_{{ sgpt_latest_version[1:] }}_amd64.deb
+        allow_unauthenticated: true
 ```
 
 The playbook can be run with the following command:
