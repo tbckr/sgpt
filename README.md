@@ -47,17 +47,17 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
 
 ## Features
 
-- Instant Answers: Obtain quick and accurate responses to simple questions directly in your shell, streamlining your
+- **Instant Answers:** Obtain quick and accurate responses to simple questions directly in your shell, streamlining your
   workflow.
-- GPT-4 Vision API: Leverage the capabilities of the [GPT-4 Vision API](https://platform.openai.com/docs/guides/vision)
+- **GPT-4 Vision API:** Leverage the capabilities of the [GPT-4 Vision API](https://platform.openai.com/docs/guides/vision)
   to analyze and generate insights from images.
-- Shell Commands Generation: Effortlessly generate and execute shell commands, simplifying complex tasks and enhancing
+- **Shell Commands Generation:** Effortlessly generate and execute shell commands, simplifying complex tasks and enhancing
   productivity.
-- Code Production: Generate code snippets in various programming languages, making it easier to learn new languages or
+- **Code Production:** Generate code snippets in various programming languages, making it easier to learn new languages or
   find solutions to coding problems.
-- ChatGPT Integration: Utilize ChatGPT's interactive chat capabilities to refine your prompts and achieve more precise
+- **ChatGPT Integration:** Utilize ChatGPT's interactive chat capabilities to refine your prompts and achieve more precise
   results, benefiting from the powerful language model.
-- Bash Functions and Aliases: Seamlessly integrate SGPT responses into custom bash functions and aliases, optimizing
+- **Bash Functions and Aliases:** Seamlessly integrate SGPT responses into custom bash functions and aliases, optimizing
   your workflows and making your daily tasks more efficient.
 
 By offering these versatile features, SGPT serves as a powerful tool to enhance your overall productivity, streamline
