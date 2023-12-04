@@ -36,7 +36,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
 - [Usage Guide](#usage-guide)
   - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
   - [Querying OpenAI Models](#querying-openai-models)
-- [GPT-4 Vision API](#gpt-4-vision-api)
+  - [GPT-4 Vision API](#gpt-4-vision-api)
   - [Chat Capabilities](#chat-capabilities)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
   - [Code Generation Capabilities](#code-generation-capabilities)
