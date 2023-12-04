@@ -171,6 +171,8 @@ To use the OpenAI API, you must first obtain an API key.
 After completing these steps, you'll have an OpenAI API key that can be used to interact with the OpenAI models through
 the SGPT tool.
 
+**Note:** Your API key is sensitive information. Do not share it with anyone.
+
 ### Querying OpenAI Models
 
 SGPT allows you to ask simple questions and receive informative answers. For example:
@@ -189,6 +191,36 @@ The mass of the sun is approximately 1.989 x 10^30 kilograms.
 
 If you want to stream the completion to the command line, you can add the `--stream` flag. This will stream the output
 to the command line as it is generated.
+
+## GPT-4 Vision API
+
+SGPT additionally facilitates the utilization of the GPT-4 Vision API. Include input images using the `-i` or `--input`
+flag, supporting both URLs and local images.
+
+```shell
+$ sgpt -m "gpt-4-vision-preview" -i "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg" "what can you see on the picture?"
+The image shows a figure resembling a robot with a humanoid form. It has a
+$ sgpt -m "gpt-4-vision-preview" -i pkg/fs/testdata/marvin.jpg "what can you see on the picture?"
+The image shows a figure resembling a robot with a sleek, metallic surface. It
+```
+
+It is also possible to combine URLs and local images:
+
+```shell
+$ sgpt -m "gpt-4-vision-preview" -i "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg" -i pkg/fs/testdata/marvin.jpg "what is the difference between those two pictures"
+The two images provided appear to be identical. Both show the same depiction of a
+```
+
+To avoid specifying the `-m "gpt-4-vision-preview"` for each request, you can streamline the process by creating a bash
+alias:
+
+```shell
+alias vision='sgpt -m "gpt-4-vision-preview"'
+```
+
+For more bash examples, see [.bash_aliases](https://github.com/tbckr/sgpt/blob/main/.bash_aliases).
+
+**Important:** The GPT-4-vision API integration is currently in beta and may change in the future.
 
 ### Chat Capabilities
 
