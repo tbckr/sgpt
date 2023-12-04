@@ -215,6 +215,7 @@ func (c *OpenAIClient) loadChatMessages(isChat bool, chatID, modifier string) (m
 
 func (c *OpenAIClient) createPromptMessage(prompt string, input []string) (message openai.ChatCompletionMessage, err error) {
 	if len(input) > 0 {
+		slog.Warn("The GPT-4 Vision API is in beta and may not work as expected")
 		// Request to the gpt-4-vision API
 
 		// Add prompt to message

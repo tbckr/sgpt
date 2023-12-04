@@ -117,7 +117,9 @@ Provide your prompt via stdin or as an argument and the tool will return the gen
 
 By default the personas "code" and "sh" are included and can be used to generate code or shell commands. You can also add your own personas in a "personas"" directory of SGPT's config directory.
 
-The tool can also be used to chat with the OpenAI models. You can start a new chat session or continue an existing one. The chat session is stored in the cache directory and can be deleted at any time.`,
+The tool can also be used to chat with the OpenAI models. You can start a new chat session or continue an existing one. The chat session is stored in the cache directory and can be deleted at any time.
+
+The OpenAI GPT-4-vision API is also supported. You can provide images via command line args to a file or url. This feature is currently in beta.`,
 		Example: `
 # Ask questions
 $ sgpt "mass of sun"
@@ -242,7 +244,7 @@ ls | sort
 	cmd.Flags().BoolVarP(&root.execute, "execute", "e", false, "execute a response in the shell")
 	cmd.Flags().BoolVarP(&root.copyToClipboard, "clipboard", "b", false, "send client response to clipboard")
 	cmd.Flags().StringVarP(&root.chat, "chat", "c", "", "use an existing chat session or create a new one")
-	cmd.Flags().StringSliceVarP(&root.input, "input", "i", nil, "provide images via command line args to a file or url")
+	cmd.Flags().StringSliceVarP(&root.input, "input", "i", nil, "provide images via command line args to a file or url (experimental)")
 
 	// flags with config binding
 	createFlagsWithConfigBinding(cmd, config)

@@ -69,6 +69,8 @@ alias vision='sgpt -m "gpt-4-vision-preview"'
 
 For more bash examples, see [.bash_aliases](https://github.com/tbckr/sgpt/blob/main/.bash_aliases).
 
+**Important:** The GPT-4-vision API integration is currently in beta and may change in the future.
+
 ## Code Generation Capabilities
 
 By adding the `code` command to your prompt, you can generate code based on given instructions by using the
