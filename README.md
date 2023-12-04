@@ -193,7 +193,7 @@ The mass of the sun is approximately 1.989 x 10^30 kilograms.
 If you want to stream the completion to the command line, you can add the `--stream` flag. This will stream the output
 to the command line as it is generated.
 
-## GPT-4 Vision API
+### GPT-4 Vision API
 
 SGPT additionally facilitates the utilization of the GPT-4 Vision API. Include input images using the `-i` or `--input`
 flag, supporting both URLs and local images.
