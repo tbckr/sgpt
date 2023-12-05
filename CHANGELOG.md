@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.8.1](https://github.com/tbckr/sgpt/compare/v2.8.0...v2.8.1) (2023-12-05)
+
+
+### Bug Fixes
+
+* **linux,deb:** wrong filepath for copyright notice ([688f435](https://github.com/tbckr/sgpt/commit/688f43514913f2e6e6fe84ff6801c765c6bac02e))
+
 ## [2.8.0](https://github.com/tbckr/sgpt/compare/v2.7.0...v2.8.0) (2023-12-04)
 
 
