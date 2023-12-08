@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.9.0](https://github.com/tbckr/sgpt/compare/v2.8.1...v2.9.0) (2023-12-08)
+
+
+### Features
+
+* enable artifact signing via cosign ([#190](https://github.com/tbckr/sgpt/issues/190)) ([7d14805](https://github.com/tbckr/sgpt/commit/7d1480511173dcd8442aee239de8a58385b6d8b3))
+
 ## [2.8.1](https://github.com/tbckr/sgpt/compare/v2.8.0...v2.8.1) (2023-12-05)
 
 
