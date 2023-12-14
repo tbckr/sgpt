@@ -6,7 +6,7 @@ Some packages may only be included on certain architectures or operating systems
 ## Overview
 
 - [github.com/atotto/clipboard](https://pkg.go.dev/github.com/atotto/clipboard) ([BSD-3-Clause](https://github.com/atotto/clipboard/blob/v0.1.4/LICENSE))
-- [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.6.0/LICENSE))
+- [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.7.0/LICENSE))
 - [github.com/hashicorp/hcl](https://pkg.go.dev/github.com/hashicorp/hcl) ([MPL-2.0](https://github.com/hashicorp/hcl/blob/v1.0.0/LICENSE))
 - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.1.0/LICENSE))
 - [github.com/magiconair/properties](https://pkg.go.dev/github.com/magiconair/properties) ([BSD-2-Clause](https://github.com/magiconair/properties/blob/v1.8.7/LICENSE.md))
@@ -18,14 +18,14 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.1.0/LICENSE))
 - [github.com/sagikazarmark/slog-shim](https://pkg.go.dev/github.com/sagikazarmark/slog-shim) ([BSD-3-Clause](https://github.com/sagikazarmark/slog-shim/blob/v0.1.0/LICENSE))
 - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/a09cb0c528c1/LICENSE))
-- [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.10.0/LICENSE.txt))
-- [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.5.1/LICENSE))
+- [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.11.0/LICENSE.txt))
+- [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.6.0/LICENSE))
 - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.8.0/LICENSE.txt))
 - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
-- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.17.0/LICENSE))
+- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.18.0/LICENSE))
 - [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE))
-- [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.12.0:LICENSE))
-- [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.13.0:LICENSE))
+- [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.15.0:LICENSE))
+- [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.14.0:LICENSE))
 - [gopkg.in/ini.v1](https://pkg.go.dev/gopkg.in/ini.v1) ([Apache-2.0](https://github.com/go-ini/ini/blob/v1.67.0/LICENSE))
 - [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE))
 
@@ -71,8 +71,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/fsnotify/fsnotify
 
 - Name: github.com/fsnotify/fsnotify
-- Version: v1.6.0
-- License: [BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.6.0/LICENSE)
+- Version: v1.7.0
+- License: [BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.7.0/LICENSE)
 
 ```text
 Copyright © 2012 The Go Authors. All rights reserved.
@@ -1150,8 +1150,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/spf13/afero
 
 - Name: github.com/spf13/afero
-- Version: v1.10.0
-- License: [Apache-2.0](https://github.com/spf13/afero/blob/v1.10.0/LICENSE.txt)
+- Version: v1.11.0
+- License: [Apache-2.0](https://github.com/spf13/afero/blob/v1.11.0/LICENSE.txt)
 
 ```text
                                 Apache License
@@ -1334,8 +1334,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/spf13/cast
 
 - Name: github.com/spf13/cast
-- Version: v1.5.1
-- License: [MIT](https://github.com/spf13/cast/blob/v1.5.1/LICENSE)
+- Version: v1.6.0
+- License: [MIT](https://github.com/spf13/cast/blob/v1.6.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1586,8 +1586,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/spf13/viper
 
 - Name: github.com/spf13/viper
-- Version: v1.17.0
-- License: [MIT](https://github.com/spf13/viper/blob/v1.17.0/LICENSE)
+- Version: v1.18.0
+- License: [MIT](https://github.com/spf13/viper/blob/v1.18.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1647,8 +1647,8 @@ THE SOFTWARE.
 ### golang.org/x/sys
 
 - Name: golang.org/x/sys
-- Version: v0.12.0
-- License: [BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.12.0:LICENSE)
+- Version: v0.15.0
+- License: [BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.15.0:LICENSE)
 
 ```text
 Copyright (c) 2009 The Go Authors. All rights reserved.
@@ -1684,8 +1684,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### golang.org/x/text
 
 - Name: golang.org/x/text
-- Version: v0.13.0
-- License: [BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.13.0:LICENSE)
+- Version: v0.14.0
+- License: [BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.14.0:LICENSE)
 
 ```text
 Copyright (c) 2009 The Go Authors. All rights reserved.
