@@ -35,7 +35,7 @@ scoop install tbckr/sgpt
 To install SGPT with Go, based on the git tag, use this command:
 
 ```shell
-go install github.com/tbckr/sgpt/cmd/sgpt@latest
+go install github.com/tbckr/sgpt/v2/cmd/sgpt@latest
 ```
 
 ## Docker
