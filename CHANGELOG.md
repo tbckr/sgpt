@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.10.0](https://github.com/tbckr/sgpt/compare/v2.9.0...v2.10.0) (2023-12-18)
+
+
+### Features
+
+* added docs for verifying artifacts and docker images ([e2d3c57](https://github.com/tbckr/sgpt/commit/e2d3c571c9c239b4bd4b51ce85fc403242124bd0))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/spf13/viper to v1.18.0 ([dc43029](https://github.com/tbckr/sgpt/commit/dc430292cec5abfb395721d45b464f7ee6dd6cc5))
+* **deps:** update module github.com/spf13/viper to v1.18.1 ([1c765b6](https://github.com/tbckr/sgpt/commit/1c765b662ba04d6486785d90773b8e296bfb5c2f))
+* use the v2 module in the go installation doc ([1a4dcc4](https://github.com/tbckr/sgpt/commit/1a4dcc4022ede0650e3e380940ddac0a44bcb32b))
+
 ## [2.9.0](https://github.com/tbckr/sgpt/compare/v2.8.1...v2.9.0) (2023-12-08)
 
 
