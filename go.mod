@@ -9,7 +9,7 @@ require (
 	github.com/muesli/roff v0.1.0
 	github.com/sashabaranov/go-openai v1.17.10-0.20231126084528-a09cb0c528c1
 	github.com/spf13/cobra v1.8.0
-	github.com/spf13/viper v1.18.1
+	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
 	gopkg.in/yaml.v3 v3.0.1
 )
