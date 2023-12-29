@@ -183,29 +183,6 @@ dockers:
     - "--label=org.opencontainers.image.url=https://github.com/tbckr/{{ .ProjectName }}"
     - "--label=org.opencontainers.image.source=https://github.com/tbckr/{{ .ProjectName }}"
     - "--label=org.opencontainers.image.licenses=MIT"
-  -
-    id: "linux-386"
-    goos: linux
-    goarch: 386
-    use: buildx
-    dockerfile: "Dockerfile.goreleaser"
-    image_templates:
-    - "{{.Env.IMAGE_NAME}}:latest-386"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}-386"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-386"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-386"
-    # Template of the docker build flags.
-    build_flag_templates:
-    - "--pull"
-    - "--platform=linux/arm64"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    - "--label=org.opencontainers.image.description={{ .ProjectName }}"
-    - "--label=org.opencontainers.image.url=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.source=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.licenses=MIT"
 
 docker_manifests:
 - name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}"
