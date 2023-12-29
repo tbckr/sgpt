@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.0](https://github.com/tbckr/sgpt/compare/v2.10.1...v2.11.0) (2023-12-29)
+
+
+### Features
+
+* use distroless base images for docker ([#200](https://github.com/tbckr/sgpt/issues/200)) ([456f7f7](https://github.com/tbckr/sgpt/commit/456f7f71cc8f0f30c8cde6129bbe5f7f27a308cf))
+
 ## [2.10.1](https://github.com/tbckr/sgpt/compare/v2.10.0...v2.10.1) (2023-12-26)
 
 
