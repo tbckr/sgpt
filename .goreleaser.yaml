@@ -190,25 +190,21 @@ docker_manifests:
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-amd64"
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-arm64"
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-armv7"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-386"
 - name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}"
   image_templates:
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-amd64"
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-arm64"
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-armv7"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-386"
 - name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}"
   image_templates:
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}-amd64"
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}-arm64"
   - "{{.Env.IMAGE_NAME}}:{{ .Major }}-armv7"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}-386"
 - name_template: "{{.Env.IMAGE_NAME}}:latest"
   image_templates:
   - "{{.Env.IMAGE_NAME}}:latest-amd64"
   - "{{.Env.IMAGE_NAME}}:latest-arm64"
   - "{{.Env.IMAGE_NAME}}:latest-armv7"
-  - "{{.Env.IMAGE_NAME}}:latest-386"
 
 checksum:
   name_template: 'checksums.txt'
