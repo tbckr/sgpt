@@ -1,7 +1,12 @@
 {
   "packages": {
     ".": {
+      "release-type": "go",
       "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        "internal/buildinfo/version.go"
+      ],
+      "skip-github-release": false,
       "bump-minor-pre-major": false,
       "bump-patch-for-minor-pre-major": false,
       "draft": false,

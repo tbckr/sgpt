@@ -52,10 +52,6 @@ jobs:
         id: release
         with:
           token: ${{ steps.generate_token.outputs.token }}
-          release-type: go
-          package-name: sgpt
-          skip-github-release: false
-          extra-files: internal/buildinfo/version.go
 
       # Checkout repo
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
