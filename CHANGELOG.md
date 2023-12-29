@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.1](https://github.com/tbckr/sgpt/compare/v2.11.0...v2.11.1) (2023-12-29)
+
+
+### Bug Fixes
+
+* do not build 389 arch docker images ([d6280f4](https://github.com/tbckr/sgpt/commit/d6280f4768036a76be47e6caa64f4f6b799ccb65))
+
 ## [2.11.0](https://github.com/tbckr/sgpt/compare/v2.10.1...v2.11.0) (2023-12-29)
 
 
