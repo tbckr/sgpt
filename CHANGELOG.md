@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.10.1](https://github.com/tbckr/sgpt/compare/v2.10.0...v2.10.1) (2023-12-26)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/spf13/viper to v1.18.2 ([72505d8](https://github.com/tbckr/sgpt/commit/72505d847893b90f61f964d31cc9e3a3799ed5a1))
+
 ## [2.10.0](https://github.com/tbckr/sgpt/compare/v2.9.0...v2.10.0) (2023-12-18)
 
 
