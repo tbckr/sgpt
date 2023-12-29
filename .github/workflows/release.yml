@@ -52,6 +52,8 @@ jobs:
         id: release
         with:
           token: ${{ steps.generate_token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
       # Checkout repo
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
