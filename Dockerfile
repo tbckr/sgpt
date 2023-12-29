@@ -19,16 +19,29 @@
 #
 # SPDX-License-Identifier: MIT
 
-ARG BUILDPLATFORM=linux/amd64
-ARG BASE_IMAGE_VERSION=golang:1.21
-FROM --platform=$BUILDPLATFORM ${BASE_IMAGE_VERSION} as build
+ARG IMAGE_1=cgr.dev/chainguard/go:1.21@sha256:f807658ebd070455c2ec930407fb4427c0761f5401c5c84e9b0dac3ee99c1da8
+ARG IMAGE_2=cgr.dev/chainguard/static:latest@sha256:2657e6641050ff808452889ae389e3e9f6591d4613156b04862403234d4694c9
 
-WORKDIR /go/src/github.com/tbckr/sgpt
+FROM --platform=$BUILDPLATFORM ${IMAGE_1} as build
+
+WORKDIR /work
+
 COPY go.mod go.sum ./
 RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 go build -o sgpt -v ./cmd/sgpt/main.go
 
-FROM gcr.io/distroless/static-debian12:nonroot
-COPY --from=build /go/src/github.com/tbckr/sgpt/sgpt /sgpt
+COPY . .
+ARG TARGETOS TARGETARCH TARGETVARIANT
+RUN \
+    if [ "${TARGETARCH}" = "arm" ] && [ -n "${TARGETVARIANT}" ]; then \
+      export GOARM="${TARGETVARIANT#v}"; \
+    fi; \
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o sgpt -v ./cmd/sgpt/main.go
+
+
+FROM ${IMAGE_2}
+
+ENV HOME /home/nonroot
+VOLUME /home/nonroot
+
+COPY --from=build /work/sgpt /sgpt
 ENTRYPOINT ["/sgpt"]

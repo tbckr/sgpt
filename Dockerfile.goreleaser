@@ -1,5 +1,7 @@
-ARG BUILDPLATFORM=linux/amd64
-ARG BASE_IMAGE_VERSION=gcr.io/distroless/static-debian12:nonroot
-FROM --platform=$BUILDPLATFORM ${BASE_IMAGE_VERSION}
+FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/static:latest@sha256:2657e6641050ff808452889ae389e3e9f6591d4613156b04862403234d4694c9
+
+ENV HOME /home/nonroot
+VOLUME /home/nonroot
+
 COPY sgpt /sgpt
 ENTRYPOINT ["/sgpt"]
