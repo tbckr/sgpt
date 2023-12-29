@@ -32,51 +32,47 @@ vars:
   DOCKER: '{{default "docker" .DOCKER}}'
 
 tasks:
-  setup:precommit:
-    desc: Setup git hooks
+  setup:install:
+    desc: Install devtools
     preconditions:
       - which python3
-    cmds:
-      - python3 -m pip install --upgrade --user pre-commit
-      - pre-commit install
-
-  setup:go-tools:
-    desc: Install tools
-    preconditions:
       - which go
+      - which docker
     cmds:
+      - pip3 install --user --upgrade pre-commit
+      - pip3 install --user --upgrade commitizen
       - go install github.com/google/addlicense@latest
       - go install github.com/caarlos0/svu@latest
       - go install golang.org/x/vuln/cmd/govulncheck@latest
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
       - go install github.com/goreleaser/goreleaser@latest
 
-  setup:docs:
-    desc: Install pipenv
-    preconditions:
-      - which python3
-    cmds:
-      - python3 -m pip install --upgrade --user pipenv
-
-  setup:
-    desc: Setup development environment
-    cmds:
-      - task: setup:precommit
-      - task: setup:go-tools
-      - task: setup:docs
-
-  validate:devtools:
+  setup:validate:
     desc: Validate that all necessary devtools are installed
     cmds:
       - which go 1>/dev/null || (echo "go is not installed" && exit 1)
       - which python3 1>/dev/null || (echo "python3 is not installed" && exit 1)
-      - which pipenv 1>/dev/null || (echo "python3 is not installed" && exit 1)
       - which docker 1>/dev/null || (echo "docker is not installed" && exit 1)
       - which task 1>/dev/null || (echo "task is not installed" && exit 1)
       - which pre-commit 1>/dev/null || (echo "pre-commit is not installed" && exit 1)
       - which addlicense 1>/dev/null || (echo "addlicense is not installed" && exit 1)
       - which svu 1>/dev/null || (echo "svu is not installed" && exit 1)
       - which goreleaser 1>/dev/null || (echo "goreleaser is not installed" && exit 1)
+      - which golangci-lint 1>/dev/null || (echo "golangci-lint is not installed" && exit 1)
+      - which govulncheck 1>/dev/null || (echo "govulncheck is not installed" && exit 1)
+      - which cz 1>/dev/null || (echo "commitizen is not installed" && exit 1)
+
+  setup:hooks:
+    desc: Setup git hooks
+    preconditions:
+      - which pre-commit
+    cmds:
+      - pre-commit install
+
+  setup:
+    desc: Setup development environment
+    cmds:
+      - task: setup:hooks
 
   docs:
     desc: Start documentation server
@@ -85,6 +81,8 @@ tasks:
 
   license-header:
     desc: Add license header to all files
+    aliases:
+      - "license"
     cmds:
       - |
         addlicense -c "Tim <tbckr>" -l MIT -s -v \
@@ -142,11 +140,17 @@ tasks:
     desc: Lint the code
     cmds:
       - task: lint:go
+      - task: lint:md
 
   lint:go:
     desc: Lint the code with golangci-lint
     cmds:
       - golangci-lint run ./...
+
+  lint:md:
+    desc: Lint markdown files
+    cmds:
+      - docker run --rm --pull always -v $(pwd):/app:ro ghcr.io/tbckr/markdownlint:18 . --config=.mdl_config.yaml
 
   ci:
     desc: Run all CI steps
