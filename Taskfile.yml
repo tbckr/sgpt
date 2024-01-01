@@ -67,7 +67,7 @@ tasks:
     preconditions:
       - which pre-commit
     cmds:
-      - pre-commit install
+      - pre-commit install --hook-type commit-msg --hook-type pre-commit
 
   setup:
     desc: Setup development environment
