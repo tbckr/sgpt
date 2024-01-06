@@ -153,7 +153,6 @@ Dockerfile
 Dockerfile.goreleaser
 renovate.json
 LICENSE
-.bash_aliases
 .task/
 coverage.txt
 sgpt
