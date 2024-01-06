@@ -49,13 +49,17 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
 
 - **Instant Answers:** Obtain quick and accurate responses to simple questions directly in your shell, streamlining your
   workflow.
-- **GPT-4 Vision API:** Leverage the capabilities of the [GPT-4 Vision API](https://platform.openai.com/docs/guides/vision)
+- **GPT-4 Vision API:** Leverage the capabilities of
+  the [GPT-4 Vision API](https://platform.openai.com/docs/guides/vision)
   to analyze and generate insights from images.
-- **Shell Commands Generation:** Effortlessly generate and execute shell commands, simplifying complex tasks and enhancing
+- **Shell Commands Generation:** Effortlessly generate and execute shell commands, simplifying complex tasks and
+  enhancing
   productivity.
-- **Code Production:** Generate code snippets in various programming languages, making it easier to learn new languages or
+- **Code Production:** Generate code snippets in various programming languages, making it easier to learn new languages
+  or
   find solutions to coding problems.
-- **ChatGPT Integration:** Utilize ChatGPT's interactive chat capabilities to refine your prompts and achieve more precise
+- **ChatGPT Integration:** Utilize ChatGPT's interactive chat capabilities to refine your prompts and achieve more
+  precise
   results, benefiting from the powerful language model.
 - **Bash Functions and Aliases:** Seamlessly integrate SGPT responses into custom bash functions and aliases, optimizing
   your workflows and making your daily tasks more efficient.
@@ -221,7 +225,7 @@ alias:
 alias vision='sgpt -m "gpt-4-vision-preview"'
 ```
 
-For more bash examples, see [.bash_aliases](https://github.com/tbckr/sgpt/blob/main/.bash_aliases).
+For more bash examples, see [.bashrc](https://github.com/tbckr/sgpt/blob/main/.bashrc).
 
 **Important:** The GPT-4-vision API integration is currently in beta and may change in the future.
 
@@ -271,6 +275,51 @@ Do you want to execute this command? (Y/n) y
 
 The `sh` command is a default persona to generate shell commands. For more information on personas, see
 the [docs](https://sgpt.readthedocs.io/en/latest/usage/personas/).
+
+### Interactive Shell Sessions
+
+Currently, SGPT does not support interactive shell sessions. However, `rlwrap` can be used to enable
+interactive-like shell sessions ([source](https://github.com/tbckr/sgpt/issues/111#issuecomment-1869814041)):
+
+```text
+$ rlwrap bash -c 'echo ▶; while read in; do [[ -n "$in" ]] && echo ■ && sgpt --chat chat_name "$in" && echo ▶; done'
+▶
+mass of sun
+■
+The mass of the Sun is approximately 1.989 x 10^30 kilograms, or about 330,000 times the mass of Earth. It contains about 99.86% of the total mass of the Solar System and is by far the most dominant object in it. The Sun's mass is composed mostly of hydrogen (~74%) and helium (~24%), with the remaining 2% consisting of heavier elements.
+▶
+convert to earth masses
+■
+To convert the mass of the Sun to Earth masses, you can simply divide the Sun's mass by the mass of the Earth. Given that:
+
+
+A. The Sun's mass is approximately 1.989 x 10^30 kilograms.
+
+B. The Earth's mass is approximately 5.972 x 10^24 kilograms.
+
+Using these values, you can calculate how many Earth masses the Sun is:
+
+(1.989 x 10^30 kg) / (5.972 x 10^24 kg/Earth) = approximately 333,000 Earth masses
+
+So the Sun is about 333,000 times more massive than the Earth.
+▶
+```
+
+A script with automated session name generation and notification support could look like this:
+
+```shell
+#!/usr/bin/env bash
+
+shopt -s -o errexit
+shopt -s -o pipefail
+shopt -s -o nounset
+shopt -s inherit_errexit
+
+export CHAT="$(date '+%Y%m%d%H%M%S%3N')_$(tr -dc 'A-Za-z' </dev/urandom | head -c 3)"
+rlwrap bash -c 'echo ▶; while read in; do [[ -n "$in" ]] && echo ■ && sgpt --chat "$CHAT" "$in" && echo ▶ && notify-send --urgency=low 💬 ; done'
+```
+
+Thanks to @ilya-bystrov for coming up with this solution.
 
 ### Code Generation Capabilities
 
@@ -334,7 +383,7 @@ Do you want to commit your changes with this commit message? [y/N] y
 ```
 
 A compilation of beneficial bash aliases and functions, including an updated gsum function, is available
-in [.bash_aliases](.bash_aliases).
+in [.bashrc](.bashrc).
 
 ## Acknowledgements
 

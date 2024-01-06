@@ -39,7 +39,7 @@ Do you want to commit your changes with this commit message? [y/N] y
 ```
 
 A compilation of beneficial bash aliases and functions, including an updated gsum function, is available
-in [.bash_aliases](https://github.com/tbckr/sgpt/blob/main/.bash_aliases).
+in [.bashrc](https://github.com/tbckr/sgpt/blob/main/.bashrc).
 
 ## Using Personas to Generate More Accurate Responses
 
