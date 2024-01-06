@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.12.0](https://github.com/tbckr/sgpt/compare/v2.11.2...v2.12.0) (2024-01-06)
+
+
+### Features
+
+* add doc for interactice shell session with rlwrap ([#217](https://github.com/tbckr/sgpt/issues/217)) ([8436ad8](https://github.com/tbckr/sgpt/commit/8436ad8f7bf564b96beddefa569afc744b7ac5db))
+* revert docker base image to chainguard image for goreleaser ([b174253](https://github.com/tbckr/sgpt/commit/b17425386b02b4a668ef8da6d8c8fb2e22a08026))
+* revert docker base image to chainguard images ([cfe3585](https://github.com/tbckr/sgpt/commit/cfe358588cca3b7099aec1180839122e030f3c5c))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.10 ([#214](https://github.com/tbckr/sgpt/issues/214)) ([f495945](https://github.com/tbckr/sgpt/commit/f4959453e3b7baf97129570c5c56d2ae2674e632))
+* set missing role of received message ([#216](https://github.com/tbckr/sgpt/issues/216)) ([9052ba6](https://github.com/tbckr/sgpt/commit/9052ba6f0eed4a617537aa1131e1a70985bfc50f))
+
 ## [2.11.2](https://github.com/tbckr/sgpt/compare/v2.11.1...v2.11.2) (2023-12-29)
 
 
