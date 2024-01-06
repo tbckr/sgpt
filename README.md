@@ -39,6 +39,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [GPT-4 Vision API](#gpt-4-vision-api)
   - [Chat Capabilities](#chat-capabilities)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
+  - [Interactive Shell Sessions](#interactive-shell-sessions)
   - [Code Generation Capabilities](#code-generation-capabilities)
   - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
 - [Acknowledgements](#acknowledgements)
