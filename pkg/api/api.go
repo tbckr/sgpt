@@ -158,6 +158,11 @@ func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, mod
 	if err != nil {
 		return "", err
 	}
+	// Set role of received message, if not set
+	// This seems to be a bug in the OpenAI API for now
+	if receivedMessage.Role == "" {
+		receivedMessage.Role = openai.ChatMessageRoleAssistant
+	}
 
 	slog.Debug("Received message from OpenAI API")
 
