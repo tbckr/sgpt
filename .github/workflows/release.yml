@@ -42,7 +42,7 @@ jobs:
       id-token: write
       packages: write
     steps:
-      - uses: actions/create-github-app-token@2986852ad836768dfea7781f31828eb3e17990fa # v1
+      - uses: actions/create-github-app-token@f04aa94d10cf56334d1c580e077ce2e3569e805d # v1
         id: generate_token
         with:
           app-id: ${{ secrets.AUTOMATION_APP_ID }}
