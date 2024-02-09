@@ -65,7 +65,7 @@ jobs:
         run: |
           ./scripts/oss-licenses.sh
 
-      - uses: actions/create-github-app-token@86576b355dd19da0519e0bdb63d8edb5bcf76a25 # v1
+      - uses: actions/create-github-app-token@f4c6bf6752984b3a29fcc135a5e70eb792c40c6b # v1
         id: generate_token
         with:
           app-id: ${{ secrets.AUTOMATION_APP_ID }}
