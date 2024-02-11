@@ -37,7 +37,7 @@ repos:
 
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.14.0
+    rev: v3.14.1
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen
