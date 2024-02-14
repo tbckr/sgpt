@@ -41,6 +41,6 @@ jobs:
       - name: 'Checkout Repository'
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: 'Dependency Review'
-        uses: actions/dependency-review-action@4cd9eb2d23752464a87e00499c30d256a59a01b4 # v4
+        uses: actions/dependency-review-action@80f10bf419f34980065523f5efca7ebed17576aa # v4
         with:
           allow-licenses: BSD-2-Clause, BSD-3-Clause, MIT, Apache-2.0, MPL-2.0, ISC
