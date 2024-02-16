@@ -60,7 +60,7 @@ func RegisterExpectedChatResponseStream(response string) {
 	httpmock.RegisterResponder(
 		"POST",
 		fmt.Sprintf("%s%s", baseURL, chatCompletionSuffix),
-		func(request *http.Request) (*http.Response, error) {
+		func(_ *http.Request) (*http.Response, error) {
 			// Reference: https://github.com/sashabaranov/go-openai/blob/a09cb0c528c110a6955a9ee9a5d021a57ed44b90/chat_stream_test.go#L39
 			data := createStreamedMessages(response)
 			resp := httpmock.NewBytesResponse(200, data)

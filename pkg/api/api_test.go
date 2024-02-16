@@ -95,7 +95,7 @@ func TestSimplePrompt(t *testing.T) {
 
 	// Cache dir should be empty
 	cacheDir := testCtx.Config.GetString("cacheDir")
-	err = filepath.Walk(cacheDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(cacheDir, func(path string, _ os.FileInfo, err error) error {
 		if path == cacheDir {
 			// Skip the root dir
 			return nil

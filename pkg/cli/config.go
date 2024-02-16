@@ -69,7 +69,7 @@ func newConfigInitCmd(config *viper.Viper) *configInitCmd {
 		Long:              "Initialize configuration",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return config.SafeWriteConfig()
 		},
 	}
