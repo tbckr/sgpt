@@ -29,7 +29,7 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build -o sgpt -v ./cmd/sgpt/main.go
 
-FROM cgr.dev/chainguard/static:latest@sha256:5ef2713be4309954b594d0b575b746b44b25786ab924894b6b156e73ce48583b
+FROM cgr.dev/chainguard/static:latest@sha256:02c5e4a18e90b16c039b4bcfe593bfb0b62373d9e7e9fa53e5de3fb0044d9f77
 ENV HOME /home/nonroot
 VOLUME /home/nonroot
 COPY --from=build /go/src/github.com/tbckr/sgpt/sgpt /sgpt
