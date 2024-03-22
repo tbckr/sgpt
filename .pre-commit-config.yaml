@@ -80,11 +80,12 @@ repos:
         language: golang
         require_serial: true
         pass_filenames: false
-      - id: govulncheck
-        name: govulncheck
-        description: Check for vulnerable dependencies
-        entry: govulncheck ./...
-        types: [ go ]
-        language: golang
-        require_serial: true
-        pass_filenames: false
+        # TODO: deactivated as long as this issues is not resolved: https://github.com/golang/go/issues/65608
+#      - id: govulncheck
+#        name: govulncheck
+#        description: Check for vulnerable dependencies
+#        entry: govulncheck ./...
+#        types: [ go ]
+#        language: golang
+#        require_serial: true
+#        pass_filenames: false
