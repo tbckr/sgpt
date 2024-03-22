@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.13.0](https://github.com/tbckr/sgpt/compare/v2.12.0...v2.13.0) (2024-03-22)
+
+
+### Features
+
+* provide input via stdin and as an argument reopened ([#239](https://github.com/tbckr/sgpt/issues/239)) ([e282744](https://github.com/tbckr/sgpt/commit/e2827448ba30e7e146e53eeaa85bf52d7522db78))
+* upgrade golang to 1.22.1 ([#236](https://github.com/tbckr/sgpt/issues/236)) ([ee685b4](https://github.com/tbckr/sgpt/commit/ee685b462bfe0f0ade3f9c55228299c3b7756ffa))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.17.11 ([599efe2](https://github.com/tbckr/sgpt/commit/599efe261e74b9eafd38d6abcbbb361f30ae955b))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.18.1 ([03fcacb](https://github.com/tbckr/sgpt/commit/03fcacb549709ea37b2f7a12db6556b1e034a52c))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.18.2 ([6f8287e](https://github.com/tbckr/sgpt/commit/6f8287edd3daf79147ab1085918416c9ff2a186c))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.18.3 ([44d0c10](https://github.com/tbckr/sgpt/commit/44d0c10102b1a698ec4787a7cad55ff85fa67154))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.19.1 ([5f37484](https://github.com/tbckr/sgpt/commit/5f3748421ca67305b43d9408a9075d4e858c1d37))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.19.2 ([b5791d4](https://github.com/tbckr/sgpt/commit/b5791d460c699bb0934f79aa64437b86d94b92e3))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.19.3 ([#229](https://github.com/tbckr/sgpt/issues/229)) ([4937d36](https://github.com/tbckr/sgpt/commit/4937d363c62ed437f14ab4dc56b5d71db269ebf8))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.19.4 ([70cfcda](https://github.com/tbckr/sgpt/commit/70cfcda5a9667b0bccd903e5520a0bfa34c9a402))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.20.0 ([f281ad3](https://github.com/tbckr/sgpt/commit/f281ad3e2df1a5264f733a655db3b990f8504f26))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.20.1 ([ab11afd](https://github.com/tbckr/sgpt/commit/ab11afdcdaca6abcba9ba13623ef7b596f49be0c))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.20.2 ([a7a08b3](https://github.com/tbckr/sgpt/commit/a7a08b3887fcd6513d477fa66a21238f7c2b4481))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.20.3 ([0e0f014](https://github.com/tbckr/sgpt/commit/0e0f01408420641e9de18ba9e40085a21a0303df))
+* **deps:** update module github.com/stretchr/testify to v1.9.0 ([6ab7914](https://github.com/tbckr/sgpt/commit/6ab7914a4eb41056ce5b9306879756d3f60baba4))
+* update go version in go.mod ([351f551](https://github.com/tbckr/sgpt/commit/351f5516efdf17fdaa84816e49fd8a992eb3cf59))
+
 ## [2.12.0](https://github.com/tbckr/sgpt/compare/v2.11.2...v2.12.0) (2024-01-06)
 
 
