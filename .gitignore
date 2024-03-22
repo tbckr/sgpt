@@ -6,7 +6,7 @@ manpages/
 completions/
 .task/
 coverage.txt
-sgpt
+/sgpt
 
 ### VisualStudioCode template
 .vscode/*

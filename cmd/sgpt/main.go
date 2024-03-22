@@ -22,12 +22,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/tbckr/sgpt/v2/pkg/cli"
 )
 
 func main() {
-	args := os.Args[1:]
-	cli.Execute(args)
+	if err, exitCode := cli.Run(os.Stdin, os.Stdout, os.Stderr, os.Getenv, os.Args); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(exitCode)
+	}
 }

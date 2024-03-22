@@ -34,12 +34,11 @@ import (
 
 const (
 	defaultDirPermissions = 0755
-	appName               = "sgpt"
 )
 
-func createPath(dirs ...string) (string, error) {
-	appPath := filepath.Join(dirs...)
-	// if app dir does not exist, create it
+func GetSafePath(elem ...string) (string, error) {
+	appPath := filepath.Join(elem...)
+	// if dir does not exist, create it
 	if _, err := os.Stat(appPath); errors.Is(err, os.ErrNotExist) {
 		slog.Debug("Creating directory: " + appPath)
 		if err = os.MkdirAll(appPath, defaultDirPermissions); err != nil {
@@ -49,30 +48,42 @@ func createPath(dirs ...string) (string, error) {
 	return appPath, nil
 }
 
-func GetAppConfigPath() (string, error) {
-	configPath, err := os.UserConfigDir()
-	if err != nil {
-		return "", err
-	}
-	return createPath(configPath, appName)
-}
+//func createPath(dirs ...string) (string, error) {
+//	appPath := filepath.Join(dirs...)
+//	// if app dir does not exist, create it
+//	if _, err := os.Stat(appPath); errors.Is(err, os.ErrNotExist) {
+//		slog.Debug("Creating directory: " + appPath)
+//		if err = os.MkdirAll(appPath, defaultDirPermissions); err != nil {
+//			return "", err
+//		}
+//	}
+//	return appPath, nil
+//}
 
-func GetAppCacheDir() (string, error) {
-	// Get user specific config dir
-	cacheDir, err := os.UserCacheDir()
-	if err != nil {
-		return "", err
-	}
-	return createPath(cacheDir, appName)
-}
-
-func GetPersonasPath() (string, error) {
-	configPath, err := GetAppConfigPath()
-	if err != nil {
-		return "", err
-	}
-	return createPath(configPath, "personas")
-}
+//func GetAppConfigPath() (string, error) {
+//	configPath, err := os.UserConfigDir()
+//	if err != nil {
+//		return "", err
+//	}
+//	return createPath(configPath, appName)
+//}
+//
+//func GetAppCacheDir() (string, error) {
+//	// Get user specific config dir
+//	cacheDir, err := os.UserCacheDir()
+//	if err != nil {
+//		return "", err
+//	}
+//	return createPath(cacheDir, appName)
+//}
+//
+//func GetPersonasPath() (string, error) {
+//	configPath, err := GetAppConfigPath()
+//	if err != nil {
+//		return "", err
+//	}
+//	return createPath(configPath, "personas")
+//}
 
 func ReadString(in io.Reader) (string, error) {
 	var buf []byte
@@ -88,8 +99,8 @@ func ReadString(in io.Reader) (string, error) {
 }
 
 // GetImageFileType returns the file type of images
-func GetImageFileType(inputFile string) (string, error) {
-	file, err := os.Open(inputFile)
+func GetImageFileType(imageFilepath string) (string, error) {
+	file, err := os.Open(imageFilepath)
 	if err != nil {
 		return "", err
 	}
@@ -114,9 +125,9 @@ func GetImageFileType(inputFile string) (string, error) {
 }
 
 // LoadBase64ImageFromFile loads a base64 encoded image from a file
-func LoadBase64ImageFromFile(inputFile string) (string, error) {
+func LoadBase64ImageFromFile(imageFilepath string) (string, error) {
 	// Load image from file
-	imageBytes, err := os.ReadFile(inputFile)
+	imageBytes, err := os.ReadFile(imageFilepath)
 	if err != nil {
 		return "", err
 	}

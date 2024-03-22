@@ -28,18 +28,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tbckr/sgpt/v2/pkg/api"
-	"github.com/tbckr/sgpt/v2/pkg/fs"
-	"github.com/tbckr/sgpt/v2/pkg/shell"
-
 	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/tbckr/sgpt/v2/internal/app"
+	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/pkg/fs"
+	"github.com/tbckr/sgpt/v2/pkg/shell"
 )
 
 type rootCmd struct {
-	cmd  *cobra.Command
-	exit func(int)
+	cmd *cobra.Command
 
 	chat            string
 	execute         bool
@@ -49,64 +48,62 @@ type rootCmd struct {
 	verbose bool
 }
 
-// We have to create our own viper config, because a singleton does not work in test mode
-func createViperConfig() (*viper.Viper, error) {
+func Run(
+	stdin io.Reader,
+	stdout, stderr io.Writer,
+	getenv func(string) string,
+	args []string,
+) (error, int) {
+
+	// Create config instance
 	config := viper.New()
-	appConfigPath, err := fs.GetAppConfigPath()
+	configDir, err := os.UserConfigDir()
 	if err != nil {
-		return nil, err
+		return err, 1
 	}
-	config.AddConfigPath(appConfigPath)
+	var appConfigDir string
+	appConfigDir, err = fs.GetSafePath(configDir, app.Name)
+	if err != nil {
+		return err, 1
+	}
+	config.AddConfigPath(appConfigDir)
 	config.SetConfigName("config")
 	config.SetConfigType("yaml")
-	return config, nil
-}
 
-func Execute(args []string) {
-	viperConfig, err := createViperConfig()
+	// Run CLI
+	var root *rootCmd
+	root, err = newRootCmd(
+		stdin,
+		stdout,
+		stderr,
+		getenv,
+		os.UserConfigDir,
+		os.UserCacheDir,
+		config,
+		shell.IsPipedShell,
+		api.CreateClient,
+	)
 	if err != nil {
-		slog.Error("Failed to create viper config", "error", err)
-		os.Exit(1)
+		return err, 1
 	}
-	newRootCmd(os.Exit, viperConfig, shell.IsPipedShell, api.CreateClient).Execute(args)
+	if err = root.Execute(args); err != nil {
+		return err, 1
+	}
+	return nil, 0
 }
 
-func (r *rootCmd) Execute(args []string) {
-	defer func() {
-		if err := recover(); err != nil {
-			slog.Error("Panic occurred", "error", err)
-		}
-	}()
+func newRootCmd(
+	stdin io.Reader,
+	stdout, stderr io.Writer,
+	getenv func(string) string,
+	userconfigdir func() (string, error),
+	usercachedir func() (string, error),
+	config *viper.Viper,
+	isPipedShell func() (bool, error),
+	createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error),
+) (*rootCmd, error) {
 
-	// Set args for root command
-	r.cmd.SetArgs(args)
-
-	if err := r.cmd.Execute(); err != nil {
-		// Defaults
-		code := 1
-		msg := "command failed"
-
-		// Override defaults if possible
-		exitErr := &exitError{}
-		if errors.As(err, &exitErr) {
-			code = exitErr.code
-			if exitErr.details != "" {
-				msg = exitErr.details
-			}
-		}
-
-		// Log error with details and exit
-		slog.Debug(msg, "error", err)
-		r.exit(code)
-		return
-	}
-	r.exit(0)
-}
-
-func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *rootCmd {
-	root := &rootCmd{
-		exit: exit,
-	}
+	root := &rootCmd{}
 
 	cmd := &cobra.Command{
 		Use:   "sgpt [persona] [prompt]",
@@ -155,17 +152,28 @@ ls | sort
 		SilenceUsage:          true,
 		Args:                  cobra.RangeArgs(0, 2),
 		ValidArgsFunction:     cobra.NoFileCompletions,
-		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			if root.verbose {
 				opts := &slog.HandlerOptions{
 					Level: slog.LevelDebug,
 				}
-				handler := slog.NewTextHandler(os.Stdout, opts)
+				handler := slog.NewTextHandler(cmd.OutOrStdout(), opts)
 				slog.SetDefault(slog.New(handler))
 			}
 		},
 		PreRunE: func(_ *cobra.Command, _ []string) error {
-			return loadViperConfig(config)
+			if err := config.ReadInConfig(); err != nil {
+				var configFileNotFoundError viper.ConfigFileNotFoundError
+				if errors.As(err, &configFileNotFoundError) {
+					// Config file not found; ignore error
+					slog.Debug("Config file not found - using defaults")
+					return nil
+				}
+				// Config file was found but another error was produced
+				return err
+			}
+			slog.Debug("Config file loaded")
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			isPiped, err := isPipedShell()
@@ -244,6 +252,9 @@ ls | sort
 			return nil
 		},
 	}
+	cmd.SetIn(stdin)
+	cmd.SetOut(stdout)
+	cmd.SetErr(stderr)
 
 	// flags
 	cmd.Flags().BoolVarP(&root.execute, "execute", "e", false, "execute a response in the shell")
@@ -252,7 +263,9 @@ ls | sort
 	cmd.Flags().StringSliceVarP(&root.input, "input", "i", nil, "provide images via command line args to a file or url (experimental)")
 
 	// flags with config binding
-	createFlagsWithConfigBinding(cmd, config)
+	if err := createFlagsWithConfigBinding(cmd, config); err != nil {
+		return nil, err
+	}
 
 	// verbose persistent flag
 	cmd.PersistentFlags().BoolVarP(&root.verbose, "verbose", "v", false,
@@ -268,97 +281,46 @@ ls | sort
 	)
 
 	root.cmd = cmd
-	return root
+	return root, nil
 }
 
-func createFlagsWithConfigBinding(cmd *cobra.Command, config *viper.Viper) {
-	var bindErrors []error
+func (r *rootCmd) Execute(args []string) error {
+	r.cmd.SetArgs(args)
+	err := r.cmd.Execute()
+	return err
+}
+
+func createFlagsWithConfigBinding(cmd *cobra.Command, config *viper.Viper) error {
 	var err error
-	// text based commands
+
 	cmd.Flags().StringP("model", "m", api.DefaultModel, "model name")
 	err = config.BindPFlag("model", cmd.Flags().Lookup("model"))
 	if err != nil {
-		bindErrors = append(bindErrors, err)
+		return err
 	}
 
 	cmd.Flags().IntP("max-tokens", "s", 2048, "strict length of output (tokens)")
 	err = config.BindPFlag("maxTokens", cmd.Flags().Lookup("max-tokens"))
 	if err != nil {
-		bindErrors = append(bindErrors, err)
+		return err
 	}
 
 	cmd.Flags().Float64P("temperature", "t", 1, "randomness of generated output")
 	err = config.BindPFlag("temperature", cmd.Flags().Lookup("temperature"))
 	if err != nil {
-		bindErrors = append(bindErrors, err)
+		return err
 	}
 
 	cmd.Flags().Float64P("top-p", "p", 1, "limits highest probable tokens")
 	err = config.BindPFlag("topP", cmd.Flags().Lookup("top-p"))
 	if err != nil {
-		bindErrors = append(bindErrors, err)
+		return err
 	}
 
 	cmd.Flags().Bool("stream", false, "stream output")
 	err = config.BindPFlag("stream", cmd.Flags().Lookup("stream"))
 	if err != nil {
-		bindErrors = append(bindErrors, err)
-	}
-
-	if len(bindErrors) > 0 {
-		for _, err = range bindErrors {
-			slog.Error("Failed to bind flag to viper", "error", err)
-		}
-		panic("Failed to bind flags to viper")
-	}
-}
-
-func loadViperConfig(config *viper.Viper) error {
-	if !viper.IsSet("TESTING") {
-		slog.Debug("Loading config")
-		err := setViperDefaults(config)
-		if err != nil {
-			return err
-		}
-	}
-	if err := config.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error
-			slog.Debug("Config file not found - using defaults")
-			return nil
-		}
-		// Config file was found but another error was produced
 		return err
 	}
-	slog.Debug("Config file loaded")
-	return nil
-}
-
-func setViperDefaults(config *viper.Viper) error {
-	// cache dir
-	appCacheDir, err := fs.GetAppCacheDir()
-	if err != nil {
-		return err
-	}
-	config.SetDefault("cacheDir", appCacheDir)
-	// personas dir
-	var personasDir string
-	personasDir, err = fs.GetPersonasPath()
-	if err != nil {
-		return err
-	}
-	config.SetDefault("personas", personasDir)
-
-	// model
-	config.SetDefault("model", api.DefaultModel)
-	// max-tokens
-	config.SetDefault("maxTokens", 2048)
-	// temperature
-	config.SetDefault("temperature", 1)
-	// top-p
-	config.SetDefault("topP", 1)
-	// stream
-	config.SetDefault("stream", false)
-
 	return nil
 }

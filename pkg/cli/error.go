@@ -24,25 +24,3 @@ package cli
 import "errors"
 
 var ErrMissingInput = errors.New("no input prompt provided")
-
-type exitError struct {
-	err     error
-	code    int
-	details string
-}
-
-func wrapErrorWithCode(err error, code int, details string) *exitError {
-	return &exitError{
-		err:     err,
-		code:    code,
-		details: details,
-	}
-}
-
-func wrapError(err error, details string) *exitError {
-	return wrapErrorWithCode(err, 1, details)
-}
-
-func (e *exitError) Error() string {
-	return e.err.Error()
-}
