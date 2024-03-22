@@ -441,6 +441,57 @@ func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	wg.Wait()
 }
 
+func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	stdinPrompt := "Say: Hello World!"
+	prompt := "Replace every 'World' word with 'ChatGPT'"
+	response := "Hello ChatGPT!"
+	expected := "Hello ChatGPT!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(stdinPrompt))
+		require.NoError(t, stdinWriter.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"stdin", prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
 func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)

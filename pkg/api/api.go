@@ -108,7 +108,7 @@ func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
 // CreateCompletion creates a completion for the given prompt and modifier. If chatID is provided, the chat is reused
 // and the completion is added to the chat with this ID. If no chatID is provided, only the modifier and prompt are
 // used to create the completion. The completion is printed to the out writer of the client and returned as a string.
-func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, modifier string, input []string) (string, error) {
+func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID string, prompt []string, modifier string, input []string) (string, error) {
 	var messages []openai.ChatCompletionMessage
 	var err error
 
@@ -128,12 +128,12 @@ func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID, prompt, mod
 	messages = append(messages, loadedMessages...)
 
 	// Add prompt to messages
-	var promptMessage openai.ChatCompletionMessage
-	promptMessage, err = c.createPromptMessage(prompt, input)
+	var promptMessages []openai.ChatCompletionMessage
+	promptMessages, err = c.createPromptMessages(prompt, input)
 	if err != nil {
 		return "", err
 	}
-	messages = append(messages, promptMessage)
+	messages = append(messages, promptMessages...)
 	slog.Debug("Added prompt message")
 
 	// Create request
@@ -218,20 +218,22 @@ func (c *OpenAIClient) loadChatMessages(isChat bool, chatID, modifier string) (m
 	return
 }
 
-func (c *OpenAIClient) createPromptMessage(prompt string, input []string) (message openai.ChatCompletionMessage, err error) {
+func (c *OpenAIClient) createPromptMessages(prompts, input []string) (messages []openai.ChatCompletionMessage, err error) {
 	if len(input) > 0 {
-		slog.Warn("The GPT-4 Vision API is in beta and may not work as expected")
 		// Request to the gpt-4-vision API
+		slog.Warn("The GPT-4 Vision API is in beta and may not work as expected")
 
+		var messageParts []openai.ChatMessagePart
 		// Add prompt to message
-		messageParts := []openai.ChatMessagePart{
-			{
+		// We append the stdin as part of the prompt as a message part
+		for _, p := range prompts {
+			messageParts = append(messageParts, openai.ChatMessagePart{
 				Type: openai.ChatMessagePartTypeText,
-				Text: prompt,
-			},
+				Text: p,
+			})
 		}
 
-		// Add images to message
+		// Add images to messages
 		for _, i := range input {
 			// By default, assume that the input is a URL
 			imageData := i
@@ -241,7 +243,7 @@ func (c *OpenAIClient) createPromptMessage(prompt string, input []string) (messa
 				// Input is a file, load image data
 				imageData, err = c.buildImageFileData(i)
 				if err != nil {
-					return openai.ChatCompletionMessage{}, err
+					return []openai.ChatCompletionMessage{}, err
 				}
 			}
 
@@ -253,19 +255,23 @@ func (c *OpenAIClient) createPromptMessage(prompt string, input []string) (messa
 			})
 		}
 
-		message = openai.ChatCompletionMessage{
+		messages = append(messages, openai.ChatCompletionMessage{
 			Role:         openai.ChatMessageRoleUser,
 			MultiContent: messageParts,
-		}
+		})
 	} else {
 		// Normal prompt
-		message = openai.ChatCompletionMessage{
-			Role:    openai.ChatMessageRoleUser,
-			Content: prompt,
+		// We append the stdin as part of the prompt
+		// This means we just add the prompt as a message
+		for _, p := range prompts {
+			messages = append(messages, openai.ChatCompletionMessage{
+				Role:    openai.ChatMessageRoleUser,
+				Content: p,
+			})
 		}
 	}
-	slog.Debug("Added prompt message")
-	return message, nil
+	slog.Debug("Added prompt messages")
+	return messages, nil
 }
 
 func (c *OpenAIClient) buildImageFileData(inputFile string) (imageData string, err error) {
