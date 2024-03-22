@@ -173,25 +173,30 @@ ls | sort
 				return err
 			}
 
-			var prompt, input string
+			var prompts []string
 			mode := "txt"
 
 			if isPiped {
+				var stdinInput string
 				slog.Debug("Piped shell detected")
 				// input is provided via stdin
-				input, err = fs.ReadString(cmd.InOrStdin())
+				stdinInput, err = fs.ReadString(cmd.InOrStdin())
 				if err != nil {
 					return err
 				}
-				if len(input) == 0 {
+				if len(stdinInput) == 0 {
 					slog.Debug("No input via pipe provided")
 					return ErrMissingInput
 				}
-				prompt = input
+				prompts = append(prompts, stdinInput)
 				// mode is provided via command line args
 				if len(args) == 1 {
 					slog.Debug("Mode provided via command line args")
 					mode = args[0]
+				} else if len(args) == 2 {
+					slog.Debug("Mode and prompt provided via command line args")
+					mode = args[0]
+					prompts = append(prompts, args[1])
 				}
 
 			} else {
@@ -201,12 +206,12 @@ ls | sort
 				} else if len(args) == 1 {
 					// input is provided via command line args
 					slog.Debug("No mode provided via command line args - using default mode")
-					prompt = args[0]
+					prompts = append(prompts, args[0])
 				} else {
 					// input and mode are provided via command line args
 					slog.Debug("Mode and prompt provided via command line args")
 					mode = strings.ToLower(args[0])
-					prompt = args[1]
+					prompts = append(prompts, args[1])
 				}
 			}
 
@@ -218,7 +223,7 @@ ls | sort
 			}
 
 			var response string
-			response, err = client.CreateCompletion(cmd.Context(), root.chat, prompt, mode, root.input)
+			response, err = client.CreateCompletion(cmd.Context(), root.chat, prompts, mode, root.input)
 			if err != nil {
 				return err
 			}

@@ -38,6 +38,13 @@ $ echo -n "mass of sun" | sgpt
 The mass of the sun is approximately 1.989 x 10^30 kilograms.
 ```
 
+You can also add another prompt to the piped data by specifying the `stdin` modifier and then specifying the prompt:
+
+```shell
+$ echo "Say: Hello World!" | sgpt stdin 'Replace every "World" word with "ChatGPT"'
+Hello ChatGPT!
+```
+
 If you want to stream the completion to the command line, you can add the `--stream` flag. This will stream the output
 to the command line as it is generated.
 

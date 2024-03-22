@@ -76,6 +76,9 @@ func GetChatModifier(config *viper.Viper, modifier string) (string, error) {
 	case "txt":
 		slog.Debug("No persona provided")
 		return "", nil
+	case "stdin":
+		slog.Debug("No persona provided, just using stdin with additional prompt")
+		return "", nil
 	default:
 		slog.Debug("Unsupported persona: " + modifier)
 		return "", ErrUnsupportedModifier
