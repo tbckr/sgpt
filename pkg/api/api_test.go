@@ -70,7 +70,7 @@ func TestSimplePrompt(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "Say: Hello World!"
+	prompt := []string{"Say: Hello World!"}
 	expected := "Hello World!"
 
 	httpmock.ActivateNonDefault(client.HTTPClient)
@@ -119,7 +119,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "Say: Hello World!"
+	prompt := []string{"Say: Hello World!"}
 	expected := "Hello World!"
 
 	httpmock.ActivateNonDefault(client.HTTPClient)
@@ -157,7 +157,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "Say: Hello World!"
+	prompt := []string{"Say: Hello World!"}
 	expected := "Hello World!"
 
 	httpmock.ActivateNonDefault(client.HTTPClient)
@@ -193,7 +193,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 
 	// Check if the prompt was added
 	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
-	require.Equal(t, prompt, messages[0].Content)
+	require.Equal(t, prompt[0], messages[0].Content)
 
 	// Check if the response was added
 	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
@@ -212,7 +212,7 @@ func TestPromptLoadChat(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "Repeat last message"
+	prompt := []string{"Repeat last message"}
 	expected := "World!"
 
 	httpmock.ActivateNonDefault(client.HTTPClient)
@@ -258,7 +258,7 @@ func TestPromptLoadChat(t *testing.T) {
 
 	// Check if the prompt was added
 	require.Equal(t, openai.ChatMessageRoleUser, messages[2].Role)
-	require.Equal(t, prompt, messages[2].Content)
+	require.Equal(t, prompt[0], messages[2].Content)
 
 	// Check if the response was added
 	require.Equal(t, openai.ChatMessageRoleAssistant, messages[3].Role)
@@ -277,7 +277,7 @@ func TestPromptWithModifier(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "Print Hello World"
+	prompt := []string{"Print Hello World!"}
 	response := `echo \"Hello World\"`
 	expected := `echo "Hello World"`
 
@@ -325,7 +325,7 @@ func TestPromptWithModifier(t *testing.T) {
 
 	// Check if the prompt was added
 	require.Equal(t, openai.ChatMessageRoleUser, messages[1].Role)
-	require.Equal(t, prompt, messages[1].Content)
+	require.Equal(t, prompt[0], messages[1].Content)
 
 	// Check if the response was added
 	require.Equal(t, openai.ChatMessageRoleAssistant, messages[2].Role)
@@ -344,7 +344,7 @@ func TestSimplePromptWithLocalImage(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "what can you see on the picture?"
+	prompt := []string{"what can you see on the picture?"}
 	expected := "The image shows a character that appears to be a stylized robot. It has"
 	inputImage := "testdata/marvin.jpg"
 
@@ -381,7 +381,7 @@ func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "what can you see on the picture?"
+	prompt := []string{"what can you see on the picture?"}
 	expected := "The image shows a character that appears to be a stylized robot. It has"
 	inputImage := "testdata/marvin.jpg"
 
@@ -423,7 +423,7 @@ func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
 	require.Len(t, messages[0].MultiContent, 2)
 	// Check, if the prompt is a multi content message
 	require.Equal(t, "text", string(messages[0].MultiContent[0].Type))
-	require.Equal(t, prompt, messages[0].MultiContent[0].Text)
+	require.Equal(t, prompt[0], messages[0].MultiContent[0].Text)
 	// Check, if the image was added
 	require.Equal(t, "image_url", string(messages[0].MultiContent[1].Type))
 	require.NotEmpty(t, messages[0].MultiContent[1].ImageURL.URL)
@@ -446,7 +446,7 @@ func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "what can you see on the picture?"
+	prompt := []string{"what can you see on the picture?"}
 	expected := "The image shows a character that appears to be a stylized robot. It has"
 	inputImage := "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg"
 
@@ -488,7 +488,7 @@ func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 	require.Len(t, messages[0].MultiContent, 2)
 	// Check, if the prompt is a multi content message
 	require.Equal(t, "text", string(messages[0].MultiContent[0].Type))
-	require.Equal(t, prompt, messages[0].MultiContent[0].Text)
+	require.Equal(t, prompt[0], messages[0].MultiContent[0].Text)
 	// Check, if the image was added
 	require.Equal(t, "image_url", string(messages[0].MultiContent[1].Type))
 	require.Equal(t, inputImage, messages[0].MultiContent[1].ImageURL.URL)
@@ -510,7 +510,7 @@ func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
-	prompt := "what is the difference between those two pictures?"
+	prompt := []string{"what is the difference between those two pictures?"}
 	expected := "The two images provided appear to be identical. Both show the same depiction of a"
 	inputImageFile := "testdata/marvin.jpg"
 	inputImageURL := "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg"
@@ -554,7 +554,7 @@ func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 
 	// Check, if the prompt is a multi content message
 	require.Equal(t, "text", string(messages[0].MultiContent[0].Type))
-	require.Equal(t, prompt, messages[0].MultiContent[0].Text)
+	require.Equal(t, prompt[0], messages[0].MultiContent[0].Text)
 	// Check, if the URL image was added
 	require.Equal(t, "image_url", string(messages[0].MultiContent[1].Type))
 	require.Equal(t, inputImageURL, messages[0].MultiContent[1].ImageURL.URL)
