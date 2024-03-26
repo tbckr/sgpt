@@ -19,7 +19,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package config
 
 import (
 	"fmt"
@@ -29,20 +29,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-type configCmd struct {
-	cmd *cobra.Command
+type RootCmd struct {
+	Command *cobra.Command
 }
 
-type configInitCmd struct {
-	cmd *cobra.Command
+type InitCmd struct {
+	Command *cobra.Command
 }
 
-type configShowCmd struct {
-	cmd *cobra.Command
+type ShowCmd struct {
+	Command *cobra.Command
 }
 
-func newConfigCmd(config *viper.Viper) *configCmd {
-	configStruct := &configCmd{}
+func NewConfigCmd(config *viper.Viper) *RootCmd {
+	configStruct := &RootCmd{}
 	cmd := &cobra.Command{
 		Use:               "config",
 		Short:             "Manage configuration",
@@ -54,15 +54,15 @@ func newConfigCmd(config *viper.Viper) *configCmd {
 		},
 	}
 	cmd.AddCommand(
-		newConfigInitCmd(config).cmd,
-		newConfigShowCmd(config).cmd,
+		NewConfigInitCmd(config).Command,
+		NewConfigShowCmd(config).Command,
 	)
-	configStruct.cmd = cmd
+	configStruct.Command = cmd
 	return configStruct
 }
 
-func newConfigInitCmd(config *viper.Viper) *configInitCmd {
-	configInit := &configInitCmd{}
+func NewConfigInitCmd(config *viper.Viper) *InitCmd {
+	configInit := &InitCmd{}
 	cmd := &cobra.Command{
 		Use:               "init",
 		Short:             "Initialize configuration",
@@ -73,12 +73,12 @@ func newConfigInitCmd(config *viper.Viper) *configInitCmd {
 			return config.SafeWriteConfig()
 		},
 	}
-	configInit.cmd = cmd
+	configInit.Command = cmd
 	return configInit
 }
 
-func newConfigShowCmd(config *viper.Viper) *configShowCmd {
-	configShow := &configShowCmd{}
+func NewConfigShowCmd(config *viper.Viper) *ShowCmd {
+	configShow := &ShowCmd{}
 	cmd := &cobra.Command{
 		Use:               "show",
 		Short:             "Show configuration",
@@ -86,7 +86,8 @@ func newConfigShowCmd(config *viper.Viper) *configShowCmd {
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		PreRunE: func(_ *cobra.Command, _ []string) error {
-			return loadViperConfig(config)
+			//return loadViperConfig(config)
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			configFilepath := config.ConfigFileUsed()
@@ -98,6 +99,6 @@ func newConfigShowCmd(config *viper.Viper) *configShowCmd {
 			return err
 		},
 	}
-	configShow.cmd = cmd
+	configShow.Command = cmd
 	return configShow
 }

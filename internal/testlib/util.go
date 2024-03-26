@@ -19,45 +19,39 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package testlib
 
 import (
-	"bytes"
+	"github.com/tbckr/sgpt/v2/pkg/api/openai"
 	"io"
-	"strings"
-	"sync"
+	"os"
 	"testing"
 
-	"github.com/tbckr/sgpt/v2/internal/testlib"
-
-	"github.com/stretchr/testify/require"
+	"github.com/spf13/viper"
 )
 
-func TestLicensesCmd(t *testing.T) {
-	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
-	expected := `To see the open source packages included in SGPT and
-their respective license information, visit:
-`
-	var wg sync.WaitGroup
-	reader, writer := io.Pipe()
+var useMockClient = func(mockClient *openai.OpenAIClient) func(*viper.Viper, io.Writer) (*openai.OpenAIClient, error) {
+	return func(_ *viper.Viper, _ io.Writer) (*openai.OpenAIClient, error) {
+		return mockClient, nil
+	}
+}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
-	root.cmd.SetOut(writer)
+type exitMemento struct {
+	code int
+}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var buf bytes.Buffer
-		_, err := io.Copy(&buf, reader)
-		require.NoError(t, err)
-		require.NoError(t, reader.Close())
-		require.True(t, strings.HasPrefix(buf.String(), expected))
-	}()
+func (e *exitMemento) Exit(i int) {
+	e.code = i
+}
 
-	root.Execute([]string{"licenses"})
-	require.Equal(t, 0, mem.code)
-	require.NoError(t, writer.Close())
+func mockIsPipedShell(isPiped bool, err error) func() (bool, error) {
+	return func() (bool, error) {
+		return isPiped, err
+	}
+}
 
-	wg.Wait()
+func skipInCI(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test on CI")
+	}
 }

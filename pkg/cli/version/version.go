@@ -19,8 +19,38 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package version
 
-import "errors"
+import (
+	"fmt"
 
-var ErrMissingInput = errors.New("no input prompt provided")
+	"github.com/spf13/cobra"
+	"github.com/tbckr/sgpt/v2/internal/buildinfo"
+)
+
+type RootCmd struct {
+	Command *cobra.Command
+	full    bool
+}
+
+func NewVersionCmd() *RootCmd {
+	versionCmd := &RootCmd{}
+	cmd := &cobra.Command{
+		Use:               "version",
+		Short:             "Get the programs version",
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			var err error
+			if versionCmd.full {
+				_, err = fmt.Fprintf(cmd.OutOrStdout(), "version: %s\ncommit: %s\ncommitDate: %s\n", buildinfo.Version(), buildinfo.Commit(), buildinfo.CommitDate())
+			} else {
+				_, err = fmt.Fprintf(cmd.OutOrStdout(), "%s\n", buildinfo.Version())
+			}
+			return err
+		},
+	}
+	cmd.Flags().BoolVarP(&versionCmd.full, "full", "f", false, "Print full version information")
+	versionCmd.Command = cmd
+	return versionCmd
+}

@@ -19,7 +19,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package api
+package openai
 
 import (
 	"bytes"

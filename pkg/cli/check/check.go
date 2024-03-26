@@ -19,48 +19,47 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package check
 
 import (
-	"fmt"
-	"runtime"
+	"io"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/tbckr/sgpt/v2/pkg/api"
 )
 
-type licensesCmd struct {
-	cmd *cobra.Command
+type RootCmd struct {
+	Command *cobra.Command
 }
 
-func newLicensesCmd() *licensesCmd {
-	licenses := &licensesCmd{}
+func NewCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (api.LLMAPI, error)) *RootCmd {
+	check := &RootCmd{}
 	cmd := &cobra.Command{
-		Use:   "licenses",
-		Short: "List the open source licenses used in this software",
+		Use:   "check",
+		Short: "Verify the API key was set correctly",
 		Long: strings.TrimSpace(`
-List the open source licenses used in this software.
+This command will return an error if the API key is not set or invalid.
 `),
-		DisableFlagsInUseLine: true,
-		Args:                  cobra.NoArgs,
-		ValidArgsFunction:     cobra.NoFileCompletions,
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			url := licensesURL()
-			_, err := fmt.Fprintln(cmd.OutOrStdout(), `To see the open source packages included in SGPT and
-their respective license information, visit:
-
-`+url)
-			return err
+			//err := loadViperConfig(config)
+			//if err != nil {
+			//	return err
+			//}
+			//_, err = createClientFn(config, cmd.OutOrStdout())
+			//if err != nil {
+			//	return err
+			//}
+			//_, err = fmt.Fprintln(cmd.OutOrStdout(), "configuration is valid")
+			//if err != nil {
+			//	return err
+			//}
+			return nil
 		},
 	}
-	licenses.cmd = cmd
-	return licenses
-}
-
-// licensesURL returns the absolute URL containing open source license information for the current platform.
-func licensesURL() string {
-	switch runtime.GOOS {
-	default:
-		return "https://github.com/tbckr/sgpt/blob/main/licenses/oss-licenses.md"
-	}
+	check.Command = cmd
+	return check
 }

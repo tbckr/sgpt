@@ -19,12 +19,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package root
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
+	openai2 "github.com/tbckr/sgpt/v2/pkg/api/openai"
+	"github.com/tbckr/sgpt/v2/pkg/cli"
 	"io"
 	"os"
 	"path/filepath"
@@ -40,18 +42,17 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 	"github.com/tbckr/sgpt/v2/internal/testlib"
-	"github.com/tbckr/sgpt/v2/pkg/api"
 )
 
 func TestRootCmd_SimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -62,7 +63,7 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -85,12 +86,12 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -101,7 +102,7 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -122,16 +123,16 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 }
 
 func TestRootCmd_SimpleClipboard(t *testing.T) {
-	skipInCI(t)
+	cli.skipInCI(t)
 
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -142,7 +143,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -169,12 +170,12 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -192,7 +193,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	_, err = configFile.WriteString(fmt.Sprintf("model: \"%s\"\n", openai.GPT4))
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 
 	wg.Add(1)
 	go func() {
@@ -216,12 +217,12 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	client, err := api.CreateClient(testCtx.Config, nil)
+	client, err := openai2.CreateClient(testCtx.Config, nil)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 
 	root.Execute([]string{})
 	require.Equal(t, 1, mem.code)
@@ -230,12 +231,12 @@ func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -246,7 +247,7 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -269,13 +270,13 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	client, err := openai2.CreateClient(testCtx.Config, stdoutWriter)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -286,7 +287,7 @@ func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(true, nil), cli.useMockClient(client))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -319,16 +320,16 @@ func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	client, err := openai2.CreateClient(testCtx.Config, stdoutWriter)
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(true, nil), cli.useMockClient(client))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -361,17 +362,17 @@ func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, errors.New("test error")), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(true, errors.New("test error")), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -394,13 +395,13 @@ func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
 func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	client, err := openai2.CreateClient(testCtx.Config, stdoutWriter)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -411,7 +412,7 @@ func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(true, nil), cli.useMockClient(client))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -444,13 +445,13 @@ func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	client, err := openai2.CreateClient(testCtx.Config, stdoutWriter)
 	require.NoError(t, err)
 
 	stdinPrompt := "Say: Hello World!"
@@ -462,7 +463,7 @@ func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(true, nil), cli.useMockClient(client))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -495,12 +496,12 @@ func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
 func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := `echo "Hello World"`
@@ -517,7 +518,7 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 		require.NoError(t, os.Unsetenv("SHELL"))
 	})
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -540,13 +541,13 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	client, err := openai2.CreateClient(testCtx.Config, stdoutWriter)
 	require.NoError(t, err)
 
 	prompt := "Print: Hello World"
@@ -563,7 +564,7 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 		_ = os.Unsetenv("SHELL")
 	})
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetIn(stdinReader)
 	root.cmd.SetOut(stdoutWriter)
 
@@ -598,12 +599,12 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Say: Hello World!"
@@ -614,7 +615,7 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -655,12 +656,12 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	persona := "This is my custom persona"
@@ -685,7 +686,7 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, fileHandler.Close())
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)
@@ -731,12 +732,12 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 func TestRootCmd_ChatConversation(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
+	client, err := openai2.CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
 
 	prompt := "Repeat last message"
@@ -763,7 +764,7 @@ func TestRootCmd_ChatConversation(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root := NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), cli.useMockClient(client))
 	root.cmd.SetOut(writer)
 
 	wg.Add(1)

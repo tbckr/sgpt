@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Tim <tbckr>
+// Copyright (c) 2024 Tim <tbckr>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -21,31 +21,6 @@
 
 package cli
 
-import (
-	"testing"
+import "errors"
 
-	"github.com/tbckr/sgpt/v2/pkg/api"
-
-	"github.com/tbckr/sgpt/v2/internal/testlib"
-
-	"github.com/stretchr/testify/require"
-)
-
-func TestCheckCmd(t *testing.T) {
-	testCtx := testlib.NewTestCtx(t)
-	testlib.SetAPIKey(t)
-	mem := &exitMemento{}
-
-	testlib.SetAPIKey(t)
-
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
-	require.Equal(t, 0, mem.code)
-}
-
-func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
-	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
-
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
-	require.Equal(t, 1, mem.code)
-}
+var ErrMissingInput = errors.New("no input prompt provided")

@@ -19,9 +19,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package completion
 
 import (
+	"github.com/tbckr/sgpt/v2/pkg/cli"
+	"github.com/tbckr/sgpt/v2/pkg/cli/root"
 	"io"
 	"testing"
 
@@ -32,9 +34,9 @@ import (
 
 func TestCompletionCmd(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion"})
 
@@ -43,9 +45,9 @@ func TestCompletionCmd(t *testing.T) {
 
 func TestCompletionCmdBash(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "bash"})
 
@@ -54,9 +56,9 @@ func TestCompletionCmdBash(t *testing.T) {
 
 func TestCompletionCmdFish(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "fish"})
 
@@ -65,9 +67,9 @@ func TestCompletionCmdFish(t *testing.T) {
 
 func TestCompletionCmdPowershell(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "powershell"})
 
@@ -76,9 +78,9 @@ func TestCompletionCmdPowershell(t *testing.T) {
 
 func TestCompletionCmdZsh(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "zsh"})
 
@@ -87,9 +89,9 @@ func TestCompletionCmdZsh(t *testing.T) {
 
 func TestCompletionCmdUnknownCompletion(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "abcd"})
 
@@ -98,9 +100,9 @@ func TestCompletionCmdUnknownCompletion(t *testing.T) {
 
 func TestCompletionCmdTooManyArgs(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	root.cmd.SetOut(io.Discard)
 	root.Execute([]string{"completion", "abcd", "efgh"})
 

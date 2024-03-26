@@ -19,49 +19,34 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package check
 
 import (
-	"fmt"
-	"io"
-	"strings"
+	"github.com/tbckr/sgpt/v2/pkg/api/openai"
+	"github.com/tbckr/sgpt/v2/pkg/cli"
+	"github.com/tbckr/sgpt/v2/pkg/cli/root"
+	"testing"
 
-	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/internal/testlib"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
 )
 
-type checkCmd struct {
-	cmd *cobra.Command
+func TestCheckCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &cli.exitMemento{}
+
+	testlib.SetAPIKey(t)
+
+	root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), openai.CreateClient).Execute([]string{"check"})
+	require.Equal(t, 0, mem.code)
 }
 
-func newCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *checkCmd {
-	check := &checkCmd{}
-	cmd := &cobra.Command{
-		Use:   "check",
-		Short: "Verify the API key was set correctly",
-		Long: strings.TrimSpace(`
-This command will return an error if the API key is not set or invalid.
-`),
-		Args:              cobra.NoArgs,
-		ValidArgsFunction: cobra.NoFileCompletions,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			err := loadViperConfig(config)
-			if err != nil {
-				return err
-			}
-			_, err = createClientFn(config, cmd.OutOrStdout())
-			if err != nil {
-				return err
-			}
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), "configuration is valid")
-			if err != nil {
-				return err
-			}
-			return nil
-		},
-	}
-	check.cmd = cmd
-	return check
+func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	mem := &cli.exitMemento{}
+
+	root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), openai.CreateClient).Execute([]string{"check"})
+	require.Equal(t, 1, mem.code)
 }

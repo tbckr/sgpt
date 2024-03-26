@@ -19,7 +19,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package root
 
 import (
 	"errors"
@@ -33,11 +33,19 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tbckr/sgpt/v2/internal/app"
 	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/pkg/api/openai"
+	"github.com/tbckr/sgpt/v2/pkg/cli"
+	"github.com/tbckr/sgpt/v2/pkg/cli/chat"
+	"github.com/tbckr/sgpt/v2/pkg/cli/check"
+	configCli "github.com/tbckr/sgpt/v2/pkg/cli/config"
+	"github.com/tbckr/sgpt/v2/pkg/cli/licenses"
+	"github.com/tbckr/sgpt/v2/pkg/cli/man"
+	"github.com/tbckr/sgpt/v2/pkg/cli/version"
 	"github.com/tbckr/sgpt/v2/pkg/fs"
 	"github.com/tbckr/sgpt/v2/pkg/shell"
 )
 
-type rootCmd struct {
+type RootCmd struct {
 	cmd *cobra.Command
 
 	chat            string
@@ -51,59 +59,67 @@ type rootCmd struct {
 func Run(
 	stdin io.Reader,
 	stdout, stderr io.Writer,
-	getenv func(string) string,
+	lookupenv func(string) (string, bool),
 	args []string,
-) (error, int) {
+) (int, error) {
 
 	// Create config instance
 	config := viper.New()
 	configDir, err := os.UserConfigDir()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	var appConfigDir string
 	appConfigDir, err = fs.GetSafePath(configDir, app.Name)
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	config.AddConfigPath(appConfigDir)
 	config.SetConfigName("config")
 	config.SetConfigType("yaml")
 
+	// Create client function
+	createClient := func(config *viper.Viper, out io.Writer) (api.LLMAPI, error) {
+		switch config.GetString("model") {
+		default:
+			return openai.CreateClient(lookupenv, config, out)
+		}
+	}
+
 	// Run CLI
-	var root *rootCmd
-	root, err = newRootCmd(
+	var root *RootCmd
+	root, err = NewRootCmd(
 		stdin,
 		stdout,
 		stderr,
-		getenv,
+		lookupenv,
 		os.UserConfigDir,
 		os.UserCacheDir,
 		config,
 		shell.IsPipedShell,
-		api.CreateClient,
+		createClient,
 	)
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	if err = root.Execute(args); err != nil {
-		return err, 1
+		return 1, err
 	}
-	return nil, 0
+	return 0, nil
 }
 
-func newRootCmd(
+func NewRootCmd(
 	stdin io.Reader,
 	stdout, stderr io.Writer,
-	getenv func(string) string,
+	lookupenv func(string) (string, bool),
 	userconfigdir func() (string, error),
 	usercachedir func() (string, error),
 	config *viper.Viper,
 	isPipedShell func() (bool, error),
-	createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error),
-) (*rootCmd, error) {
+	createClient func(*viper.Viper, io.Writer) (api.LLMAPI, error),
+) (*RootCmd, error) {
 
-	root := &rootCmd{}
+	root := &RootCmd{}
 
 	cmd := &cobra.Command{
 		Use:   "sgpt [persona] [prompt]",
@@ -194,13 +210,13 @@ ls | sort
 				}
 				if len(stdinInput) == 0 {
 					slog.Debug("No input via pipe provided")
-					return ErrMissingInput
+					return cli.ErrMissingInput
 				}
 				prompts = append(prompts, stdinInput)
 				// mode is provided via command line args
 				if len(args) == 1 {
 					slog.Debug("Mode provided via command line args")
-					mode = args[0]
+					prompts = append(prompts, args[0])
 				} else if len(args) == 2 {
 					slog.Debug("Mode and prompt provided via command line args")
 					mode = args[0]
@@ -210,7 +226,7 @@ ls | sort
 			} else {
 				// input is provided via command line args
 				if len(args) == 0 {
-					return ErrMissingInput
+					return cli.ErrMissingInput
 				} else if len(args) == 1 {
 					// input is provided via command line args
 					slog.Debug("No mode provided via command line args - using default mode")
@@ -224,8 +240,8 @@ ls | sort
 			}
 
 			// Create client
-			var client *api.OpenAIClient
-			client, err = createClientFn(config, cmd.OutOrStdout())
+			var client api.LLMAPI
+			client, err = createClient(config, cmd.OutOrStdout())
 			if err != nil {
 				return err
 			}
@@ -272,19 +288,19 @@ ls | sort
 		"enable more verbose output for debugging")
 
 	cmd.AddCommand(
-		newChatCmd(config).cmd,
-		newCheckCmd(config, createClientFn).cmd,
-		newVersionCmd().cmd,
-		newLicensesCmd().cmd,
-		newManCmd().cmd,
-		newConfigCmd(config).cmd,
+		chat.NewChatCmd(config).Command,
+		check.NewCheckCmd(config, createClient).Command,
+		version.NewVersionCmd().Command,
+		licenses.NewLicensesCmd().Command,
+		man.NewManCmd().Command,
+		configCli.NewConfigCmd(config).Command,
 	)
 
 	root.cmd = cmd
 	return root, nil
 }
 
-func (r *rootCmd) Execute(args []string) error {
+func (r *RootCmd) Execute(args []string) error {
 	r.cmd.SetArgs(args)
 	err := r.cmd.Execute()
 	return err
@@ -293,7 +309,7 @@ func (r *rootCmd) Execute(args []string) error {
 func createFlagsWithConfigBinding(cmd *cobra.Command, config *viper.Viper) error {
 	var err error
 
-	cmd.Flags().StringP("model", "m", api.DefaultModel, "model name")
+	cmd.Flags().StringP("model", "m", app.DefaultModel, "model name")
 	err = config.BindPFlag("model", cmd.Flags().Lookup("model"))
 	if err != nil {
 		return err

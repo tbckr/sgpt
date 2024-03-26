@@ -19,34 +19,48 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package licenses
 
 import (
-	"io"
-	"testing"
+	"fmt"
+	"runtime"
+	"strings"
 
-	"github.com/tbckr/sgpt/v2/internal/testlib"
-
-	"github.com/stretchr/testify/require"
+	"github.com/spf13/cobra"
 )
 
-func TestManCmd(t *testing.T) {
-	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
-
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
-	root.cmd.SetOut(io.Discard)
-	root.Execute([]string{"man"})
-
-	require.Equal(t, 0, mem.code)
+type RootCmd struct {
+	Command *cobra.Command
 }
-func TestManCmdUnknowArgs(t *testing.T) {
-	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
-	root.cmd.SetOut(io.Discard)
-	root.Execute([]string{"man", "abcd"})
+func NewLicensesCmd() *RootCmd {
+	licenses := &RootCmd{}
+	cmd := &cobra.Command{
+		Use:   "licenses",
+		Short: "List the open source licenses used in this software",
+		Long: strings.TrimSpace(`
+List the open source licenses used in this software.
+`),
+		DisableFlagsInUseLine: true,
+		Args:                  cobra.NoArgs,
+		ValidArgsFunction:     cobra.NoFileCompletions,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			url := licensesURL()
+			_, err := fmt.Fprintln(cmd.OutOrStdout(), `To see the open source packages included in SGPT and
+their respective license information, visit:
 
-	require.Equal(t, 1, mem.code)
+`+url)
+			return err
+		},
+	}
+	licenses.Command = cmd
+	return licenses
+}
+
+// licensesURL returns the absolute URL containing open source license information for the current platform.
+func licensesURL() string {
+	switch runtime.GOOS {
+	default:
+		return "https://github.com/tbckr/sgpt/blob/main/licenses/oss-licenses.md"
+	}
 }

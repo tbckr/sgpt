@@ -19,7 +19,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package man
 
 import (
 	"fmt"
@@ -29,12 +29,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type manCmd struct {
-	cmd *cobra.Command
+type RootCmd struct {
+	Command *cobra.Command
 }
 
-func newManCmd() *manCmd {
-	man := &manCmd{}
+func NewManCmd() *RootCmd {
+	man := &RootCmd{}
 	cmd := &cobra.Command{
 		Use:                   "man",
 		Short:                 "Generate SGPT's command line reference manual",
@@ -44,7 +44,7 @@ func newManCmd() *manCmd {
 		Args:                  cobra.NoArgs,
 		ValidArgsFunction:     cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			manPage, err := mcoral.NewManPage(1, man.cmd.Root())
+			manPage, err := mcoral.NewManPage(1, man.Command.Root())
 			if err != nil {
 				return err
 			}
@@ -54,6 +54,6 @@ func newManCmd() *manCmd {
 			return err
 		},
 	}
-	man.cmd = cmd
+	man.Command = cmd
 	return man
 }

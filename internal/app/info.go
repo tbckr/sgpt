@@ -21,4 +21,7 @@
 
 package app
 
-const Name = "sgpt"
+const (
+	Name         = "sgpt"
+	DefaultModel = "gpt-3.5-turbo"
+)

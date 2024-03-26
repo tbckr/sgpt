@@ -19,7 +19,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package chat
 
 import (
 	"errors"
@@ -27,11 +27,10 @@ import (
 	"io"
 	"strings"
 
-	chat2 "github.com/tbckr/sgpt/v2/pkg/chat"
-
 	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	chat2 "github.com/tbckr/sgpt/v2/pkg/chat"
 )
 
 const (
@@ -44,25 +43,25 @@ var (
 	ErrChatSessionNotExist = errors.New("given chat does not exist")
 )
 
-type chatCmd struct {
-	cmd *cobra.Command
+type RootCmd struct {
+	Command *cobra.Command
 }
 
-type chatLsCmd struct {
-	cmd *cobra.Command
+type LsCmd struct {
+	Command *cobra.Command
 }
 
-type chatShowCmd struct {
-	cmd *cobra.Command
+type ShowCmd struct {
+	Command *cobra.Command
 }
 
-type chatRmCmd struct {
-	cmd       *cobra.Command
+type RmCmd struct {
+	Command   *cobra.Command
 	deleteAll bool
 }
 
-func newChatCmd(config *viper.Viper) *chatCmd {
-	chatStruct := &chatCmd{}
+func NewChatCmd(config *viper.Viper) *RootCmd {
+	chatStruct := &RootCmd{}
 	cmd := &cobra.Command{
 		Use:   "chat",
 		Short: "Manage chat sessions",
@@ -77,16 +76,16 @@ Manage all open chat sessions - list, show, and delete chat sessions.
 		},
 	}
 	cmd.AddCommand(
-		newLsCmd(config).cmd,
-		newShowCmd(config).cmd,
-		newRmCmd(config).cmd,
+		NewLsCmd(config).Command,
+		NewShowCmd(config).Command,
+		NewRmCmd(config).Command,
 	)
-	chatStruct.cmd = cmd
+	chatStruct.Command = cmd
 	return chatStruct
 }
 
-func newLsCmd(config *viper.Viper) *chatLsCmd {
-	ls := &chatLsCmd{}
+func NewLsCmd(config *viper.Viper) *LsCmd {
+	ls := &LsCmd{}
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "List all chat sessions",
@@ -113,12 +112,12 @@ List all chat sessions.
 			return err
 		},
 	}
-	ls.cmd = cmd
+	ls.Command = cmd
 	return ls
 }
 
-func newShowCmd(config *viper.Viper) *chatShowCmd {
-	show := &chatShowCmd{}
+func NewShowCmd(config *viper.Viper) *ShowCmd {
+	show := &ShowCmd{}
 	cmd := &cobra.Command{
 		Use:     "show <session name>",
 		Aliases: []string{"cat"},
@@ -151,12 +150,12 @@ Show the conversation for the given chat session.
 			return showConversation(cmd.OutOrStdout(), messages)
 		},
 	}
-	show.cmd = cmd
+	show.Command = cmd
 	return show
 }
 
-func newRmCmd(config *viper.Viper) *chatRmCmd {
-	rm := &chatRmCmd{}
+func NewRmCmd(config *viper.Viper) *RmCmd {
+	rm := &RmCmd{}
 	cmd := &cobra.Command{
 		Use:   "rm [session name]",
 		Short: "Remove the specified chat session",
@@ -190,7 +189,7 @@ Remove the specified chat session. The --all flag removes all chat sessions.
 		},
 	}
 	cmd.Flags().BoolVarP(&rm.deleteAll, "all", "a", false, "remove all chat sessions")
-	rm.cmd = cmd
+	rm.Command = cmd
 	return rm
 }
 

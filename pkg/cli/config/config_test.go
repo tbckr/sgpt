@@ -19,9 +19,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package config
 
 import (
+	"github.com/tbckr/sgpt/v2/pkg/cli"
+	"github.com/tbckr/sgpt/v2/pkg/cli/root"
 	"path/filepath"
 	"testing"
 
@@ -32,9 +34,9 @@ import (
 
 func TestConfigCmd(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"config"})
 	require.Equal(t, 0, mem.code)
@@ -42,9 +44,9 @@ func TestConfigCmd(t *testing.T) {
 
 func TestConfigCmdInit(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	newRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
+	root.NewRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(testCtx.ConfigDir, "config.yaml"))
@@ -59,36 +61,36 @@ func TestConfigCmdInit(t *testing.T) {
 
 func TestConfigCmdInitAlreadyExists(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	newRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
+	root.NewRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(testCtx.ConfigDir, "config.yaml"))
 
-	newRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
+	root.NewRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
 	require.Equal(t, 1, mem.code)
 }
 
 func TestConfigCmdShowConfig(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	newRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
+	root.NewRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "init"})
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(testCtx.ConfigDir, "config.yaml"))
 
-	newRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "show"})
+	root.NewRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "show"})
 	require.Equal(t, 0, mem.code)
 }
 
 func TestConfigCmdShowConfigNonExistent(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
 	require.NoFileExists(t, filepath.Join(testCtx.ConfigDir, "config.yaml"))
 
-	newRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "show"})
+	root.NewRootCmd(mem.Exit, testCtx.Config, nil, nil).Execute([]string{"config", "show"})
 	require.Equal(t, 1, mem.code)
 }

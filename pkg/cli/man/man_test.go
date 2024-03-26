@@ -19,38 +19,36 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package man
 
 import (
-	"fmt"
+	"github.com/tbckr/sgpt/v2/pkg/cli"
+	"github.com/tbckr/sgpt/v2/pkg/cli/root"
+	"io"
+	"testing"
 
-	"github.com/spf13/cobra"
-	"github.com/tbckr/sgpt/v2/internal/buildinfo"
+	"github.com/tbckr/sgpt/v2/internal/testlib"
+
+	"github.com/stretchr/testify/require"
 )
 
-type versionCmd struct {
-	cmd  *cobra.Command
-	full bool
-}
+func TestManCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	mem := &cli.exitMemento{}
 
-func newVersionCmd() *versionCmd {
-	version := &versionCmd{}
-	cmd := &cobra.Command{
-		Use:               "version",
-		Short:             "Get the programs version",
-		Args:              cobra.NoArgs,
-		ValidArgsFunction: cobra.NoFileCompletions,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			var err error
-			if version.full {
-				_, err = fmt.Fprintf(cmd.OutOrStdout(), "version: %s\ncommit: %s\ncommitDate: %s\n", buildinfo.Version(), buildinfo.Commit(), buildinfo.CommitDate())
-			} else {
-				_, err = fmt.Fprintf(cmd.OutOrStdout(), "%s\n", buildinfo.Version())
-			}
-			return err
-		},
-	}
-	cmd.Flags().BoolVarP(&version.full, "full", "f", false, "Print full version information")
-	version.cmd = cmd
-	return version
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
+	root.cmd.SetOut(io.Discard)
+	root.Execute([]string{"man"})
+
+	require.Equal(t, 0, mem.code)
+}
+func TestManCmdUnknowArgs(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	mem := &cli.exitMemento{}
+
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
+	root.cmd.SetOut(io.Discard)
+	root.Execute([]string{"man", "abcd"})
+
+	require.Equal(t, 1, mem.code)
 }

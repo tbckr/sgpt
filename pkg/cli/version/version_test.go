@@ -19,10 +19,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package version
 
 import (
 	"bytes"
+	"github.com/tbckr/sgpt/v2/pkg/cli"
+	root2 "github.com/tbckr/sgpt/v2/pkg/cli/root"
 	"io"
 	"strings"
 	"testing"
@@ -34,9 +36,9 @@ import (
 
 func TestVersionCmd(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root2.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	cmd := root.cmd
 
 	outBytes := bytes.NewBufferString("")
@@ -56,9 +58,9 @@ func TestVersionCmd(t *testing.T) {
 
 func TestVersionCmdFull(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil)
+	root := root2.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
 	cmd := root.cmd
 
 	outBytes := bytes.NewBufferString("")
@@ -78,8 +80,8 @@ func TestVersionCmdFull(t *testing.T) {
 
 func TestVersionCmdUnknowArg(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
-	mem := &exitMemento{}
+	mem := &cli.exitMemento{}
 
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), nil).Execute([]string{"version", "abcd"})
+	root2.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil).Execute([]string{"version", "abcd"})
 	require.Equal(t, 1, mem.code)
 }

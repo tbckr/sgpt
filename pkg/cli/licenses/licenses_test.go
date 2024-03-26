@@ -19,40 +19,47 @@
 //
 // SPDX-License-Identifier: MIT
 
-package cli
+package licenses
 
 import (
+	"bytes"
+	"github.com/tbckr/sgpt/v2/pkg/cli"
+	"github.com/tbckr/sgpt/v2/pkg/cli/root"
 	"io"
-	"os"
+	"strings"
+	"sync"
 	"testing"
 
-	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/internal/testlib"
 
-	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
 )
 
-var useMockClient = func(mockClient *api.OpenAIClient) func(*viper.Viper, io.Writer) (*api.OpenAIClient, error) {
-	return func(_ *viper.Viper, _ io.Writer) (*api.OpenAIClient, error) {
-		return mockClient, nil
-	}
-}
+func TestLicensesCmd(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	mem := &cli.exitMemento{}
+	expected := `To see the open source packages included in SGPT and
+their respective license information, visit:
+`
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
 
-type exitMemento struct {
-	code int
-}
+	root := root.NewRootCmd(mem.Exit, testCtx.Config, cli.mockIsPipedShell(false, nil), nil)
+	root.cmd.SetOut(writer)
 
-func (e *exitMemento) Exit(i int) {
-	e.code = i
-}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		require.True(t, strings.HasPrefix(buf.String(), expected))
+	}()
 
-func mockIsPipedShell(isPiped bool, err error) func() (bool, error) {
-	return func() (bool, error) {
-		return isPiped, err
-	}
-}
+	root.Execute([]string{"licenses"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
 
-func skipInCI(t *testing.T) {
-	if os.Getenv("CI") != "" {
-		t.Skip("Skipping test on CI")
-	}
+	wg.Wait()
 }
