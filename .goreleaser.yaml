@@ -311,7 +311,7 @@ brews:
       name: "tbckr-automation[bot]"
       email: "gh-automation@tb5.dev"
     commit_msg_template: "chore: Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
-    folder: Formula
+    directory: Formula
     description: |-
      SGPT is a command-line tool that provides a convenient way to interact with OpenAI models,
      enabling users to run queries, generate shell commands, produce code,
