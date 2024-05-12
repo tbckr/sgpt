@@ -157,7 +157,7 @@ release suitable for your system.
 
 ## Usage Guide
 
-See the [documentation](http://sgpt.readthedocs.io/) for detailed usage instructions.
+See the [documentation](https://sgpt.readthedocs.io/en/stable/) for detailed usage instructions.
 
 ### Getting started: Obtaining an OpenAI API Key
 
