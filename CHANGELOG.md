@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.14.1](https://github.com/tbckr/sgpt/compare/v2.14.0...v2.14.1) (2024-05-14)
+
+
+### Bug Fixes
+
+* **goreleaser:** path to license file ([505c039](https://github.com/tbckr/sgpt/commit/505c0399caff03ad211ecd2cbae556e8ce68b188))
+
 ## [2.14.0](https://github.com/tbckr/sgpt/compare/v2.13.0...v2.14.0) (2024-05-14)
 
 
