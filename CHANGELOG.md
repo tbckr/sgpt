@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.14.0](https://github.com/tbckr/sgpt/compare/v2.13.0...v2.14.0) (2024-05-14)
+
+
+### Features
+
+* add infos for gpt-4o support ([cb20c3b](https://github.com/tbckr/sgpt/commit/cb20c3b6ffa6c2888724bde2d5b2a0ac0e0c1045))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.20.4 ([0e9e17f](https://github.com/tbckr/sgpt/commit/0e9e17fc66de1b59294fe710b96cb6bc0d91f909))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.20.5 ([ff87600](https://github.com/tbckr/sgpt/commit/ff876000a406ea49fad2f7862370ebe5820915f9))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.21.0 ([1d9bf14](https://github.com/tbckr/sgpt/commit/1d9bf14a7ca34e93e1e0cb994ebc4e4a9e3cf96c))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.22.0 ([e463e41](https://github.com/tbckr/sgpt/commit/e463e41ba5da4bf8c9483a4dd0ba6a191dbcfd54))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.23.0 ([e620612](https://github.com/tbckr/sgpt/commit/e6206127b0487e98cbb797d1793ad8aaf4adbc30))
+* **goreleaser:** remove deprecations ([64d2c47](https://github.com/tbckr/sgpt/commit/64d2c4749ee274ff167008a6e3ed495dd1b9cba6))
+* use go version 1.22.3 in gha ([60b4aa1](https://github.com/tbckr/sgpt/commit/60b4aa17c19f2961e39d38305c88445b19deb4ee))
+* use latest go version github workflows ([6e576d9](https://github.com/tbckr/sgpt/commit/6e576d92d51d2f1abba63912d65e5025ed3d5582))
+
 ## [2.13.0](https://github.com/tbckr/sgpt/compare/v2.12.0...v2.13.0) (2024-03-22)
 
 
