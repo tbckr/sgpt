@@ -50,9 +50,10 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
 
 - **Instant Answers:** Obtain quick and accurate responses to simple questions directly in your shell, streamlining your
   workflow.
+- **GPT-4o Integration:** Access the capabilities of the [GPT-4o API](https://platform.openai.com/docs/models/gpt-4o)
+  to generate detailed and informative responses.
 - **GPT-4 Vision API:** Leverage the capabilities of
-  the [GPT-4 Vision API](https://platform.openai.com/docs/guides/vision)
-  to analyze and generate insights from images.
+  the [GPT-4 Vision API](https://platform.openai.com/docs/guides/vision) to analyze and generate insights from images.
 - **Shell Commands Generation:** Effortlessly generate and execute shell commands, simplifying complex tasks and
   enhancing
   productivity.
