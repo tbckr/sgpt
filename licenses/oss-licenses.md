@@ -15,16 +15,16 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
 - [github.com/muesli/mango-pflag](https://pkg.go.dev/github.com/muesli/mango-pflag) ([MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE))
 - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
-- [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.1.0/LICENSE))
+- [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.2.2/LICENSE))
 - [github.com/sagikazarmark/slog-shim](https://pkg.go.dev/github.com/sagikazarmark/slog-shim) ([BSD-3-Clause](https://github.com/sagikazarmark/slog-shim/blob/v0.1.0/LICENSE))
 - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.24.1/LICENSE))
 - [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.11.0/LICENSE.txt))
 - [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.6.0/LICENSE))
 - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.8.0/LICENSE.txt))
 - [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.5/LICENSE))
-- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.18.2/LICENSE))
+- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.19.0/LICENSE))
 - [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE))
-- [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.15.0:LICENSE))
+- [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.18.0:LICENSE))
 - [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.14.0:LICENSE))
 - [gopkg.in/ini.v1](https://pkg.go.dev/gopkg.in/ini.v1) ([Apache-2.0](https://github.com/go-ini/ini/blob/v1.67.0/LICENSE))
 - [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE))
@@ -870,8 +870,8 @@ SOFTWARE.
 ### github.com/pelletier/go-toml/v2
 
 - Name: github.com/pelletier/go-toml/v2
-- Version: v2.1.0
-- License: [MIT](https://github.com/pelletier/go-toml/blob/v2.1.0/LICENSE)
+- Version: v2.2.2
+- License: [MIT](https://github.com/pelletier/go-toml/blob/v2.2.2/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1586,8 +1586,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/spf13/viper
 
 - Name: github.com/spf13/viper
-- Version: v1.18.2
-- License: [MIT](https://github.com/spf13/viper/blob/v1.18.2/LICENSE)
+- Version: v1.19.0
+- License: [MIT](https://github.com/spf13/viper/blob/v1.19.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1647,8 +1647,8 @@ THE SOFTWARE.
 ### golang.org/x/sys
 
 - Name: golang.org/x/sys
-- Version: v0.15.0
-- License: [BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.15.0:LICENSE)
+- Version: v0.18.0
+- License: [BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.18.0:LICENSE)
 
 ```text
 Copyright (c) 2009 The Go Authors. All rights reserved.
