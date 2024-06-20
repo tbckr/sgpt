@@ -17,7 +17,7 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
 - [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.2.2/LICENSE))
 - [github.com/sagikazarmark/slog-shim](https://pkg.go.dev/github.com/sagikazarmark/slog-shim) ([BSD-3-Clause](https://github.com/sagikazarmark/slog-shim/blob/v0.1.0/LICENSE))
-- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.24.2/LICENSE))
+- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.25.0/LICENSE))
 - [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.11.0/LICENSE.txt))
 - [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.6.0/LICENSE))
 - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.8.1/LICENSE.txt))
@@ -26,8 +26,8 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE))
 - [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.18.0:LICENSE))
 - [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.14.0:LICENSE))
-- [gopkg.in/ini.v1](https://pkg.go.dev/gopkg.in/ini.v1) ([Apache-2.0](https://github.com/go-ini/ini/blob/v1.67.0/LICENSE))
-- [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE))
+- [gopkg.in/ini.v1](https://pkg.go.dev/gopkg.in/ini.v1) ([Apache-2.0](Unknown))
+- [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](Unknown))
 
 ## Details
 
@@ -939,8 +939,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/sashabaranov/go-openai
 
 - Name: github.com/sashabaranov/go-openai
-- Version: v1.24.2
-- License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.24.2/LICENSE)
+- Version: v1.25.0
+- License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.25.0/LICENSE)
 
 ```text
                                  Apache License
@@ -1722,7 +1722,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 - Name: gopkg.in/ini.v1
 - Version: v1.67.0
-- License: [Apache-2.0](https://github.com/go-ini/ini/blob/v1.67.0/LICENSE)
+- License: [Apache-2.0](Unknown)
 
 ```text
 Apache License
@@ -1923,7 +1923,7 @@ third-party archives.
 
 - Name: gopkg.in/yaml.v3
 - Version: v3.0.1
-- License: [MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE)
+- License: [MIT](Unknown)
 
 ```text
 
