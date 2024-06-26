@@ -26,8 +26,8 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE))
 - [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.18.0:LICENSE))
 - [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.14.0:LICENSE))
-- [gopkg.in/ini.v1](https://pkg.go.dev/gopkg.in/ini.v1) ([Apache-2.0](Unknown))
-- [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](Unknown))
+- [gopkg.in/ini.v1](https://pkg.go.dev/gopkg.in/ini.v1) ([Apache-2.0](https://github.com/go-ini/ini/blob/v1.67.0/LICENSE))
+- [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE))
 
 ## Details
 
@@ -1722,7 +1722,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 - Name: gopkg.in/ini.v1
 - Version: v1.67.0
-- License: [Apache-2.0](Unknown)
+- License: [Apache-2.0](https://github.com/go-ini/ini/blob/v1.67.0/LICENSE)
 
 ```text
 Apache License
@@ -1923,7 +1923,7 @@ third-party archives.
 
 - Name: gopkg.in/yaml.v3
 - Version: v3.0.1
-- License: [MIT](Unknown)
+- License: [MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE)
 
 ```text
 
