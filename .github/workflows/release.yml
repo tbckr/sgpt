@@ -68,7 +68,7 @@ jobs:
         with:
           go-version: '>=1.22.3'
           cache: true
-      - uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3
+      - uses: docker/setup-buildx-action@4fd812986e6c8c2a69e18311145f9371337f27d4 # v3
         if: ${{ steps.release.outputs.release_created }}
       - uses: anchore/sbom-action/download-syft@e8d2a6937ecead383dfe75190d104edd1f9c5751 # v0.16.0
         if: ${{ steps.release.outputs.release_created }}
