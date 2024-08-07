@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.14.2](https://github.com/tbckr/sgpt/compare/v2.14.1...v2.14.2) (2024-08-07)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.23.1 ([4d63646](https://github.com/tbckr/sgpt/commit/4d63646e7ab210cee521108e77341023ceffd20b))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.24.0 ([e4cafde](https://github.com/tbckr/sgpt/commit/e4cafde70297e8f002661175a4e72d6eb7342b16))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.24.1 ([ebe96df](https://github.com/tbckr/sgpt/commit/ebe96dfa04f5942fdbc76c296f857e8acb8912c0))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.24.2 ([ee181ea](https://github.com/tbckr/sgpt/commit/ee181ea0384c7a541aa10947161ecab30b1ec60e))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.25.0 ([b71ec16](https://github.com/tbckr/sgpt/commit/b71ec161d027602ef717ee7df07a1eb891c9ffdd))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.26.0 ([d9f4eae](https://github.com/tbckr/sgpt/commit/d9f4eae2b4c783b9ae453fd1e2726da0130b7cd9))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.26.1 ([656b8d1](https://github.com/tbckr/sgpt/commit/656b8d1b8e2a754b35588df0b0b02f8e5206a275))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.26.2 ([5d9e998](https://github.com/tbckr/sgpt/commit/5d9e9988babffefdf6a530d67bb441097ceef8a9))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.26.3 ([c59d1ea](https://github.com/tbckr/sgpt/commit/c59d1eafb604296062a6ff5ba7db6ba055eef2c5))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.27.0 ([bb03fc9](https://github.com/tbckr/sgpt/commit/bb03fc9036d9e14301c798c526dc37d6a8242fce))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.27.1 ([c6af444](https://github.com/tbckr/sgpt/commit/c6af444d4dce5d4dd9c516a03abdbbd060496556))
+* **deps:** update module github.com/spf13/cobra to v1.8.1 ([8c927e5](https://github.com/tbckr/sgpt/commit/8c927e57f067e9db91466be94b681b17866e31b7))
+* **deps:** update module github.com/spf13/viper to v1.19.0 ([6518491](https://github.com/tbckr/sgpt/commit/65184913cdf1f8cf52a4d8793e66a81e5e45c288))
+* update go version to 1.22.5 ([#269](https://github.com/tbckr/sgpt/issues/269)) ([2578a99](https://github.com/tbckr/sgpt/commit/2578a99bee846dbb4af72022e3c14cad90609089))
+
 ## [2.14.1](https://github.com/tbckr/sgpt/compare/v2.14.0...v2.14.1) (2024-05-14)
 
 
