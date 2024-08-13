@@ -20,7 +20,7 @@
 # SPDX-License-Identifier: MIT
 
 ARG BUILDPLATFORM=linux/amd64
-ARG BASE_IMAGE_VERSION=golang:1.22@sha256:e4741baa94a913c171ac5398f1ac25af83b766ebdd4b665ff73a55a8c8b3a5d5
+ARG BASE_IMAGE_VERSION=golang:1.22@sha256:945c798aafa0a5ce1a324de4f3a74ebd84c1455680e2f2362a185bc7c7847010
 FROM --platform=$BUILDPLATFORM ${BASE_IMAGE_VERSION} as build
 
 WORKDIR /go/src/github.com/tbckr/sgpt
