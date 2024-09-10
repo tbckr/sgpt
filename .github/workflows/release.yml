@@ -72,7 +72,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
       - uses: anchore/sbom-action/download-syft@61119d458adab75f756bc0b9e4bde25725f86a7a # v0.17.2
         if: ${{ steps.release.outputs.release_created }}
-      - uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3
+      - uses: sigstore/cosign-installer@4959ce089c160fddf62f7b42464195ba1a56d382 # v3
         if: ${{ steps.release.outputs.release_created }}
 
       # Login to ghcr.io
