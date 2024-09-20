@@ -72,6 +72,9 @@ Manage all open chat sessions - list, show, and delete chat sessions.
 		DisableFlagsInUseLine: true,
 		Args:                  cobra.NoArgs,
 		ValidArgsFunction:     cobra.NoFileCompletions,
+		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
+			return loadViperConfig(config)
+		},
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()
 		},
