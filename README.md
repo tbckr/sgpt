@@ -242,7 +242,7 @@ if you have provided the stream option via the config file).
 Example:
 
 ```shell
-$ sgpt -m "o1" --stream=false "how many rs are in strawberry?"
+$ sgpt -m "o1-preview" --stream=false "how many rs are in strawberry?"
 There are three "r"s in the word "strawberry".
 ```
 
