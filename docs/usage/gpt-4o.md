@@ -18,6 +18,6 @@ The two pictures you provided appear to be identical. There are no visible diffe
 ```
 
 You can also set the default model to GPT-4o or GPT-4 Vision by setting it in
-the [configuration file](https://sgpt.readthedocs.io/en/stable/configuration/).
+the [configuration file](../configuration.md).
 
 **Important:** The GPT-4o and GPT-4-vision API integration is currently in beta and may change in the future.
