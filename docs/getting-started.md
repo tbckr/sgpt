@@ -78,6 +78,34 @@ For more bash examples, see [.bashrc](https://github.com/tbckr/sgpt/blob/main/.b
 
 **Important:** The GPT-4-vision API integration is currently in beta and may change in the future.
 
+## o1 API Support
+
+If you are already whitelisted for the o1 API, you can use it by specifying the model with the `-m` flag. You must also
+provide the `--stream=false` flag to not stream the output as it is not supported by the o1 API (this is only necessary,
+if you have provided the stream option via the config file).
+
+Example:
+
+```shell
+$ sgpt -m "o1" --stream=false "how many rs are in strawberry?"
+There are three "r"s in the word "strawberry".
+```
+
+You can also create a bash alias to use the o1 API more easily. For example, add the following line to your `.bashrc`:
+
+```shell
+alias sgpt-o1="sgpt -m \"o1-preview\" --stream=false"
+```
+
+Then you can use the alias like this:
+
+```shell
+$ sgpt-o1 "how many rs are in strawberry?"
+There are three "r"s in the word "strawberry".
+```
+
+**Important:** The o1 API does not support personas.
+
 ## Code Generation Capabilities
 
 By adding the `code` command to your prompt, you can generate code based on given instructions by using the

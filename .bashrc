@@ -24,3 +24,6 @@ gsum() {
 
 # Create a alias for access to the GPT-4 Vision API
 alias vision='sgpt -m "gpt-4-vision-preview"'
+
+# Create a alias for access to OpenAI's o1-preview model
+alias sgpt-o1="sgpt -m \"o1-preview\" --stream=false"
