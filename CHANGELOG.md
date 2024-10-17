@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.16.0](https://github.com/tbckr/sgpt/compare/v2.15.0...v2.16.0) (2024-10-17)
+
+
+### Features
+
+* add information and alias regarding o1 model support ([40b567a](https://github.com/tbckr/sgpt/commit/40b567ac78145cd9bcf391046d72cc055dc00ed5))
+
+
+### Bug Fixes
+
+* add o1 doc to toc and fix o1 example in readme ([42924c7](https://github.com/tbckr/sgpt/commit/42924c780e95dea049f214a9bbf2907ad221164f))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.30.0 ([83d12eb](https://github.com/tbckr/sgpt/commit/83d12ebc5f154134edcf03e7cd520f66d57da075))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.30.3 ([ddd6671](https://github.com/tbckr/sgpt/commit/ddd667144c0a4f81bc10523b231f8125f32dd8fa))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.31.0 ([b57aaa4](https://github.com/tbckr/sgpt/commit/b57aaa4f7dad1ecb0bf64b3ac8d15e8d09a5f54b))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.32.0 ([84570ed](https://github.com/tbckr/sgpt/commit/84570edaa5e4ba36b6af38a62dafd8404a6bea83))
+* **docs:** fix o1 example in docs ([62b5178](https://github.com/tbckr/sgpt/commit/62b51787cfeed6863083dc65f11913356d8cd2da))
+
 ## [2.15.0](https://github.com/tbckr/sgpt/compare/v2.14.1...v2.15.0) (2024-09-20)
 
 
