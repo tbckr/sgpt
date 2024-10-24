@@ -20,6 +20,8 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 This is a Go implementation. For the original Python implementation,
 visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind when reporting issues.
 
+Note: Currently under heavy refactoring for v3, but v2 is still maintained.
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
