@@ -24,18 +24,18 @@
       devShells = forEachSupportedSystem ({ pkgs, unstable }: {
         default = pkgs.mkShellNoCC {
           # Pinned packages available in the environment
-          packages = with pkgs; [
-            go-task
-            pre-commit
-            commitizen
-            goreleaser
-            golangci-lint
-            govulncheck
-            svu
-            addlicense
-            mkdocs
-            python311Packages.mkdocs-material
-            nixpkgs-fmt
+          packages = [
+            pkgs.go-task
+            pkgs.pre-commit
+            pkgs.commitizen
+            pkgs.goreleaser
+            pkgs.golangci-lint
+            pkgs.govulncheck
+            pkgs.svu
+            pkgs.addlicense
+            pkgs.mkdocs
+            pkgs.python311Packages.mkdocs-material
+            pkgs.nixpkgs-fmt
           ];
         };
       });
