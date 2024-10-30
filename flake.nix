@@ -14,13 +14,14 @@
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
       forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
         pkgs = import nixpkgs { inherit system; };
+        unstable = import unstable { inherit system; };
       });
     in {
       # Schemas tell Nix about the structure of your flake's outputs
       schemas = flake-schemas.schemas;
 
       # Development environments
-      devShells = forEachSupportedSystem ({ pkgs }: {
+      devShells = forEachSupportedSystem ({ pkgs, unstable }: {
         default = pkgs.mkShellNoCC {
           # Pinned packages available in the environment
           packages = with pkgs; [
