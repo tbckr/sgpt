@@ -23,10 +23,10 @@ By participating in this project, you agree to abide our
 
 Prerequisites:
 
-- [Task](https://taskfile.dev/installation)
-- [Go 1.21+](https://go.dev/doc/install)
-- [Python 3.9+](https://www.python.org/downloads/)
+- [Go 1.23+](https://go.dev/doc/install)
 - [Docker](https://docs.docker.com/get-docker/)
+- [Nix Package Manager](https://nixos.org/download.html) (install recommended via [Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer))
+- [Direnv](https://direnv.net/docs/installation.html)
 
 Clone `sgpt` anywhere:
 
@@ -34,27 +34,13 @@ Clone `sgpt` anywhere:
 git clone git@github.com:tbckr/sgpt.git
 ```
 
-`cd` into the directory and install the dependencies:
+`cd` into the directory and allow the `direnv` to load the environment:
 
 ```sh
-task setup
+direnv allow
 ```
 
-This will install the following tools and pre-commit hook:
-
-- [pre-commit](https://pre-commit.com/#install)
-- [goreleaser](https://goreleaser.com/install/)
-- [golangci-lint](https://golangci-lint.run/usage/install/#local-installation)
-- [addlicense](https://github.com/google/addlicense)
-- [svu](https://github.com/caarlos0/svu)
-- [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
-- [pipenv](https://pypi.org/project/pipenv/)
-
-Check that everything is working by running the `validate:devtools` task:
-
-```sh
-task validate:devtools
-```
+This will install all the necessary dependencies for the project via nix flakes.
 
 A good way to make sure everything else is okay is to run the test suite:
 

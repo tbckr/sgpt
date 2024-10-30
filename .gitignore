@@ -4,7 +4,8 @@
 dist/
 manpages/
 completions/
-.task/
+/.direnv/
+/.task/
 coverage.txt
 sgpt
 
