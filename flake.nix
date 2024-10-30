@@ -4,10 +4,11 @@
   inputs = {
     flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*";
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*";
+    unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
   # Flake outputs that other flakes can use
-  outputs = { self, flake-schemas, nixpkgs }:
+  outputs = { self, flake-schemas, nixpkgs, unstable }:
     let
       # Helpers for producing system-specific outputs
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
