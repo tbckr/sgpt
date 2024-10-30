@@ -22,6 +22,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"io"
 	"log/slog"
@@ -48,12 +49,7 @@ type rootCmd struct {
 	verbose bool
 }
 
-func Run(
-	stdin io.Reader,
-	stdout, stderr io.Writer,
-	getenv func(string) string,
-	args []string,
-) (error, int) {
+func Run(ctx context.Context, stdin io.Reader, stdout, stderr io.Writer, getenv func(string) string, args []string) (error, int) {
 
 	// Create config instance
 	config := viper.New()
@@ -73,6 +69,7 @@ func Run(
 	// Run CLI
 	var root *rootCmd
 	root, err = newRootCmd(
+		ctx,
 		stdin,
 		stdout,
 		stderr,

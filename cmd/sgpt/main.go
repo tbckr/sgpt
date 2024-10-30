@@ -22,14 +22,27 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
 
 	"github.com/tbckr/sgpt/v2/pkg/cli"
 )
 
 func main() {
-	if err, exitCode := cli.Run(os.Stdin, os.Stdout, os.Stderr, os.Getenv, os.Args); err != nil {
+
+	// handle interrupt signals
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-signals
+		_, _ = fmt.Fprintf(os.Stderr, "Received interrupt signal, shutting down...\n")
+		cancel()
+	}()
+
+	if err, exitCode := cli.Run(ctx, os.Stdin, os.Stdout, os.Stderr, os.Getenv, os.Args); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(exitCode)
 	}
