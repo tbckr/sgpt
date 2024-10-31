@@ -25,16 +25,16 @@
         default = pkgs.mkShellNoCC {
           # Pinned packages available in the environment
           packages = [
-            pkgs.go-task
-            pkgs.pre-commit
-            pkgs.commitizen
-            pkgs.goreleaser
-            pkgs.golangci-lint
-            pkgs.govulncheck
-            pkgs.svu
-            pkgs.addlicense
-            pkgs.mkdocs
-            pkgs.python311Packages.mkdocs-material
+            unstable.go-task
+            unstable.pre-commit
+            unstable.commitizen
+            unstable.goreleaser
+            unstable.golangci-lint
+            unstable.govulncheck
+            unstable.svu
+            unstable.addlicense
+            unstable.mkdocs
+            unstable.python311Packages.mkdocs-material
             pkgs.nixpkgs-fmt
           ];
         };
