@@ -53,11 +53,16 @@ var (
 
 // OpenAIClient is a client for the OpenAI API.
 type OpenAIClient struct {
-	HTTPClient         *http.Client
+	httpClient         *http.Client
 	config             *viper.Viper
 	api                *openai.Client
 	out                io.Writer
 	chatSessionManager chat.SessionManager
+}
+
+// GetHTTPClient implements the Provider interface
+func (c *OpenAIClient) GetHTTPClient() *http.Client {
+	return c.httpClient
 }
 
 // CreateClient creates a new OpenAI client with the given config and output writer.
