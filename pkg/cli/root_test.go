@@ -58,7 +58,7 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -97,7 +97,7 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -138,7 +138,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -181,7 +181,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -242,7 +242,7 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -282,7 +282,7 @@ func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -407,7 +407,7 @@ func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -458,7 +458,7 @@ func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
 	response := "Hello ChatGPT!"
 	expected := "Hello ChatGPT!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -507,7 +507,7 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -553,7 +553,7 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	response := `echo \"Hello World\"`
 	expected := "echo \"Hello World\"\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -610,7 +610,7 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -668,7 +668,7 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	response := "Hello World!"
 	expected := "Hello World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -743,7 +743,7 @@ func TestRootCmd_ChatConversation(t *testing.T) {
 	response := "World!"
 	expected := "World!\n"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 

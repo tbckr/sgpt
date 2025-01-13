@@ -29,8 +29,9 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
+	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
 	"github.com/spf13/viper"
 )
 
@@ -49,12 +50,14 @@ func (c *AWSBedrockProvider) GetHTTPClient() *http.Client {
 
 // NewAWSBedrockProvider creates a new AWS Bedrock provider
 func NewAWSBedrockProvider(config *viper.Viper, out io.Writer) (*AWSBedrockProvider, error) {
-	cfg, err := config.LoadDefaultConfig(context.Background())
+	// Load AWS SDK config using aws-sdk-go-v2/config package
+	awsCfg, err := awsconfig.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("unable to load AWS SDK config: %w", err)
 	}
 
-	client := bedrockruntime.NewFromConfig(cfg)
+	// Create Bedrock client using AWS config
+	client := bedrockruntime.NewFromConfig(awsCfg)
 
 	return &AWSBedrockProvider{
 		httpClient: http.DefaultClient,
@@ -80,7 +83,7 @@ func (c *AWSBedrockProvider) StreamingPrompt(ctx context.Context, model string, 
 	var fullResponse string
 	for event := range output.GetStream().Events() {
 		switch v := event.(type) {
-		case *bedrockruntime.ResponseStreamMemberChunk:
+		case *types.ResponseStreamMemberChunk:
 			var deltaResp struct {
 				Type  string `json:"type"`
 				Delta struct {

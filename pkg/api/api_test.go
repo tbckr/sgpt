@@ -73,7 +73,7 @@ func TestSimplePrompt(t *testing.T) {
 	prompt := []string{"Say: Hello World!"}
 	expected := "Hello World!"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
@@ -122,7 +122,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 	prompt := []string{"Say: Hello World!"}
 	expected := "Hello World!"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponseStream(expected)
 
@@ -160,7 +160,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 	prompt := []string{"Say: Hello World!"}
 	expected := "Hello World!"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
@@ -215,7 +215,7 @@ func TestPromptLoadChat(t *testing.T) {
 	prompt := []string{"Repeat last message"}
 	expected := "World!"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
@@ -281,7 +281,7 @@ func TestPromptWithModifier(t *testing.T) {
 	response := `echo \"Hello World\"`
 	expected := `echo "Hello World"`
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
@@ -348,7 +348,7 @@ func TestSimplePromptWithLocalImage(t *testing.T) {
 	expected := "The image shows a character that appears to be a stylized robot. It has"
 	inputImage := "testdata/marvin.jpg"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
@@ -385,7 +385,7 @@ func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
 	expected := "The image shows a character that appears to be a stylized robot. It has"
 	inputImage := "testdata/marvin.jpg"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
@@ -450,7 +450,7 @@ func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 	expected := "The image shows a character that appears to be a stylized robot. It has"
 	inputImage := "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 
@@ -515,7 +515,7 @@ func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 	inputImageFile := "testdata/marvin.jpg"
 	inputImageURL := "https://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg"
 
-	httpmock.ActivateNonDefault(client.HTTPClient)
+	httpmock.ActivateNonDefault(client.GetHTTPClient())
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(expected)
 

@@ -100,7 +100,7 @@ func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
 
 	// Create client
 	client := &OpenAIClient{
-		HTTPClient:         httpClient,
+		httpClient:         httpClient,
 		config:             config,
 		api:                openai.NewClientWithConfig(clientConfig),
 		out:                out,
