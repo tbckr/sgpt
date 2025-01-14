@@ -257,13 +257,16 @@ func TestChatCmdRmSession(t *testing.T) {
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "rm", "test"})
 	require.Equal(t, 0, mem.code)
-	require.NoFileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
+	require.NoDirExists(t, chatDir)
+	require.NoFileExists(t, filepath.Join(chatDir, "messages.json"))
 }
 
 func TestChatCmdRmSessionNonExistent(t *testing.T) {
@@ -276,13 +279,16 @@ func TestChatCmdRmSessionNonExistent(t *testing.T) {
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "rm", "test2"})
 	require.Equal(t, 0, mem.code)
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 }
 
 func TestChatCmdRmSessionAll(t *testing.T) {
@@ -295,17 +301,25 @@ func TestChatCmdRmSessionAll(t *testing.T) {
 	messages := createTestMessages()
 	err = manager.SaveSession("test", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
+	chatDir1 := filepath.Join(testCtx.Config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir1)
+	require.FileExists(t, filepath.Join(chatDir1, "messages.json"))
 	err = manager.SaveSession("test2", messages)
 	require.NoError(t, err)
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test2"))
+	chatDir2 := filepath.Join(testCtx.Config.GetString("cacheDir"), "test2")
+	require.DirExists(t, chatDir2)
+	require.FileExists(t, filepath.Join(chatDir2, "messages.json"))
 
 	root := newRootCmd(mem.Exit, testCtx.Config, nil, nil)
 
 	root.Execute([]string{"chat", "rm", "--all"})
 	require.Equal(t, 0, mem.code)
-	require.NoFileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test"))
-	require.NoFileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test2"))
+	testDir1 := filepath.Join(testCtx.Config.GetString("cacheDir"), "test")
+	require.NoDirExists(t, testDir1)
+	require.NoFileExists(t, filepath.Join(testDir1, "messages.json"))
+	testDir2 := filepath.Join(testCtx.Config.GetString("cacheDir"), "test2")
+	require.NoDirExists(t, testDir2)
+	require.NoFileExists(t, filepath.Join(testDir2, "messages.json"))
 }
 
 func TestChatCmdRmSessionMissingName(t *testing.T) {

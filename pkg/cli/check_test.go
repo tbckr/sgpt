@@ -22,12 +22,12 @@
 package cli
 
 import (
+	"net/http"
+	"os"
 	"testing"
 
 	"github.com/tbckr/sgpt/v2/pkg/api"
-
 	"github.com/tbckr/sgpt/v2/internal/testlib"
-
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,7 +38,11 @@ func TestCheckCmd(t *testing.T) {
 
 	testlib.SetAPIKey(t)
 
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Out:        os.Stdout,
+	}
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client)).Execute([]string{"check"})
 	require.Equal(t, 0, mem.code)
 }
 
@@ -46,6 +50,29 @@ func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
+	// Save current API key
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	
+	// Unset OpenAI API key for this test
+	if err := os.Unsetenv("OPENAI_API_KEY"); err != nil {
+		t.Fatal(err)
+	}
+
+	// Test with OpenAI provider (default)
+	client := &api.MockProvider{HTTPClient: &http.Client{}}
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client)).Execute([]string{"check"})
 	require.Equal(t, 1, mem.code)
+
+	// Test with Bedrock provider (should pass without OpenAI API key)
+	testCtx.Config.Set("provider", "bedrock")
+	mem = &exitMemento{}
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client)).Execute([]string{"check"})
+	require.Equal(t, 0, mem.code)
+
+	// Reset API key
+	if apiKey != "" {
+		if err := os.Setenv("OPENAI_API_KEY", apiKey); err != nil {
+			t.Fatal(err)
+		}
+	}
 }

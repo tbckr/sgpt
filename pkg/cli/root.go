@@ -23,14 +23,20 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
 	"strings"
 
+	"path/filepath"
+
 	"github.com/tbckr/sgpt/v2/pkg/api"
+	"github.com/tbckr/sgpt/v2/pkg/chat"
 	"github.com/tbckr/sgpt/v2/pkg/fs"
 	"github.com/tbckr/sgpt/v2/pkg/shell"
+	
+	"github.com/sashabaranov/go-openai"
 
 	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
@@ -68,7 +74,7 @@ func Execute(args []string) {
 		slog.Error("Failed to create viper config", "error", err)
 		os.Exit(1)
 	}
-	newRootCmd(os.Exit, viperConfig, shell.IsPipedShell, api.CreateClient).Execute(args)
+	newRootCmd(os.Exit, viperConfig, shell.IsPipedShell, api.CreateProvider).Execute(args)
 }
 
 func (r *rootCmd) Execute(args []string) {
@@ -103,7 +109,7 @@ func (r *rootCmd) Execute(args []string) {
 	r.exit(0)
 }
 
-func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *rootCmd {
+func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func(*viper.Viper, io.Writer) (api.Provider, error)) *rootCmd {
 	root := &rootCmd{
 		exit: exit,
 	}
@@ -215,17 +221,78 @@ ls | sort
 				}
 			}
 
-			// Create client
-			var client *api.OpenAIClient
-			client, err = createClientFn(config, cmd.OutOrStdout())
+			// Create provider
+			var provider api.Provider
+			provider, err = createClientFn(config, cmd.OutOrStdout())
 			if err != nil {
 				return err
 			}
 
 			var response string
-			response, err = client.CreateCompletion(cmd.Context(), root.chat, prompts, mode, root.input)
+			response, err = provider.CreateCompletion(cmd.Context(), root.chat, prompts, mode, root.input)
 			if err != nil {
 				return err
+			}
+
+			// If using chat, save the response to the chat session
+			if root.chat != "" {
+				var manager chat.SessionManager
+				manager, err = chat.NewFilesystemChatSessionManager(config)
+				if err != nil {
+					return fmt.Errorf("failed to create chat session manager: %w", err)
+				}
+
+				// Get existing messages
+				var messages []openai.ChatCompletionMessage
+				messages, err = manager.GetSession(root.chat)
+				if err != nil && !errors.Is(err, chat.ErrChatSessionDoesNotExist) {
+					return fmt.Errorf("failed to get chat session: %w", err)
+				}
+
+				// If this is a new chat session and we're using a persona,
+				// add the persona as a system message first
+				if len(messages) == 0 && len(args) > 0 {
+					// Check if the first argument is a persona file
+					personaPath := filepath.Join(config.GetString("personas"), args[0])
+					if _, err := os.Stat(personaPath); err == nil {
+						// Read the persona content
+						var persona []byte
+						persona, err = os.ReadFile(personaPath)
+						if err != nil {
+							return fmt.Errorf("failed to read persona file: %w", err)
+						}
+
+						// Add persona as system message
+						messages = append(messages, openai.ChatCompletionMessage{
+							Role:    openai.ChatMessageRoleSystem,
+							Content: string(persona),
+						})
+
+						// When using a persona in chat mode, we want to:
+						// 1. Keep the persona as a system message
+						// 2. Use the original prompt for the completion
+						// 3. Use the prompt (without persona) for chat messages
+						originalPrompt := args[1] // The actual prompt is in args[1]
+						prompts = []string{originalPrompt} // Use only the actual prompt
+					}
+				}
+
+				// Add user prompt
+				messages = append(messages, openai.ChatCompletionMessage{
+					Role:    openai.ChatMessageRoleUser,
+					Content: strings.Join(prompts, "\n"),
+				})
+
+				// Add assistant response
+				messages = append(messages, openai.ChatCompletionMessage{
+					Role:    openai.ChatMessageRoleAssistant,
+					Content: strings.TrimSpace(response),
+				})
+
+				// Save updated messages
+				if err = manager.SaveSession(root.chat, messages); err != nil {
+					return fmt.Errorf("failed to save chat session: %w", err)
+				}
 			}
 
 			if root.copyToClipboard {
@@ -305,6 +372,13 @@ func createFlagsWithConfigBinding(cmd *cobra.Command, config *viper.Viper) {
 		bindErrors = append(bindErrors, err)
 	}
 
+	// provider flag
+	cmd.Flags().String("provider", "", "Name of the AI provider (e.g. 'bedrock' or 'openai')")
+	err = config.BindPFlag("provider", cmd.Flags().Lookup("provider"))
+	if err != nil {
+		bindErrors = append(bindErrors, err)
+	}
+
 	if len(bindErrors) > 0 {
 		for _, err = range bindErrors {
 			slog.Error("Failed to bind flag to viper", "error", err)
@@ -321,6 +395,11 @@ func loadViperConfig(config *viper.Viper) error {
 			return err
 		}
 	}
+	
+	// Debug log all important config values
+	fmt.Printf("Provider: %s\n", config.GetString("provider"))
+	fmt.Printf("Model: %s\n", config.GetString("model"))
+	fmt.Printf("Stream: %v\n", config.GetBool("stream"))
 	if err := config.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore error
@@ -359,6 +438,8 @@ func setViperDefaults(config *viper.Viper) error {
 	config.SetDefault("topP", 1)
 	// stream
 	config.SetDefault("stream", false)
+	// provider
+	config.SetDefault("provider", "")
 
 	return nil
 }

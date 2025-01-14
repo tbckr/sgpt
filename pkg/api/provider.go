@@ -23,11 +23,19 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 
+	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
 	"github.com/spf13/viper"
 )
+
+// BedrockInvoker defines the minimal interface needed for Bedrock API calls
+type BedrockInvoker interface {
+	InvokeModel(ctx context.Context, params *bedrockruntime.InvokeModelInput, optFns ...func(*bedrockruntime.Options)) (*bedrockruntime.InvokeModelOutput, error)
+	InvokeModelWithResponseStream(ctx context.Context, params *bedrockruntime.InvokeModelWithResponseStreamInput, optFns ...func(*bedrockruntime.Options)) (*bedrockruntime.InvokeModelWithResponseStreamOutput, error)
+}
 
 // Provider defines the interface that all AI providers must implement
 type Provider interface {
@@ -40,10 +48,20 @@ type Provider interface {
 // CreateProvider creates a new provider based on the configuration
 func CreateProvider(config *viper.Viper, out io.Writer) (Provider, error) {
 	provider := config.GetString("provider")
-	switch provider {
-	case "bedrock":
+	// Log the provider selection
+	fmt.Printf("Creating provider: %s\n", provider)
+
+	// Try creating AWS Bedrock provider first if specified
+	if provider == "bedrock" {
+		fmt.Println("Using AWS Bedrock provider")
 		return NewAWSBedrockProvider(config, out)
-	default:
+	}
+
+	// Default to OpenAI for empty or "openai" provider
+	if provider == "" || provider == "openai" {
+		fmt.Println("Using OpenAI provider")
 		return CreateClient(config, out)
 	}
+
+	return nil, fmt.Errorf("unknown provider: %s", provider)
 }

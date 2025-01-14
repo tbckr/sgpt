@@ -26,6 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -51,8 +52,11 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -90,8 +94,11 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -131,8 +138,11 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -167,6 +177,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 }
 
 func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
+	var err error
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
@@ -174,8 +185,11 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -218,8 +232,9 @@ func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
-	client, err := api.CreateClient(testCtx.Config, nil)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+	}
 
 	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
 
@@ -235,8 +250,11 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -275,8 +293,11 @@ func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        stdoutWriter,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -325,8 +346,9 @@ func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+	}
 
 	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
 	root.cmd.SetIn(stdinReader)
@@ -366,8 +388,10 @@ func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Error:      fmt.Errorf("piped shell error"),
+	}
 
 	prompt := "Say: Hello World!"
 
@@ -400,8 +424,11 @@ func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        stdoutWriter,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -450,8 +477,11 @@ func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        stdoutWriter,
+	}
 
 	stdinPrompt := "Say: Hello World!"
 	prompt := "Replace every 'World' word with 'ChatGPT'"
@@ -500,8 +530,12 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	var err error
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	prompt := `echo "Hello World"`
 	response := "Hello World!"
@@ -546,8 +580,11 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   `echo \"Hello World\"`,
+		Out:        stdoutWriter,
+	}
 
 	prompt := "Print: Hello World"
 	response := `echo \"Hello World\"`
@@ -557,10 +594,12 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
+	var err error
 	err = os.Setenv("SHELL", "/bin/bash")
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		_ = os.Unsetenv("SHELL")
+		err = os.Unsetenv("SHELL")
+		require.NoError(t, err)
 	})
 
 	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
@@ -596,15 +635,29 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 }
 
 func TestRootCmd_SimplePromptWithChat(t *testing.T) {
+	var err error
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
+	// Create chat directory and initialize messages file
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	err = os.MkdirAll(chatDir, 0755)
+	require.NoError(t, err)
+	
+	// Initialize messages file
+	messagesFile := filepath.Join(chatDir, "messages.json")
+	err = os.WriteFile(messagesFile, []byte("[]"), 0644)
+	require.NoError(t, err)
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	prompt := "Say: Hello World!"
 	response := "Hello World!"
@@ -631,9 +684,11 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	require.Equal(t, 0, mem.code)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
-	manager, err := chat.NewFilesystemChatSessionManager(testCtx.Config)
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
 	require.NoError(t, err)
 
 	var messages []openai.ChatCompletionMessage
@@ -653,15 +708,29 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 }
 
 func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
+	var err error
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
+	// Create chat directory and initialize messages file
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	err = os.MkdirAll(chatDir, 0755)
+	require.NoError(t, err)
+	
+	// Initialize messages file
+	messagesFile := filepath.Join(chatDir, "messages.json")
+	err = os.WriteFile(messagesFile, []byte("[]"), 0644)
+	require.NoError(t, err)
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "Hello World!",
+		Out:        writer,
+	}
 
 	persona := "This is my custom persona"
 	prompt := "Say: Hello World!"
@@ -702,7 +771,8 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	require.Equal(t, 0, mem.code)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
@@ -729,15 +799,29 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 }
 
 func TestRootCmd_ChatConversation(t *testing.T) {
+	var err error
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
+	// Create chat directory and initialize messages file
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	err = os.MkdirAll(chatDir, 0755)
+	require.NoError(t, err)
+	
+	// Initialize messages file
+	messagesFile := filepath.Join(chatDir, "messages.json")
+	err = os.WriteFile(messagesFile, []byte("[]"), 0644)
+	require.NoError(t, err)
+
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
 
-	client, err := api.CreateClient(testCtx.Config, writer)
-	require.NoError(t, err)
+	client := &api.MockProvider{
+		HTTPClient: &http.Client{},
+		Response:   "World!",
+		Out:        writer,
+	}
 
 	prompt := "Repeat last message"
 	response := "World!"
@@ -780,7 +864,8 @@ func TestRootCmd_ChatConversation(t *testing.T) {
 	require.Equal(t, 0, mem.code)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var messages []openai.ChatCompletionMessage
 	messages, err = manager.GetSession("test_chat")

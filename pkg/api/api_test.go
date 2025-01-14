@@ -33,28 +33,33 @@ import (
 
 	"github.com/jarcoal/httpmock"
 	"github.com/sashabaranov/go-openai"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	"github.com/tbckr/sgpt/v2/internal/testlib"
 	"github.com/tbckr/sgpt/v2/pkg/chat"
 )
 
-func TestCreateClient(t *testing.T) {
+func TestCreateProvider(t *testing.T) {
 	// Set the api key
 	err := os.Setenv("OPENAI_API_KEY", "test")
 	require.NoError(t, err)
 
-	var client *OpenAIClient
-	client, err = CreateClient(nil, nil)
+	config := viper.New()
+	config.Set("provider", "openai")
+	
+	var provider Provider
+	provider, err = CreateProvider(config, nil)
 	require.NoError(t, err)
-	require.NotNil(t, client)
+	require.NotNil(t, provider)
 }
 
 func TestCreateClientMissingApiKey(t *testing.T) {
 	err := os.Unsetenv("OPENAI_API_KEY")
 	require.NoError(t, err)
 
+	config := viper.New()
 	var client *OpenAIClient
-	client, err = CreateClient(nil, nil)
+	client, err = CreateClient(config, nil)
 	require.Error(t, err)
 	require.ErrorIs(t, err, ErrMissingAPIKey)
 	require.Nil(t, client)
@@ -180,7 +185,9 @@ func TestPromptSaveAsChat(t *testing.T) {
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
@@ -309,7 +316,9 @@ func TestPromptWithModifier(t *testing.T) {
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
@@ -405,7 +414,9 @@ func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
@@ -470,7 +481,9 @@ func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
@@ -535,7 +548,9 @@ func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 	require.Equal(t, expected, result)
 	require.NoError(t, writer.Close())
 
-	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+	chatDir := filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var manager chat.SessionManager
 	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)

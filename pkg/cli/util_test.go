@@ -31,8 +31,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-var useMockClient = func(mockClient *api.OpenAIClient) func(*viper.Viper, io.Writer) (*api.OpenAIClient, error) {
-	return func(_ *viper.Viper, _ io.Writer) (*api.OpenAIClient, error) {
+var useMockClient = func(mockClient api.Provider) func(*viper.Viper, io.Writer) (api.Provider, error) {
+	return func(_ *viper.Viper, _ io.Writer) (api.Provider, error) {
 		return mockClient, nil
 	}
 }

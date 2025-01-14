@@ -67,6 +67,11 @@ func (c *OpenAIClient) GetHTTPClient() *http.Client {
 
 // CreateClient creates a new OpenAI client with the given config and output writer.
 func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
+	// Don't create OpenAI client if we're using Bedrock
+	if config.GetString("provider") == "bedrock" {
+		return nil, fmt.Errorf("cannot create OpenAI client when using Bedrock provider")
+	}
+
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
 	if !exists {

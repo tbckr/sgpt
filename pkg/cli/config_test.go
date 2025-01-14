@@ -48,11 +48,11 @@ func TestConfigCmdInit(t *testing.T) {
 	require.Equal(t, 0, mem.code)
 
 	require.FileExists(t, filepath.Join(testCtx.ConfigDir, "config.yaml"))
-	// config must only contain values for model, maxtokens, temperature, topp
+	// config must only contain values for model, maxtokens, temperature, topp, provider
 	require.NoError(t, testCtx.Config.ReadInConfig())
 	// TESTING may be in the config, because this is a test
-	require.Equal(t, 8, len(testCtx.Config.AllSettings()))
-	for _, key := range []string{"model", "maxtokens", "temperature", "topp", "cachedir", "personas", "stream", "testing"} {
+	require.Equal(t, 9, len(testCtx.Config.AllSettings()))
+	for _, key := range []string{"model", "maxtokens", "temperature", "topp", "cachedir", "personas", "stream", "testing", "provider"} {
 		require.Contains(t, testCtx.Config.AllSettings(), key)
 	}
 }

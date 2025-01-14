@@ -22,8 +22,8 @@
 package chat
 
 import (
-	"bufio"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -44,16 +44,25 @@ func NewFilesystemChatSessionManager(config *viper.Viper) (SessionManager, error
 
 func (m FilesystemChatSessionManager) getFilepathForSession(sessionName string) (string, error) {
 	cacheDir := m.config.GetString("cacheDir")
-	filePath := filepath.Join(cacheDir, sessionName)
-	return filePath, nil
+	sessionDir := filepath.Join(cacheDir, sessionName)
+	return sessionDir, nil
+}
+
+func (m FilesystemChatSessionManager) getMessagesFilepath(sessionDir string) string {
+	return filepath.Join(sessionDir, "messages.json")
 }
 
 func (m FilesystemChatSessionManager) fileExists(filePath string) (bool, error) {
-	if _, err := os.Stat(filePath); err != nil {
+	info, err := os.Stat(filePath)
+	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
 		}
 		return false, err
+	}
+	// For chat sessions, we expect a directory
+	if !info.IsDir() {
+		return false, fmt.Errorf("%q is not a directory", filePath)
 	}
 	return true, nil
 }
@@ -98,30 +107,31 @@ func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.C
 	}
 	slog.Debug("Session exists")
 
-	// Open file
+	// Open messages file
+	messagesFile := m.getMessagesFilepath(sessionFilepath)
 	var file *os.File
-	file, err = os.Open(sessionFilepath)
+	file, err = os.Open(messagesFile)
 	if err != nil {
+		if os.IsNotExist(err) {
+			// Create empty messages file if it doesn't exist
+			if err = os.MkdirAll(sessionFilepath, 0755); err != nil {
+				return nil, err
+			}
+			if err = os.WriteFile(messagesFile, []byte("[]"), 0644); err != nil {
+				return nil, err
+			}
+			return []openai.ChatCompletionMessage{}, nil
+		}
 		return nil, err
 	}
 	defer file.Close()
 
 	slog.Debug("Reading messages from session file")
-	// Read messages
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-
+	// Read messages array
 	var messages []openai.ChatCompletionMessage
-	var data []byte
-	var readMessage openai.ChatCompletionMessage
-
-	for scanner.Scan() {
-		data = scanner.Bytes()
-		readMessage = openai.ChatCompletionMessage{}
-		if err = json.Unmarshal(data, &readMessage); err != nil {
-			return nil, err
-		}
-		messages = append(messages, readMessage)
+	decoder := json.NewDecoder(file)
+	if err = decoder.Decode(&messages); err != nil {
+		return nil, fmt.Errorf("failed to decode messages: %w", err)
 	}
 	slog.Debug("Messages from session file imported")
 	return messages, nil
@@ -148,36 +158,38 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 	}
 	slog.Debug("Session exists")
 
-	// Open file
+	// Create session directory if it doesn't exist
+	if !exists {
+		if err = os.MkdirAll(sessionFilepath, 0755); err != nil {
+			return err
+		}
+		slog.Debug("Created new session directory")
+	}
+
+	// Open messages file
+	messagesFile := m.getMessagesFilepath(sessionFilepath)
 	var file *os.File
-	if exists {
+	if _, err = os.Stat(messagesFile); err == nil {
 		// Open and truncate existing file
-		file, err = os.OpenFile(sessionFilepath, os.O_WRONLY|os.O_TRUNC, defaultFilePermissions)
+		file, err = os.OpenFile(messagesFile, os.O_WRONLY|os.O_TRUNC, defaultFilePermissions)
 		if err != nil {
 			return err
 		}
-		slog.Debug("Existing session file opened and truncated")
+		slog.Debug("Existing messages file opened and truncated")
 	} else {
 		// Create file
-		file, err = os.Create(sessionFilepath)
+		file, err = os.Create(messagesFile)
 		if err != nil {
 			return err
 		}
-		slog.Debug("New session file created")
+		slog.Debug("New messages file created")
 	}
 	defer file.Close()
 
-	// Save messages to file
-	var data []byte
-	for _, message := range messages {
-		data, err = json.Marshal(message)
-		if err != nil {
-			return err
-		}
-		_, err = file.WriteString(string(data) + "\n")
-		if err != nil {
-			return err
-		}
+	// Save messages as JSON array
+	encoder := json.NewEncoder(file)
+	if err = encoder.Encode(messages); err != nil {
+		return fmt.Errorf("failed to encode messages: %w", err)
 	}
 	slog.Debug("Messages saved to session file")
 	return nil
@@ -213,7 +225,7 @@ func (m FilesystemChatSessionManager) DeleteSession(sessionName string) error {
 		slog.Debug("Session does not exist - nothing to delete")
 		return nil
 	}
-	err = os.Remove(sessionFilepath)
+	err = os.RemoveAll(sessionFilepath)
 	if err != nil {
 		return err
 	}

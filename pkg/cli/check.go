@@ -24,6 +24,7 @@ package cli
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/tbckr/sgpt/v2/pkg/api"
@@ -36,7 +37,7 @@ type checkCmd struct {
 	cmd *cobra.Command
 }
 
-func newCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *checkCmd {
+func newCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (api.Provider, error)) *checkCmd {
 	check := &checkCmd{}
 	cmd := &cobra.Command{
 		Use:   "check",
@@ -51,6 +52,15 @@ This command will return an error if the API key is not set or invalid.
 			if err != nil {
 				return err
 			}
+
+			// Check for OpenAI API key if using OpenAI provider
+			provider := config.GetString("provider")
+			if provider == "" || provider == "openai" {
+				if _, exists := os.LookupEnv("OPENAI_API_KEY"); !exists {
+					return api.ErrMissingAPIKey
+				}
+			}
+
 			_, err = createClientFn(config, cmd.OutOrStdout())
 			if err != nil {
 				return err

@@ -95,7 +95,9 @@ func TestFilesystemChatSessionManager_SessionExists(t *testing.T) {
 	exists, err = manager.SessionExists("test")
 	require.NoError(t, err)
 	require.True(t, exists)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 }
 
 func TestFilesystemChatSessionManager_SessionDoesNotExist(t *testing.T) {
@@ -125,7 +127,9 @@ func TestFilesystemChatSessionManager_SaveExistingSession(t *testing.T) {
 	exists, err = manager.SessionExists("test")
 	require.NoError(t, err)
 	require.True(t, exists)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	messages = append(messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
@@ -155,7 +159,9 @@ func TestFilesystemChatSessionManager_GetSession(t *testing.T) {
 	exists, err = manager.SessionExists("test")
 	require.NoError(t, err)
 	require.True(t, exists)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var loadedMessages []openai.ChatCompletionMessage
 	loadedMessages, err = manager.GetSession("test")
@@ -189,7 +195,9 @@ func TestFilesystemChatSessionManager_ListSessions(t *testing.T) {
 	exists, err = manager.SessionExists("test")
 	require.NoError(t, err)
 	require.True(t, exists)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var sessions []string
 	sessions, err = manager.ListSessions()
@@ -211,7 +219,9 @@ func TestFilesystemChatSessionManager_DeleteSession(t *testing.T) {
 	exists, err = manager.SessionExists("test")
 	require.NoError(t, err)
 	require.True(t, exists)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var sessions []string
 	sessions, err = manager.ListSessions()
@@ -244,7 +254,9 @@ func TestFilesystemChatSessionManager_DeleteNotExistingSession(t *testing.T) {
 	exists, err = manager.SessionExists("test")
 	require.NoError(t, err)
 	require.True(t, exists)
-	require.FileExists(t, filepath.Join(config.GetString("cacheDir"), "test"))
+	chatDir := filepath.Join(config.GetString("cacheDir"), "test")
+	require.DirExists(t, chatDir)
+	require.FileExists(t, filepath.Join(chatDir, "messages.json"))
 
 	var sessions []string
 	sessions, err = manager.ListSessions()
