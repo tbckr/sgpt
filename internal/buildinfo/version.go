@@ -22,7 +22,7 @@
 package buildinfo
 
 var (
-	version    = "v2.15.0" // x-release-please-version
+	version    = "v2.16.0" // x-release-please-version
 	commit     = "unset"
 	commitDate = "unset"
 )
