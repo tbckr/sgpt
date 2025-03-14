@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.16.1](https://github.com/tbckr/sgpt/compare/v2.16.0...v2.16.1) (2025-03-14)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.38.0 ([5ae0bf7](https://github.com/tbckr/sgpt/commit/5ae0bf7becbc30c222368728a83c5c59bd6739dc))
+
 ## [2.16.0](https://github.com/tbckr/sgpt/compare/v2.15.0...v2.16.0) (2025-02-25)
 
 
