@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.16.1](https://github.com/tbckr/sgpt/compare/v2.16.0...v2.16.1) (2025-03-29)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/sashabaranov/go-openai to v1.38.0 ([5ae0bf7](https://github.com/tbckr/sgpt/commit/5ae0bf7becbc30c222368728a83c5c59bd6739dc))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.38.1 ([3ca1bcf](https://github.com/tbckr/sgpt/commit/3ca1bcfbe8359da57cb5317b63bbfdb2e706ed8b))
+* **deps:** update module github.com/spf13/viper to v1.20.0 ([b4bbaf7](https://github.com/tbckr/sgpt/commit/b4bbaf73b2b42782e1ca30982fd8f10bbe0fd905))
+
 ## [2.16.0](https://github.com/tbckr/sgpt/compare/v2.15.0...v2.16.0) (2025-02-25)
 
 
