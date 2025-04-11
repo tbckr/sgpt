@@ -5,7 +5,7 @@ models beyond OpenAI's offerings.
 
 ## Setup
 
-1. Set the OpenRouter API base URL:
+1. Set the OpenRouter API base URL environment variable:
    ```shell
    export OPENAI_API_BASE="https://openrouter.ai/api/v1"
    ```
