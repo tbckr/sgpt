@@ -30,7 +30,6 @@ This is roughly 333,000 times the mass of Earth. The Sun contains about 99.86% o
 
 Browse the complete list of available models on the [OpenRouter models page](https://openrouter.ai/models).
 
-> [!TIP]
-> Under [Integrations](https://openrouter.ai/settings/integrations) in your OpenRouter account, you can link your
-> existing OpenAI API key. This allows you to use any remaining OpenAI credits when accessing OpenAI models through
-> OpenRouter.
+**Tip:** Under [Integrations](https://openrouter.ai/settings/integrations) in your OpenRouter account, you can link your
+existing OpenAI API key. This allows you to use any remaining OpenAI credits when accessing OpenAI models through
+OpenRouter.
