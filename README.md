@@ -41,6 +41,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [Querying OpenAI Models](#querying-openai-models)
   - [GPT-4o and GPT-4 Vision API Support](#gpt-4o-and-gpt-4-vision-api-support)
   - [o1 API Support](#o1-api-support)
+  - [OpenRouter API Support](#openrouter-api-support)
   - [Chat Capabilities](#chat-capabilities)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
   - [Interactive Shell Sessions](#interactive-shell-sessions)
