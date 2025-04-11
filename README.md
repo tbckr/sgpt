@@ -20,7 +20,8 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 This is a Go implementation. For the original Python implementation,
 visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind when reporting issues.
 
-Note: Currently under heavy refactoring for v3, but v2 is still maintained.
+> [!NOTE]
+> Currently under heavy refactoring for v3, but v2 is still maintained.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -68,6 +69,8 @@ Note: Currently under heavy refactoring for v3, but v2 is still maintained.
   results, benefiting from the powerful language model.
 - **Bash Functions and Aliases:** Seamlessly integrate SGPT responses into custom bash functions and aliases, optimizing
   your workflows and making your daily tasks more efficient.
+- **OpenRouter Support:** Use [OpenRouter](https://openrouter.ai) to access various large language models (LLMs) via a
+  single API, providing flexibility and convenience in your interactions with different models.
 
 By offering these versatile features, SGPT serves as a powerful tool to enhance your overall productivity, streamline
 your workflow, and simplify complex tasks.
@@ -183,7 +186,8 @@ To use the OpenAI API, you must first obtain an API key.
 After completing these steps, you'll have an OpenAI API key that can be used to interact with the OpenAI models through
 the SGPT tool.
 
-**Note:** Your API key is sensitive information. Do not share it with anyone.
+> [!IMPORTANT]
+> Your API key is sensitive information. Do not share it with anyone.
 
 ### Querying OpenAI Models
 
@@ -262,6 +266,39 @@ There are three "r"s in the word "strawberry".
 ```
 
 **Important:** The o1 API does not support personas.
+
+### OpenRouter API Support
+
+SGPT seamlessly integrates with the [OpenRouter API](https://openrouter.ai), giving you access to a wide range of AI
+models beyond OpenAI's offerings.
+
+1. Set the OpenRouter API base URL:
+   ```shell
+   export OPENAI_API_BASE="https://openrouter.ai/api/v1"
+   ```
+
+2. Create an API key at [OpenRouter](https://openrouter.ai/settings/keys) and set it as your environment variable:
+   ```shell
+   export OPENAI_API_KEY="your_openrouter_api_key"
+   ```
+
+Once configured, you can specify any OpenRouter-supported model with the `-m` flag:
+
+```shell
+$ sgpt -m "anthropic/claude-3.7-sonnet" "mass of sun"
+The mass of the Sun is approximately:
+
+1.989 × 10^30 kilograms (kg)
+
+This is roughly 333,000 times the mass of Earth. The Sun contains about 99.86% of all the mass in our solar system.
+```
+
+Browse the complete list of available models on the [OpenRouter models page](https://openrouter.ai/models).
+
+> [!TIP]
+> Under [Integrations](https://openrouter.ai/settings/integrations) in your OpenRouter account, you can link your
+> existing OpenAI API key. This allows you to use any remaining OpenAI credits when accessing OpenAI models through
+> OpenRouter.
 
 ### Chat Capabilities
 

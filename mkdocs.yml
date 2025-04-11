@@ -71,6 +71,7 @@ nav:
       - Query Models: 'usage/query-models.md'
       - GPT-4o and GPT4 Vision API: 'usage/gpt-4o.md'
       - o1 API Support: 'usage/o1.md'
+      - OpenRouter API Support: 'usage/openrouter.md'
       - Chat: 'usage/chat.md'
       - Docker: 'usage/docker.md'
       - Personas: 'usage/personas.md'
