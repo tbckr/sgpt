@@ -10,11 +10,9 @@
 # === Configuration ===
 TMP_INSTALL_DIR="/tmp/sgpt_install"
 TARGET_FILE="/etc/profile.d/sgpt_bind.sh"
-# the credential file which will be created (all users can read that file
-# change permissions as needed or create an sgpt user group)
+# the credential file which will be created (all users can read that file - change permissions as needed or create an sgpt user group)
 API_KEY_FILE="/etc/sgpt/openai_key.sh"
-# the file with the openai_api_key to be used at installation (root access only)
-# this file has to contain only the openai key at the first line
+# the file with the openai_api_key to be used at installation (root access only) - this file should contain only the key at the first line
 SOURCE_CREDENTIAL_FILE="/etc/credentials/sgpt/openai_key"
 LOG_FILE="/var/log/sgpt-ubuntu-debian-setup.log"
 
@@ -76,6 +74,17 @@ escape_sed_pattern() {
     echo "$1" | sed -e 's/[][\\/.*^$(){}?+|]/\\&/g'
 }
 
+clean_profile() {
+ESCAPED_PROFILE=$(escape_sed_pattern "$SGPT_PROFILE_BLOCK")
+sudo sed -i "/$ESCAPED_PROFILE/,/# \*\*\* sgpt settings end \*\*\*/d" /etc/profile
+}
+
+clean_bashrc() {
+ESCAPED_BASHRC=$(escape_sed_pattern "$SGPT_BASHRC_BLOCK")
+sudo sed -i "/$ESCAPED_BASHRC/,/# \*\*\* sgpt settings end \*\*\*/d" /etc/bash.bashrc
+}
+
+
 # === UNINSTALL Mode ===
 if [[ "$UNINSTALL" == true ]]; then
     echo "🧽 Uninstalling sgpt and cleaning up configuration..."
@@ -83,11 +92,8 @@ if [[ "$UNINSTALL" == true ]]; then
     sudo rm -f "$API_KEY_FILE"
     sudo dpkg -r sgpt || echo "ℹ️ sgpt was not installed."
 
-    ESCAPED_PROFILE=$(escape_sed_pattern "$SGPT_PROFILE_BLOCK")
-    ESCAPED_BASHRC=$(escape_sed_pattern "$SGPT_BASHRC_BLOCK")
-
-    sudo sed -i "/$ESCAPED_PROFILE/,/# \*\*\* sgpt settings end \*\*\*/d" /etc/profile
-    sudo sed -i "/$ESCAPED_BASHRC/,/# \*\*\* sgpt settings end \*\*\*/d" /etc/bash.bashrc
+    clean_profile
+    clean_bashrc
 
     echo "✅ sgpt successfully uninstalled and cleaned up."
     exit 0
@@ -166,21 +172,14 @@ echo "✅ sgpt_bind.sh created."
 
 # === Step 6: Patch /etc/profile ===
 echo "🧩 Updating /etc/profile ..."
-if grep -q "$SGPT_PROFILE_BLOCK" /etc/profile; then
-    ESCAPED_BLOCK=$(escape_sed_pattern "$SGPT_PROFILE_BLOCK")
-    sudo sed -i "/$ESCAPED_BLOCK/,/# \*\*\* sgpt settings end \*\*\*/c$SGPT_PROFILE_CODE" /etc/profile
-else
-    echo "$SGPT_PROFILE_CODE" | sudo tee -a /etc/profile > /dev/null
-fi
+
+clean_profile
+echo "$SGPT_PROFILE_CODE" | sudo tee -a /etc/profile > /dev/null
 
 # === Step 7: Patch /etc/bash.bashrc ===
 echo "🧩 Updating /etc/bash.bashrc ..."
-if grep -q "$SGPT_BASHRC_BLOCK" /etc/bash.bashrc; then
-    ESCAPED_BLOCK=$(escape_sed_pattern "$SGPT_BASHRC_BLOCK")
-    sudo sed -i "/$ESCAPED_BLOCK/,/# \*\*\* sgpt settings end \*\*\*/c$SGPT_BASHRC_CODE" /etc/bash.bashrc
-else
-    echo "$SGPT_BASHRC_CODE" | sudo tee -a /etc/bash.bashrc > /dev/null
-fi
+clean_bashrc
+echo "$SGPT_BASHRC_CODE" | sudo tee -a /etc/bash.bashrc > /dev/null
 
 echo "✅ Shell-GPT setup completed successfully."
 echo "👉 Open a new terminal or re-login to activate the configuration."
