@@ -3,34 +3,10 @@ import subprocess
 import sys
 import datetime
 
-### TODO
-# Here is a workaround to avoid using an environment variable.
-#
-# Add the directory with the following content into your PATH:
-#
-# ./
-# ├── config.json
-# └── sgpt.sh --> put in /usr/local/bin - which is in the path before /usr/bin/sgpt
-# $ cat config.json
-# {"openai_api_key": "<value>"}
-#
-# $ cat sgpt.sh
-# OPENAI_API_KEY=$(cat $(dirname ${BASH_SOURCE[0]})/config.json | jq -r .openai_api_key) sgpt "$@"
-# Now you can use sgpt.sh instead of sgpt to run your scripts/commands without exposing the API key.
-#
-# put model 4.1 (?) also in that config to override the standard setting, like "model-override"
-###
-
-
 LOG_FILE = "/var/log/install-sgpt-pkg.log"
 TMP_INSTALL_DIR = "/tmp/sgpt_install"
 PROFILE_SCRIPT_LOCATION = "/etc/profile.d/sgpt_bind.sh"
-# the credential file which will be created - all users can read that file
-# change permissions as needed or create a sgpt user group
-API_KEY_FILE = "/etc/sgpt/openai_key.sh"
-# the file with the openai_api_key to be used at installation (root access only)
-# this file have to contain only the key as the first line
-SOURCE_CREDENTIAL_FILE = "/etc/credentials/sgpt/openai_key"
+WRAPPER_SCRIPT_LOCATION = "/usr/bin/sgpt.sh"
 SGPT_PROFILE_BLOCK_START = "# *** sgpt settings begin ***"
 SGPT_PROFILE_BLOCK_END = "# *** sgpt settings end ***"
 SGPT_PROFILE_CODE = '''if [ -f /etc/bash.bashrc ]; then
@@ -130,7 +106,7 @@ def install_sgpt():
 def uninstall_sgpt():
     print_and_log("🧽 Uninstalling sgpt and cleaning up configuration...")
     run_command(f"rm -f {PROFILE_SCRIPT_LOCATION}")
-    run_command(f"rm -f {API_KEY_FILE}")
+    run_command(f"rm -f {WRAPPER_SCRIPT_LOCATION}")
     run_command("dpkg -r sgpt || true")
     remove_block_between_lines(SGPT_PROFILE_BLOCK_START, SGPT_PROFILE_BLOCK_END, "/etc/profile")
     remove_block_between_lines(SGPT_BASHRC_BLOCK_START, SGPT_BASHRC_BLOCK_END, "/etc/bash.bashrc")
@@ -156,44 +132,118 @@ def remove_block_between_lines(start, end, file_path):
                 f.write(line)
 
 
-def read_api_key():
-    print_and_log(f"🔐 Reading API key from {SOURCE_CREDENTIAL_FILE} ...")
-    if os.path.exists(SOURCE_CREDENTIAL_FILE):
-        with open(SOURCE_CREDENTIAL_FILE, "r") as f:
-            key = f.readline().strip()
-        os.makedirs("/etc/sgpt", exist_ok=True)
-        with open(API_KEY_FILE, "w") as f:
-            f.write(f'export OPENAI_API_KEY="{key}"\n')
-        os.chmod(API_KEY_FILE, 0o644)
-        print_and_log(f"✅ API key saved to {API_KEY_FILE}")
-    else:
-        print_and_log("❌ Error: API key file not found or not readable. Aborting.")
-        sys.exit(1)
-
-
 def create_bind_script():
     print_and_log(f"🔗 Creating binding script {PROFILE_SCRIPT_LOCATION} ...")
     with open(PROFILE_SCRIPT_LOCATION, "w") as f:
-        f.write(f"""# Shell-GPT API key loader
-if [[ -f "{API_KEY_FILE}" ]]; then
-    source "{API_KEY_FILE}"
-else
-    echo "⚠️  Warning: API key file {API_KEY_FILE} not found."
-fi
-
-# Shell-GPT Bash integration v0.2
-_sgpt_bash() {{
+        f.write("""#!/bin/bash
+# Shell-GPT Bash integration 
+_sgpt_bash() {
     if [[ -n "$READLINE_LINE" ]]; then
         READLINE_LINE=$(sgpt sh "$READLINE_LINE" --stream)
-        READLINE_POINT=${{#READLINE_LINE}}
+        READLINE_POINT=${#READLINE_LINE}
     fi
-}}
+}
 
 # Bind Ctrl+L to sgpt
 bind -x '"\\C-l": _sgpt_bash'
+
+# alias sgpt --> sgpt.sh
+alias sgpt='/usr/bin/sgpt.sh'
 """)
     os.chmod(PROFILE_SCRIPT_LOCATION, 0o755)
-    print_and_log("✅ sgpt_bind.sh created.")
+    print_and_log(f"✅ {PROFILE_SCRIPT_LOCATION} created.")
+
+
+def create_wrapper_script():
+    print_and_log(f"🔗 Creating wrapper script {WRAPPER_SCRIPT_LOCATION} ...")
+    with open(WRAPPER_SCRIPT_LOCATION, "w") as f:
+        f.write("""#!/bin/bash
+
+# Define the path to the configuration file
+CONFIG_FILE="$HOME/.config/sgpt/multiconfig.json"
+
+# If the config file doesn't exist, create it with default preset settings
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  # Create the directory if it doesn't already exist
+  mkdir -p "$(dirname "$CONFIG_FILE")"
+  
+  # Write a default JSON configuration with multiple presets
+  cat > "$CONFIG_FILE" <<EOF
+{
+  "default": {
+    "api_base": "https://api.openai.com/v1",
+    "api_key": "",
+    "model": "gpt-4.1-nano",
+    "flags": ""
+  },
+  "mini": {
+    "api_base": "https://api.openai.com/v1",
+    "api_key": "",
+    "model": "gpt-4.1-mini",
+    "flags": ""
+  },
+  "minilong": {
+    "api_base": "https://api.openai.com/v1",
+    "api_key": "",
+    "model": "gpt-4.1-mini",
+    "flags": "-s 100000"
+  },
+  "claude": {
+    "api_base": "https://openrouter.ai/api/v1",
+    "api_key": "",
+    "model": "anthropic/claude-3.7-sonnet",
+    "flags": ""
+  }
+}
+EOF
+
+  # Set secure permissions for the config file (read/write for user only)
+  chmod 0600 "$CONFIG_FILE"
+
+  # Notify the user to fill in API keys and flags
+  echo "Configuration file created at $CONFIG_FILE. Please set your API keys and flags before proceeding."
+  echo "Add as many presets as You want."
+  exit 1  # Exit after creating the file
+fi
+
+# Check if the user provided a preset with the -p flag
+if [[ "$1" == "-p" ]]; then
+  PRESET="$2"      # Set the preset from the argument
+  shift 2          # Remove -p and preset from the argument list
+else
+  PRESET="default"  # Use "default" preset if none is specified
+fi
+
+# Extract preset settings from the config using `jq`
+API_BASE=$(jq -r ".$PRESET.api_base" "$CONFIG_FILE")
+API_KEY=$(jq -r ".$PRESET.api_key" "$CONFIG_FILE")
+MODEL=$(jq -r ".$PRESET.model" "$CONFIG_FILE")
+FLAGS=$(jq -r ".$PRESET.flags" "$CONFIG_FILE")
+
+# Validate that required values are not missing or null
+if [[ -z "$API_BASE" || "$API_BASE" == "null" ]]; then
+  echo "Error: 'api_base' for preset '$PRESET' is missing."
+  echo "Please set it in $CONFIG_FILE"
+  exit 1
+fi
+
+if [[ -z "$API_KEY" || "$API_KEY" == "null" ]]; then
+  echo "Error: 'api_key' for preset '$PRESET' is missing."
+  echo "Please set it in $CONFIG_FILE"
+  exit 1
+fi
+
+if [[ -z "$MODEL" || "$MODEL" == "null" ]]; then
+  echo "Error: 'model' for preset '$PRESET' is missing."
+  echo "Please set it in $CONFIG_FILE"
+  exit 1
+fi
+
+# Run the sgpt command with the selected preset's configuration
+OPENAI_API_KEY="$API_KEY" OPENAI_API_BASE="$API_BASE" /usr/bin/sgpt -m "$MODEL" $FLAGS "$@"
+""")
+    os.chmod(WRAPPER_SCRIPT_LOCATION, 0o755)
+    print_and_log(f"✅ {WRAPPER_SCRIPT_LOCATION} created.")
 
 
 def patch_file(file_path, start_tag, end_tag, content):
@@ -227,8 +277,8 @@ def main():
     else:
         print_and_log("✅ sgpt is already up to date. No installation needed.")
 
-    read_api_key()
     create_bind_script()
+    create_wrapper_script()
 
     print_and_log("🧩 Updating /etc/profile ...")
     patch_file("/etc/profile", SGPT_PROFILE_BLOCK_START, SGPT_PROFILE_BLOCK_END, SGPT_PROFILE_CODE)
