@@ -18,6 +18,7 @@ import datetime
 # OPENAI_API_KEY=$(cat $(dirname ${BASH_SOURCE[0]})/config.json | jq -r .openai_api_key) sgpt "$@"
 # Now you can use sgpt.sh instead of sgpt to run your scripts/commands without exposing the API key.
 #
+# put model 4.1 (?) also in that config to override the standard setting, like "model-override"
 ###
 
 
