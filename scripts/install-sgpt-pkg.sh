@@ -9,7 +9,7 @@
 
 # === Configuration ===
 TMP_INSTALL_DIR="/tmp/sgpt_install"
-TARGET_FILE="/etc/profile.d/sgpt_bind.sh"
+PROFILE_SCRIPT_LOCATION="/etc/profile.d/sgpt_bind.sh"
 # the credential file which will be created (all users can read that file - change permissions as needed or create an sgpt user group)
 API_KEY_FILE="/etc/sgpt/openai_key.sh"
 # the file with the openai_api_key to be used at installation (root access only) - this file should contain only the key at the first line
@@ -20,15 +20,20 @@ SGPT_PROFILE_BLOCK_START="# *** sgpt settings begin ***"
 SGPT_PROFILE_BLOCK_END="# *** sgpt settings end ***"
 SGPT_PROFILE_CODE='if [ -f /etc/bash.bashrc ]; then
     . /etc/bash.bashrc
-fi
-'
+fi'
 
 SGPT_BASHRC_BLOCK_START="# *** sgpt settings begin ***"
 SGPT_BASHRC_BLOCK_END="# *** sgpt settings end ***"
 SGPT_BASHRC_CODE='if [[ $- == *i* ]] && [[ -f /etc/profile.d/sgpt_bind.sh ]]; then
     source /etc/profile.d/sgpt_bind.sh
+fi'
+
+# === Sudo Check ===
+if [[ "$EUID" -ne 0 ]]; then
+    echo "❌ Error: This script must be run as root (with sudo)."
+    echo "ℹ️  Please run it again using: sudo $0"
+    exit 1
 fi
-'
 
 # === Start Logging ===
 exec > >(tee -a "$LOG_FILE") 2>&1
@@ -67,17 +72,16 @@ fi
 
 
 # === Remove a block of text from a file ===
-# Arguments:
-#   $1 - The exact starting line (must match fully)
-#   $2 - The exact ending line (must match fully)
-#   $3 - The file path to operate on
-# Returns:
-#   0 - Success
-#   1 - File does not exist
-#   2 - Start line not found
-#   3 - End line not found
-
 remove_block_between_lines() {
+    # Arguments:
+    #   $1 - The exact starting line (must match fully)
+    #   $2 - The exact ending line (must match fully)
+    #   $3 - The file path to operate on
+    # Returns:
+    #   0 - Success
+    #   1 - File does not exist
+    #   2 - Start line not found
+    #   3 - End line not found
     local start="$1"
     local end="$2"
     local file="$3"
@@ -122,7 +126,7 @@ remove_block_between_lines "${SGPT_BASHRC_BLOCK_START}" "${SGPT_BASHRC_BLOCK_END
 # === UNINSTALL Mode ===
 if [[ "$UNINSTALL" == true ]]; then
     echo "🧽 Uninstalling sgpt and cleaning up configuration..."
-    sudo rm -f "$TARGET_FILE"
+    sudo rm -f "$PROFILE_SCRIPT_LOCATION"
     sudo rm -f "$API_KEY_FILE"
     sudo dpkg -r sgpt || echo "ℹ️ sgpt was not installed."
     remove_sgpt_profile_settings
@@ -178,8 +182,8 @@ else
 fi
 
 # === Step 5: Create sgpt_bind.sh ===
-echo "🔗 Creating binding script $TARGET_FILE ..."
-sudo tee "$TARGET_FILE" > /dev/null << EOF
+echo "🔗 Creating binding script $PROFILE_SCRIPT_LOCATION ..."
+sudo tee "$PROFILE_SCRIPT_LOCATION" > /dev/null << EOF
 # Shell-GPT API key loader
 if [[ -f "$API_KEY_FILE" ]]; then
     source "$API_KEY_FILE"
@@ -199,7 +203,7 @@ _sgpt_bash() {
 bind -x '"\\C-l": _sgpt_bash'
 EOF
 
-sudo chmod +x "$TARGET_FILE"
+sudo chmod +x "$PROFILE_SCRIPT_LOCATION"
 echo "✅ sgpt_bind.sh created."
 
 # === Step 6: Patch /etc/profile ===
