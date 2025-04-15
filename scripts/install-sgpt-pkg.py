@@ -7,7 +7,11 @@ import datetime
 LOG_FILE = "/var/log/install-sgpt-pkg.log"
 TMP_INSTALL_DIR = "/tmp/sgpt_install"
 PROFILE_SCRIPT_LOCATION = "/etc/profile.d/sgpt_bind.sh"
+# the credential file which will be created - all users can read that file
+# change permissions as needed or create a sgpt user group
 API_KEY_FILE = "/etc/sgpt/openai_key.sh"
+# the file with the openai_api_key to be used at installation (root access only)
+# this file have to contain only the key as the first line
 SOURCE_CREDENTIAL_FILE = "/etc/credentials/sgpt/openai_key"
 SGPT_PROFILE_BLOCK_START = "# *** sgpt settings begin ***"
 SGPT_PROFILE_BLOCK_END = "# *** sgpt settings end ***"
