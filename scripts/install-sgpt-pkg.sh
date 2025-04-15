@@ -16,22 +16,18 @@ API_KEY_FILE="/etc/sgpt/openai_key.sh"
 SOURCE_CREDENTIAL_FILE="/etc/credentials/sgpt/openai_key"
 LOG_FILE="/var/log/sgpt-ubuntu-debian-setup.log"
 
-SGPT_PROFILE_BLOCK="# *** sgpt settings begin ***"
-SGPT_PROFILE_CODE='
-# *** sgpt settings begin ***
-if [ -f /etc/bash.bashrc ]; then
+SGPT_PROFILE_BLOCK_START="# *** sgpt settings begin ***"
+SGPT_PROFILE_BLOCK_END="# *** sgpt settings end ***"
+SGPT_PROFILE_CODE='if [ -f /etc/bash.bashrc ]; then
     . /etc/bash.bashrc
 fi
-# *** sgpt settings end ***
 '
 
-SGPT_BASHRC_BLOCK="# *** sgpt settings begin ***"
-SGPT_BASHRC_CODE='
-# *** sgpt settings begin ***
-if [[ $- == *i* ]] && [[ -f /etc/profile.d/sgpt_bind.sh ]]; then
+SGPT_BASHRC_BLOCK_START="# *** sgpt settings begin ***"
+SGPT_BASHRC_BLOCK_END="# *** sgpt settings end ***"
+SGPT_BASHRC_CODE='if [[ $- == *i* ]] && [[ -f /etc/profile.d/sgpt_bind.sh ]]; then
     source /etc/profile.d/sgpt_bind.sh
 fi
-# *** sgpt settings end ***
 '
 
 # === Start Logging ===
@@ -69,19 +65,57 @@ elif [[ "$1" == "--uninstall" ]]; then
     echo "🧹 --uninstall enabled: sgpt and configs will be removed."
 fi
 
-# === Escape helper for sed ===
-escape_sed_pattern() {
-    echo "$1" | sed -e 's/[][\\/.*^$(){}?+|]/\\&/g'
+
+# === Remove a block of text from a file ===
+# Arguments:
+#   $1 - The exact starting line (must match fully)
+#   $2 - The exact ending line (must match fully)
+#   $3 - The file path to operate on
+# Returns:
+#   0 - Success
+#   1 - File does not exist
+#   2 - Start line not found
+#   3 - End line not found
+
+remove_block_between_lines() {
+    local start="$1"
+    local end="$2"
+    local file="$3"
+
+    # Check if file exists
+    if ! sudo test -f "$file"; then
+        echo "Error: File '$file' does not exist."
+        return 1
+    fi
+
+    # Check if start line exists
+    if ! sudo grep -Fxq "$start" "$file"; then
+        echo "Error: Start line not found in '$file'."
+        return 2
+    fi
+
+    # Check if end line exists
+    if ! sudo grep -Fxq "$end" "$file"; then
+        echo "Error: End line not found in '$file'."
+        return 3
+    fi
+
+    # Process and replace the file content
+    sudo awk -v start="$start" -v end="$end" '
+        $0 == start {in_block=1; next}
+        $0 == end && in_block {in_block=0; next}
+        !in_block
+    ' "$file" | sudo tee "$file.tmp" > /dev/null && sudo mv "$file.tmp" "$file"
+
+    return 0
 }
 
-clean_profile() {
-ESCAPED_PROFILE=$(escape_sed_pattern "$SGPT_PROFILE_BLOCK")
-sudo sed -i "/$ESCAPED_PROFILE/,/# \*\*\* sgpt settings end \*\*\*/d" /etc/profile
+remove_sgpt_profile_settings() {
+  remove_block_between_lines "${SGPT_PROFILE_BLOCK_START}" "${SGPT_PROFILE_BLOCK_END}" "/etc/profile"
 }
 
-clean_bashrc() {
-ESCAPED_BASHRC=$(escape_sed_pattern "$SGPT_BASHRC_BLOCK")
-sudo sed -i "/$ESCAPED_BASHRC/,/# \*\*\* sgpt settings end \*\*\*/d" /etc/bash.bashrc
+remove_sgpt_bashrc_settings() {
+remove_block_between_lines "${SGPT_BASHRC_BLOCK_START}" "${SGPT_BASHRC_BLOCK_END}" "/etc/bash.bashrc"
 }
 
 
@@ -91,10 +125,8 @@ if [[ "$UNINSTALL" == true ]]; then
     sudo rm -f "$TARGET_FILE"
     sudo rm -f "$API_KEY_FILE"
     sudo dpkg -r sgpt || echo "ℹ️ sgpt was not installed."
-
-    clean_profile
-    clean_bashrc
-
+    remove_sgpt_profile_settings
+    remove_sgpt_bashrc_settings
     echo "✅ sgpt successfully uninstalled and cleaned up."
     exit 0
 fi
@@ -173,13 +205,18 @@ echo "✅ sgpt_bind.sh created."
 # === Step 6: Patch /etc/profile ===
 echo "🧩 Updating /etc/profile ..."
 
-clean_profile
+remove_sgpt_profile_settings
+echo "$SGPT_PROFILE_BLOCK_START" | sudo tee -a /etc/profile > /dev/null
 echo "$SGPT_PROFILE_CODE" | sudo tee -a /etc/profile > /dev/null
+echo "$SGPT_PROFILE_BLOCK_END" | sudo tee -a /etc/profile > /dev/null
 
 # === Step 7: Patch /etc/bash.bashrc ===
 echo "🧩 Updating /etc/bash.bashrc ..."
-clean_bashrc
+remove_sgpt_bashrc_settings
+
+echo "$SGPT_BASHRC_BLOCK_START" | sudo tee -a /etc/bash.bashrc > /dev/null
 echo "$SGPT_BASHRC_CODE" | sudo tee -a /etc/bash.bashrc > /dev/null
+echo "$SGPT_BASHRC_BLOCK_END" | sudo tee -a /etc/bash.bashrc > /dev/null
 
 echo "✅ Shell-GPT setup completed successfully."
 echo "👉 Open a new terminal or re-login to activate the configuration."
