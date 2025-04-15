@@ -47,11 +47,11 @@ sudo python3 install-sgpt-pkg.py [OPTION]
 
 ### Options:
 
-| Option            | Description                                                         |
-|-------------------|---------------------------------------------------------------------|
-| `--help`          | Show usage instructions                                             |
-| `--force-install` | Force installation of the latest version                            |
-| `--uninstall`     | Uninstall `sgpt` and remove all configuration and integration files |
+| Option            | Description                                                                          |
+|-------------------|--------------------------------------------------------------------------------------|
+| `--help`          | Show usage instructions                                                              |
+| `--force-install` | Force installation of the latest version                                             |
+| `--uninstall`     | Uninstall `sgpt` and remove all integration files (keeps user preset configurations) |
 
 ---
 
