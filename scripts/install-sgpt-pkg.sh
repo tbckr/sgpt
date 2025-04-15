@@ -2,10 +2,10 @@
 # this will install or update sgpt and create a keybinding to cntrl-l
 
 # Usage Overview
-# bash sgpt-ubuntu-debian-setup.sh                   # install/update if needed
-# bash sgpt-ubuntu-debian-setup.sh --force-install   # always install latest
-# bash sgpt-ubuntu-debian-setup.sh --uninstall       # cleanly remove all
-# bash sgpt-ubuntu-debian-setup.sh --help            # show help message
+# bash install-sgpt-pkg.sh                   # install/update if needed
+# bash install-sgpt-pkg.sh --force-install   # always install latest
+# bash install-sgpt-pkg.sh --uninstall       # cleanly remove all
+# bash install-sgpt-pkg.sh --help            # show help message
 
 # === Configuration ===
 TMP_INSTALL_DIR="/tmp/sgpt_install"
@@ -14,7 +14,7 @@ PROFILE_SCRIPT_LOCATION="/etc/profile.d/sgpt_bind.sh"
 API_KEY_FILE="/etc/sgpt/openai_key.sh"
 # the file with the openai_api_key to be used at installation (root access only) - this file should contain only the key at the first line
 SOURCE_CREDENTIAL_FILE="/etc/credentials/sgpt/openai_key"
-LOG_FILE="/var/log/sgpt-ubuntu-debian-setup.log"
+LOG_FILE="/var/log/install-sgpt-pkg.log"
 
 SGPT_PROFILE_BLOCK_START="# *** sgpt settings begin ***"
 SGPT_PROFILE_BLOCK_END="# *** sgpt settings end ***"
@@ -48,7 +48,7 @@ show_help() {
     echo ""
     echo "Shell-GPT System Installer"
     echo "--------------------------"
-    echo "Usage: ./sgpt-ubuntu-debian-setup.sh [option]"
+    echo "Usage: ./install-sgpt-pkg.sh [option]"
     echo ""
     echo "Options:"
     echo "  --force-install     Always install the latest version"
