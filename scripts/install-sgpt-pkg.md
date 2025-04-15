@@ -15,6 +15,16 @@ After installation, `sgpt` can be used with different **presets** defined in a u
 - User-specific **API key**,
 - Additional **flags** (e.g., for streaming, long context).
 
+```bash
+# new flag -p to select a preset which can preset all the settings mentioned above 
+$> sgpt -p mini "what is the mass of the sun"
+
+# use <cntrl-l> hotkey to get back a command which can be executed with just pressing enter : 
+$> list all files < 8kB <cntrl-l>
+$> find . -type f -size -8k | ls -l
+```
+
+
 This allows every user on the system to define and use their own AI setup — with complete flexibility over providers, models, context lengths, and access keys.
 
 ---
