@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.1](https://github.com/tbckr/sgpt/compare/v2.17.0...v2.17.1) (2025-04-18)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/jarcoal/httpmock to v1.4.0 ([abd2da9](https://github.com/tbckr/sgpt/commit/abd2da9b9694a26a6db250a1c3f50bc9315649de))
+
 ## [2.17.0](https://github.com/tbckr/sgpt/compare/v2.16.0...v2.17.0) (2025-04-11)
 
 
