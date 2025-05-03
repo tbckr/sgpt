@@ -15,7 +15,7 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
 - [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.2.3/LICENSE))
 - [github.com/sagikazarmark/locafero](https://pkg.go.dev/github.com/sagikazarmark/locafero) ([MIT](https://github.com/sagikazarmark/locafero/blob/v0.7.0/LICENSE))
-- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.38.2/LICENSE))
+- [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.38.3/LICENSE))
 - [github.com/sourcegraph/conc](https://pkg.go.dev/github.com/sourcegraph/conc) ([MIT](https://github.com/sourcegraph/conc/blob/v0.3.0/LICENSE))
 - [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.12.0/LICENSE.txt))
 - [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.7.1/LICENSE))
@@ -531,8 +531,8 @@ THE SOFTWARE.
 ### github.com/sashabaranov/go-openai
 
 - Name: github.com/sashabaranov/go-openai
-- Version: v1.38.2
-- License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.38.2/LICENSE)
+- Version: v1.38.3
+- License: [Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.38.3/LICENSE)
 
 ```text
                                  Apache License
