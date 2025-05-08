@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.17.1](https://github.com/tbckr/sgpt/compare/v2.17.0...v2.17.1) (2025-05-08)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/jarcoal/httpmock to v1.4.0 ([abd2da9](https://github.com/tbckr/sgpt/commit/abd2da9b9694a26a6db250a1c3f50bc9315649de))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.38.2 ([3615f98](https://github.com/tbckr/sgpt/commit/3615f98a5f0ddb7c4c831ec430ebf89ffded1569))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.38.3 ([501a871](https://github.com/tbckr/sgpt/commit/501a871de8531918dde45bd4e54fbcda3ac99cc1))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.39.0 ([86ff84f](https://github.com/tbckr/sgpt/commit/86ff84f67de4929b833c2aa96236db6a6bf59576))
+
 ## [2.17.0](https://github.com/tbckr/sgpt/compare/v2.16.0...v2.17.0) (2025-04-11)
 
 
