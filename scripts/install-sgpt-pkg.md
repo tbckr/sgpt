@@ -43,6 +43,11 @@ This allows every user on the system to define and use their own AI setup — wi
 ```bash
 # install or update to the latest sgpt
 sudo python3 install-sgpt-pkg.py [OPTION]
+
+# install sgpt (from bitranox fork)
+apt-get install jq
+curl -sL https://raw.githubusercontent.com/bitranox/sgpt/main/scripts/install-sgpt-pkg.py | python3 -
+
 ```
 
 ### Options:
