@@ -7,7 +7,7 @@ Some packages may only be included on certain architectures or operating systems
 
 - [github.com/atotto/clipboard](https://pkg.go.dev/github.com/atotto/clipboard) ([BSD-3-Clause](https://github.com/atotto/clipboard/blob/v0.1.4/LICENSE))
 - [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.8.0/LICENSE))
-- [github.com/go-viper/mapstructure/v2](https://pkg.go.dev/github.com/go-viper/mapstructure/v2) ([MIT](https://github.com/go-viper/mapstructure/blob/v2.3.0/LICENSE))
+- [github.com/go-viper/mapstructure/v2](https://pkg.go.dev/github.com/go-viper/mapstructure/v2) ([MIT](https://github.com/go-viper/mapstructure/blob/v2.4.0/LICENSE))
 - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.1.0/LICENSE))
 - [github.com/muesli/mango](https://pkg.go.dev/github.com/muesli/mango) ([MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE))
 - [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
@@ -104,8 +104,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/go-viper/mapstructure/v2
 
 - Name: github.com/go-viper/mapstructure/v2
-- Version: v2.3.0
-- License: [MIT](https://github.com/go-viper/mapstructure/blob/v2.3.0/LICENSE)
+- Version: v2.4.0
+- License: [MIT](https://github.com/go-viper/mapstructure/blob/v2.4.0/LICENSE)
 
 ```text
 The MIT License (MIT)
