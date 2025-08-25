@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/atotto/clipboard v0.1.4
-	github.com/jarcoal/httpmock v1.4.0
+	github.com/jarcoal/httpmock v1.4.1
 	github.com/muesli/mango-cobra v1.2.0
 	github.com/muesli/roff v0.1.0
 	github.com/sashabaranov/go-openai v1.41.1
