@@ -138,17 +138,22 @@ def create_bind_script():
         f.write("""#!/bin/bash
 # Shell-GPT Bash integration 
 _sgpt_bash() {
-    if [[ -n "$READLINE_LINE" ]]; then
-        READLINE_LINE=$(sgpt sh "$READLINE_LINE" --stream)
-        READLINE_POINT=${#READLINE_LINE}
-    fi
+	if [[ -n "$READLINE_LINE" ]]; then
+		READLINE_LINE=$(sgpt sh "$READLINE_LINE" --stream)
+		READLINE_POINT=${#READLINE_LINE}
+	fi
 }
 
-# Bind Ctrl+L to sgpt
-bind -x '"\\C-l": _sgpt_bash'
+# Bind Ctrl+L to sgpt only in interactive TTY shells
+if [[ $- == *i* ]] && [[ -t 0 && -t 1 ]]; then
+	bind -x '"\C-l": _sgpt_bash'
+fi
 
-# alias sgpt --> sgpt.sh
-alias sgpt='/usr/bin/sgpt.sh'
+# alias sgpt --> sgpt.sh (only if present)
+if [[ -x /usr/bin/sgpt.sh ]]; then
+	alias sgpt='/usr/bin/sgpt.sh'
+fi
+
 """)
     os.chmod(PROFILE_SCRIPT_LOCATION, 0o755)
     print_and_log(f"✅ {PROFILE_SCRIPT_LOCATION} created.")
