@@ -6,25 +6,26 @@ Some packages may only be included on certain architectures or operating systems
 ## Overview
 
 - [github.com/atotto/clipboard](https://pkg.go.dev/github.com/atotto/clipboard) ([BSD-3-Clause](https://github.com/atotto/clipboard/blob/v0.1.4/LICENSE))
-- [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.8.0/LICENSE))
+- [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.9.0/LICENSE))
 - [github.com/go-viper/mapstructure/v2](https://pkg.go.dev/github.com/go-viper/mapstructure/v2) ([MIT](https://github.com/go-viper/mapstructure/blob/v2.4.0/LICENSE))
 - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.1.0/LICENSE))
 - [github.com/muesli/mango](https://pkg.go.dev/github.com/muesli/mango) ([MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE))
 - [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
 - [github.com/muesli/mango-pflag](https://pkg.go.dev/github.com/muesli/mango-pflag) ([MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE))
 - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
-- [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.2.3/LICENSE))
-- [github.com/sagikazarmark/locafero](https://pkg.go.dev/github.com/sagikazarmark/locafero) ([MIT](https://github.com/sagikazarmark/locafero/blob/v0.7.0/LICENSE))
+- [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.2.4/LICENSE))
+- [github.com/sagikazarmark/locafero](https://pkg.go.dev/github.com/sagikazarmark/locafero) ([MIT](https://github.com/sagikazarmark/locafero/blob/v0.11.0/LICENSE))
 - [github.com/sashabaranov/go-openai](https://pkg.go.dev/github.com/sashabaranov/go-openai) ([Apache-2.0](https://github.com/sashabaranov/go-openai/blob/v1.41.2/LICENSE))
-- [github.com/sourcegraph/conc](https://pkg.go.dev/github.com/sourcegraph/conc) ([MIT](https://github.com/sourcegraph/conc/blob/v0.3.0/LICENSE))
-- [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.12.0/LICENSE.txt))
-- [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.7.1/LICENSE))
+- [github.com/sourcegraph/conc](https://pkg.go.dev/github.com/sourcegraph/conc) ([MIT](https://github.com/sourcegraph/conc/blob/5f936abd7ae8/LICENSE))
+- [github.com/spf13/afero](https://pkg.go.dev/github.com/spf13/afero) ([Apache-2.0](https://github.com/spf13/afero/blob/v1.15.0/LICENSE.txt))
+- [github.com/spf13/cast](https://pkg.go.dev/github.com/spf13/cast) ([MIT](https://github.com/spf13/cast/blob/v1.10.0/LICENSE))
 - [github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra) ([Apache-2.0](https://github.com/spf13/cobra/blob/v1.10.1/LICENSE.txt))
-- [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.9/LICENSE))
-- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.20.1/LICENSE))
+- [github.com/spf13/pflag](https://pkg.go.dev/github.com/spf13/pflag) ([BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.10/LICENSE))
+- [github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper) ([MIT](https://github.com/spf13/viper/blob/v1.21.0/LICENSE))
 - [github.com/subosito/gotenv](https://pkg.go.dev/github.com/subosito/gotenv) ([MIT](https://github.com/subosito/gotenv/blob/v1.6.0/LICENSE))
+- [go.yaml.in/yaml/v3](https://pkg.go.dev/go.yaml.in/yaml/v3) ([MIT](https://github.com/yaml/go-yaml/blob/v3.0.4/LICENSE))
 - [golang.org/x/sys](https://pkg.go.dev/golang.org/x/sys) ([BSD-3-Clause](https://cs.opensource.google/go/x/sys/+/v0.29.0:LICENSE))
-- [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.21.0:LICENSE))
+- [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) ([BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.28.0:LICENSE))
 - [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) ([MIT](https://github.com/go-yaml/yaml/blob/v3.0.1/LICENSE))
 
 ## Details
@@ -69,8 +70,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/fsnotify/fsnotify
 
 - Name: github.com/fsnotify/fsnotify
-- Version: v1.8.0
-- License: [BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.8.0/LICENSE)
+- Version: v1.9.0
+- License: [BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.9.0/LICENSE)
 
 ```text
 Copyright © 2012 The Go Authors. All rights reserved.
@@ -470,8 +471,8 @@ SOFTWARE.
 ### github.com/pelletier/go-toml/v2
 
 - Name: github.com/pelletier/go-toml/v2
-- Version: v2.2.3
-- License: [MIT](https://github.com/pelletier/go-toml/blob/v2.2.3/LICENSE)
+- Version: v2.2.4
+- License: [MIT](https://github.com/pelletier/go-toml/blob/v2.2.4/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -502,8 +503,8 @@ SOFTWARE.
 ### github.com/sagikazarmark/locafero
 
 - Name: github.com/sagikazarmark/locafero
-- Version: v0.7.0
-- License: [MIT](https://github.com/sagikazarmark/locafero/blob/v0.7.0/LICENSE)
+- Version: v0.11.0
+- License: [MIT](https://github.com/sagikazarmark/locafero/blob/v0.11.0/LICENSE)
 
 ```text
 Copyright (c) 2023 Márk Sági-Kazár <mark.sagikazar@gmail.com>
@@ -742,8 +743,8 @@ THE SOFTWARE.
 ### github.com/sourcegraph/conc
 
 - Name: github.com/sourcegraph/conc
-- Version: v0.3.0
-- License: [MIT](https://github.com/sourcegraph/conc/blob/v0.3.0/LICENSE)
+- Version: v0.3.1-0.20240121214520-5f936abd7ae8
+- License: [MIT](https://github.com/sourcegraph/conc/blob/5f936abd7ae8/LICENSE)
 
 ```text
 MIT License
@@ -773,8 +774,8 @@ SOFTWARE.
 ### github.com/spf13/afero
 
 - Name: github.com/spf13/afero
-- Version: v1.12.0
-- License: [Apache-2.0](https://github.com/spf13/afero/blob/v1.12.0/LICENSE.txt)
+- Version: v1.15.0
+- License: [Apache-2.0](https://github.com/spf13/afero/blob/v1.15.0/LICENSE.txt)
 
 ```text
                                 Apache License
@@ -957,8 +958,8 @@ SOFTWARE.
 ### github.com/spf13/cast
 
 - Name: github.com/spf13/cast
-- Version: v1.7.1
-- License: [MIT](https://github.com/spf13/cast/blob/v1.7.1/LICENSE)
+- Version: v1.10.0
+- License: [MIT](https://github.com/spf13/cast/blob/v1.10.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1171,8 +1172,8 @@ SOFTWARE.
 ### github.com/spf13/pflag
 
 - Name: github.com/spf13/pflag
-- Version: v1.0.9
-- License: [BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.9/LICENSE)
+- Version: v1.0.10
+- License: [BSD-3-Clause](https://github.com/spf13/pflag/blob/v1.0.10/LICENSE)
 
 ```text
 Copyright (c) 2012 Alex Ogier. All rights reserved.
@@ -1209,8 +1210,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### github.com/spf13/viper
 
 - Name: github.com/spf13/viper
-- Version: v1.20.1
-- License: [MIT](https://github.com/spf13/viper/blob/v1.20.1/LICENSE)
+- Version: v1.21.0
+- License: [MIT](https://github.com/spf13/viper/blob/v1.21.0/LICENSE)
 
 ```text
 The MIT License (MIT)
@@ -1267,6 +1268,66 @@ THE SOFTWARE.
 
 ```
 
+### go.yaml.in/yaml/v3
+
+- Name: go.yaml.in/yaml/v3
+- Version: v3.0.4
+- License: [MIT](https://github.com/yaml/go-yaml/blob/v3.0.4/LICENSE)
+
+```text
+
+This project is covered by two different licenses: MIT and Apache.
+
+#### MIT License ####
+
+The following files were ported to Go from C files of libyaml, and thus
+are still covered by their original MIT license, with the additional
+copyright staring in 2011 when the project was ported over:
+
+    apic.go emitterc.go parserc.go readerc.go scannerc.go
+    writerc.go yamlh.go yamlprivateh.go
+
+Copyright (c) 2006-2010 Kirill Simonov
+Copyright (c) 2006-2011 Kirill Simonov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+### Apache License ###
+
+All the remaining project files are covered by the Apache license:
+
+Copyright (c) 2011-2019 Canonical Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
+
 ### golang.org/x/sys
 
 - Name: golang.org/x/sys
@@ -1307,8 +1368,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ### golang.org/x/text
 
 - Name: golang.org/x/text
-- Version: v0.21.0
-- License: [BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.21.0:LICENSE)
+- Version: v0.28.0
+- License: [BSD-3-Clause](https://cs.opensource.google/go/x/text/+/v0.28.0:LICENSE)
 
 ```text
 Copyright 2009 The Go Authors.
