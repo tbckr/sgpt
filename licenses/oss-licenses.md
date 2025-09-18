@@ -9,8 +9,8 @@ Some packages may only be included on certain architectures or operating systems
 - [github.com/fsnotify/fsnotify](https://pkg.go.dev/github.com/fsnotify/fsnotify) ([BSD-3-Clause](https://github.com/fsnotify/fsnotify/blob/v1.9.0/LICENSE))
 - [github.com/go-viper/mapstructure/v2](https://pkg.go.dev/github.com/go-viper/mapstructure/v2) ([MIT](https://github.com/go-viper/mapstructure/blob/v2.4.0/LICENSE))
 - [github.com/inconshreveable/mousetrap](https://pkg.go.dev/github.com/inconshreveable/mousetrap) ([Apache-2.0](https://github.com/inconshreveable/mousetrap/blob/v1.1.0/LICENSE))
-- [github.com/muesli/mango](https://pkg.go.dev/github.com/muesli/mango) ([MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE))
-- [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE))
+- [github.com/muesli/mango](https://pkg.go.dev/github.com/muesli/mango) ([MIT](https://github.com/muesli/mango/blob/v0.2.0/LICENSE))
+- [github.com/muesli/mango-cobra](https://pkg.go.dev/github.com/muesli/mango-cobra) ([MIT](https://github.com/muesli/mango-cobra/blob/v1.3.0/LICENSE))
 - [github.com/muesli/mango-pflag](https://pkg.go.dev/github.com/muesli/mango-pflag) ([MIT](https://github.com/muesli/mango-pflag/blob/v0.1.0/LICENSE))
 - [github.com/muesli/roff](https://pkg.go.dev/github.com/muesli/roff) ([MIT](https://github.com/muesli/roff/blob/v0.1.0/LICENSE))
 - [github.com/pelletier/go-toml/v2](https://pkg.go.dev/github.com/pelletier/go-toml/v2) ([MIT](https://github.com/pelletier/go-toml/blob/v2.2.4/LICENSE))
@@ -347,8 +347,8 @@ THE SOFTWARE.
 ### github.com/muesli/mango
 
 - Name: github.com/muesli/mango
-- Version: v0.1.0
-- License: [MIT](https://github.com/muesli/mango/blob/v0.1.0/LICENSE)
+- Version: v0.2.0
+- License: [MIT](https://github.com/muesli/mango/blob/v0.2.0/LICENSE)
 
 ```text
 MIT License
@@ -378,8 +378,8 @@ SOFTWARE.
 ### github.com/muesli/mango-cobra
 
 - Name: github.com/muesli/mango-cobra
-- Version: v1.2.0
-- License: [MIT](https://github.com/muesli/mango-cobra/blob/v1.2.0/LICENSE)
+- Version: v1.3.0
+- License: [MIT](https://github.com/muesli/mango-cobra/blob/v1.3.0/LICENSE)
 
 ```text
 MIT License
