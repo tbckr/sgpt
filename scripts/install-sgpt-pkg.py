@@ -154,7 +154,7 @@ if [[ $- == *i* ]] && [[ -n "$BASH_VERSION" ]]; then
   }
 
   # Achtung: überschreibt das übliche Ctrl+L (clear-screen)
-  bind -x '"\C-l": _sgpt_bash'
+  bind -x '"\\C-l": _sgpt_bash'
 fi
 
 # Alias kann bleiben für normale Nutzung im Terminal
