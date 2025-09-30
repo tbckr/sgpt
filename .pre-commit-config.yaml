@@ -31,7 +31,7 @@ repos:
       - id: check-executables-have-shebangs
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.27.0
+    rev: v8.28.0
     hooks:
       - id: gitleaks-docker
 
@@ -54,7 +54,7 @@ repos:
 
   # GitHub Actions hooks
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.0
+    rev: 0.34.0
     hooks:
       - id: check-github-workflows
         files: ^\.github/workflows/.*\.ya?ml$
