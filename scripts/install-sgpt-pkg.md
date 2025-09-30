@@ -46,8 +46,8 @@ sudo python3 install-sgpt-pkg.py [OPTION]
 
 # install sgpt (from bitranox fork)
 apt-get install jq
-curl -sL https://raw.githubusercontent.com/bitranox/sgpt/main/scripts/install-sgpt-pkg.py | python3 -
-
+curl -sL https://raw.githubusercontent.com/bitranox/sgpt/main/scripts/install-sgpt-pkg.py | sudo python3 -
+source /etc/profile.d/sgpt_bind.sh
 ```
 
 ### Options:

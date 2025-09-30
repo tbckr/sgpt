@@ -136,29 +136,89 @@ def create_bind_script():
     print_and_log(f"🔗 Creating binding script {PROFILE_SCRIPT_LOCATION} ...")
     with open(PROFILE_SCRIPT_LOCATION, "w") as f:
         f.write(r"""#!/bin/bash
-# Pfad zu sgpt fest verdrahten (Alias ist in Funktionen unzuverlässig)
-_sgpt_cmd="/usr/bin/sgpt.sh"
-# Nur in interaktiven Bash-Sessions ausführen
-if [[ $- == *i* ]] && [[ -n "$BASH_VERSION" ]]; then
-  # optional: sicherstellen, dass Readline-Keymap aktiv ist
-  set -o emacs 2>/dev/null
+# /etc/profile.d/sgpt_bind.sh
+# System-wide Bash Readline integration for sgpt
 
-  _sgpt_bash() {
-    # Wird nur von bind -x aufgerufen; READLINE_LINE ist dann gesetzt
-    if [[ -n "$READLINE_LINE" ]]; then
-      # Übergibt die aktuelle Zeile an sgpt und ersetzt sie durch die Antwort
-      READLINE_LINE="$("$_sgpt_cmd" sh "$READLINE_LINE" --stream)"
-      READLINE_POINT=${#READLINE_LINE}
-    fi
-  }
-
-  # Achtung: überschreibt das übliche Ctrl+L (clear-screen)
-  bind -x '"\C-l": _sgpt_bash'
+# ── Exit early if not Bash or if explicitly disabled ──────────────────────────
+# (profile.d scripts may also be sourced by /bin/sh or other shells)
+if [ -z "${BASH_VERSION-}" ] || [ "${SGPT_BIND_DISABLE-}" = "1" ]; then
+  return 0 2>/dev/null || true
 fi
 
-# Alias kann bleiben für normale Nutzung im Terminal
-if [[ -x $_sgpt_cmd ]]; then
-    alias sgpt='/usr/bin/sgpt.sh'
+# ── Only run in interactive Bash sessions with a TTY ─────────────────────────
+case $- in
+  *i*) : ;;   # interactive
+  *)   return 0 2>/dev/null || true ;;
+esac
+# both stdin and stdout must be TTYs
+if ! [[ -t 0 && -t 1 ]]; then
+  return 0 2>/dev/null || true
+fi
+
+# ── Configuration (can be overridden by environment variables) ───────────────
+# Keybinding (default: Ctrl+L). Example: export SGPT_KEYBIND=$'\C-g'
+: "${SGPT_KEYBIND:=$'\C-l'}"
+# Optional timeout in seconds (0 = disabled). Example: export SGPT_TIMEOUT=12
+: "${SGPT_TIMEOUT:=0}"
+# Explicit sgpt path (empty = auto-detect). Example: export SGPT_CMD=/usr/local/bin/sgpt
+: "${SGPT_CMD:=}"
+
+# ── Resolve sgpt command ─────────────────────────────────────────────────────
+_sgpt_pick_cmd() {
+  local _c=""
+  if [[ -n "$SGPT_CMD" && -x "$SGPT_CMD" ]]; then
+    _c=$SGPT_CMD
+  elif [[ -x /usr/bin/sgpt.sh ]]; then
+    _c=/usr/bin/sgpt.sh
+  elif command -v sgpt >/dev/null 2>&1; then
+    _c=$(command -v sgpt)
+  fi
+  printf '%s' "$_c"
+}
+
+# ── Readline widget (called by bind -x) ──────────────────────────────────────
+_sgpt_bash() {
+  # Clear-screen fallback (keeps usual Ctrl+L behavior on empty line)
+  if [[ -z ${READLINE_LINE-} ]]; then
+    printf '\e[H\e[2J'   # ANSI: cursor home + clear screen
+    READLINE_POINT=0
+    return 0
+  fi
+
+  local _cmd; _cmd="$(_sgpt_pick_cmd)"
+  if [[ -z "$_cmd" ]]; then
+    printf '\n[sgpt] command not found. Set $SGPT_CMD or install sgpt.\n' >&2
+    printf '\a' 2>/dev/null
+    return 1
+  fi
+
+  local _in _out _rc=0
+  _in=$READLINE_LINE
+
+  # Run with optional timeout (if available)
+  if (( SGPT_TIMEOUT > 0 )) && command -v timeout >/dev/null 2>&1; then
+    _out=$(timeout --preserve-status "${SGPT_TIMEOUT}s" \
+           "$_cmd" sh -- "$_in" --stream 2>/dev/null) || _rc=$?
+  else
+    _out=$("$_cmd" sh -- "$_in" --stream 2>/dev/null) || _rc=$?
+  fi
+
+  if [[ $_rc -eq 0 && -n $_out ]]; then
+    READLINE_LINE=$_out
+    READLINE_POINT=${#READLINE_LINE}
+  else
+    # short bell on error/timeout
+    printf '\a' 2>/dev/null
+  fi
+}
+
+# ── Enable Readline and set keybinding ───────────────────────────────────────
+set -o emacs 2>/dev/null
+bind -x '"'"$SGPT_KEYBIND"'"':_sgpt_bash
+
+# ── Optional alias for convenience ───────────────────────────────────────────
+if [[ -x /usr/bin/sgpt.sh ]]; then
+  alias sgpt='/usr/bin/sgpt.sh'
 fi
 """)
     os.chmod(PROFILE_SCRIPT_LOCATION, 0o755)
