@@ -136,30 +136,22 @@ def create_bind_script():
     print_and_log(f"🔗 Creating binding script {PROFILE_SCRIPT_LOCATION} ...")
     with open(PROFILE_SCRIPT_LOCATION, "w") as f:
         f.write("""#!/bin/bash
-# Nur in interaktiven Bash-Sessions ausführen
-if [[ $- == *i* ]] && [[ -n "$BASH_VERSION" ]]; then
-  # optional: sicherstellen, dass Readline-Keymap aktiv ist
-  set -o emacs 2>/dev/null
+# Shell-GPT Bash integration 
+_sgpt_bash() {
+	if [[ -n "$READLINE_LINE" ]]; then
+		READLINE_LINE=$(sgpt sh "$READLINE_LINE" --stream)
+		READLINE_POINT=${#READLINE_LINE}
+	fi
+}
 
-  # Pfad zu sgpt fest verdrahten (Alias ist in Funktionen unzuverlässig)
-  _sgpt_cmd="/usr/bin/sgpt.sh"
-
-  _sgpt_bash() {
-    # Wird nur von bind -x aufgerufen; READLINE_LINE ist dann gesetzt
-    if [[ -n "$READLINE_LINE" ]]; then
-      # Übergibt die aktuelle Zeile an sgpt und ersetzt sie durch die Antwort
-      READLINE_LINE="$("$_sgpt_cmd" sh "$READLINE_LINE" --stream)"
-      READLINE_POINT=${#READLINE_LINE}
-    fi
-  }
-
-  # Achtung: überschreibt das übliche Ctrl+L (clear-screen)
-  bind -x '"\\C-l": _sgpt_bash'
+# Bind Ctrl+L to sgpt only in interactive TTY shells
+if [[ $- == *i* ]] && [[ -t 0 && -t 1 ]]; then
+	bind -x '"\C-l": _sgpt_bash'
 fi
 
-# Alias kann bleiben für normale Nutzung im Terminal
+# alias sgpt --> sgpt.sh (only if present)
 if [[ -x /usr/bin/sgpt.sh ]]; then
-    alias sgpt='/usr/bin/sgpt.sh'
+	alias sgpt='/usr/bin/sgpt.sh'
 fi
 
 """)
