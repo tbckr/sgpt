@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.17.1](https://github.com/tbckr/sgpt/compare/v2.17.0...v2.17.1) (2025-10-10)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/jarcoal/httpmock to v1.4.0 ([abd2da9](https://github.com/tbckr/sgpt/commit/abd2da9b9694a26a6db250a1c3f50bc9315649de))
+* **deps:** update module github.com/jarcoal/httpmock to v1.4.1 ([b0ef981](https://github.com/tbckr/sgpt/commit/b0ef981c82bac34c9cfbbf1b5e4b9ca3aaff054e))
+* **deps:** update module github.com/muesli/mango-cobra to v1.3.0 ([f538770](https://github.com/tbckr/sgpt/commit/f538770cae2936de09ac6e4618935e934ad7a99d))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.38.2 ([3615f98](https://github.com/tbckr/sgpt/commit/3615f98a5f0ddb7c4c831ec430ebf89ffded1569))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.38.3 ([501a871](https://github.com/tbckr/sgpt/commit/501a871de8531918dde45bd4e54fbcda3ac99cc1))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.39.0 ([86ff84f](https://github.com/tbckr/sgpt/commit/86ff84f67de4929b833c2aa96236db6a6bf59576))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.39.1 ([8b874ce](https://github.com/tbckr/sgpt/commit/8b874ce922275d244440b74f04f84e61bcf64752))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.40.0 ([6762dda](https://github.com/tbckr/sgpt/commit/6762dda173c3ad24277dd3fdc6b500bcc10c43ed))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.40.1 ([9516dd3](https://github.com/tbckr/sgpt/commit/9516dd3e4922e9d4a2f573258df555a6ae9192f4))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.40.2 ([0044c17](https://github.com/tbckr/sgpt/commit/0044c17158708b6261f8bcc5b9040656b1200cd6))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.40.3 ([d4b7138](https://github.com/tbckr/sgpt/commit/d4b71382df0aaf92968b71335844362aec7af428))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.40.4 ([797eb25](https://github.com/tbckr/sgpt/commit/797eb25268673ac42b872a37a0f2ca3a5a77d786))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.40.5 ([0c0986b](https://github.com/tbckr/sgpt/commit/0c0986b0a0d029ba8556fc49659910e243e6dd5a))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.41.0 ([63c89b6](https://github.com/tbckr/sgpt/commit/63c89b6a9e11a30099f43025775239ac3b3782e1))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.41.1 ([67dbb72](https://github.com/tbckr/sgpt/commit/67dbb72a4dc1a59ac4624cc39a82736b51faec78))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.41.2 ([0000ee9](https://github.com/tbckr/sgpt/commit/0000ee95ebcdf18feb3428821fe79f46aa42136d))
+* **deps:** update module github.com/spf13/cobra to v1.10.0 ([e891843](https://github.com/tbckr/sgpt/commit/e891843a065453a07ef342db2e434538c3f819fd))
+* **deps:** update module github.com/spf13/cobra to v1.10.1 ([9fddc77](https://github.com/tbckr/sgpt/commit/9fddc77feb507ab21d2e064ba8891dc60db5206f))
+* **deps:** update module github.com/spf13/viper to v1.21.0 ([d369344](https://github.com/tbckr/sgpt/commit/d369344dbaf62f7650a8a043e08b103ab06aab86))
+* **deps:** update module github.com/stretchr/testify to v1.11.0 ([b732cc2](https://github.com/tbckr/sgpt/commit/b732cc20bb4c7543ccc83576b319d0e330af2116))
+* **deps:** update module github.com/stretchr/testify to v1.11.1 ([0401ac7](https://github.com/tbckr/sgpt/commit/0401ac75fe93621040440eb8254a6e4a730ee8a2))
+
 ## [2.17.0](https://github.com/tbckr/sgpt/compare/v2.16.0...v2.17.0) (2025-04-11)
 
 
