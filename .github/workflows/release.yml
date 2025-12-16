@@ -63,7 +63,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
 
       # Install necessary tools
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         if: ${{ steps.release.outputs.release_created }}
         with:
           go-version-file: go.mod
