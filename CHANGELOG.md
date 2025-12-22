@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.2](https://github.com/tbckr/sgpt/compare/v2.17.1...v2.17.2) (2025-12-22)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/spf13/cobra to v1.10.2 ([e87bc36](https://github.com/tbckr/sgpt/commit/e87bc3602b12f7db043c92f09776047f5f8e0ebf))
+
 ## [2.17.1](https://github.com/tbckr/sgpt/compare/v2.17.0...v2.17.1) (2025-10-10)
 
 
