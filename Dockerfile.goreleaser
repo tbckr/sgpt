@@ -3,5 +3,5 @@ ARG BASE_IMAGE_VERSION=cgr.dev/chainguard/static:latest@sha256:a301031ffd4ed67f3
 FROM --platform=$BUILDPLATFORM ${BASE_IMAGE_VERSION}
 ENV HOME /home/nonroot
 VOLUME /home/nonroot
-COPY $BUILDPLATFORM/sgpt /sgpt
+COPY sgpt /sgpt
 ENTRYPOINT ["/sgpt"]
