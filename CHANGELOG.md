@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.3](https://github.com/tbckr/sgpt/compare/v2.17.2...v2.17.3) (2026-01-08)
+
+
+### Bug Fixes
+
+* fix gorelaser docker image build ([8cdcde9](https://github.com/tbckr/sgpt/commit/8cdcde99c72f13856b51271bc8f2351969c2a492))
+
 ## [2.17.2](https://github.com/tbckr/sgpt/compare/v2.17.1...v2.17.2) (2026-01-08)
 
 
