@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.4](https://github.com/tbckr/sgpt/compare/v2.17.3...v2.17.4) (2026-01-08)
+
+
+### Bug Fixes
+
+* fix goreleaser docker build ([d6d6925](https://github.com/tbckr/sgpt/commit/d6d6925225d003322527a54f6d8c5991818f0f94))
+
 ## [2.17.3](https://github.com/tbckr/sgpt/compare/v2.17.2...v2.17.3) (2026-01-08)
 
 
