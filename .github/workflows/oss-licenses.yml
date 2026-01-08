@@ -72,7 +72,7 @@ jobs:
           private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
 
       - name: Send pull request
-        uses: peter-evans/create-pull-request@4e1beaa7521e8b457b572c090b25bd3db56bf1c5 # v5.0.3
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.generate_token.outputs.token }}
           author: tbckr-automation[bot] <gh-automation@tb5.dev>
