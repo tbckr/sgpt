@@ -116,7 +116,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9
         with:
-          args: --timeout=5m --print-issued-lines --print-linter-name -c .golangci.yaml --out-format=github-actions
+          args: --timeout=5m -c .golangci.yaml
           install-mode: "goinstall"
           skip-cache: true
           only-new-issues: true
