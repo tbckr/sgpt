@@ -92,7 +92,7 @@ jobs:
         # do not upload coverage for renovate/ branches
         if: "!contains(github.ref, 'renovate')"
         with:
-          file: ./coverage.txt
+          files: ./coverage.txt
       # Check goreleaser config
       - uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
         with:
