@@ -19,6 +19,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+version: 2
+
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -69,7 +71,7 @@ release:
   mode: keep-existing
 
 archives:
-  - format: tar.gz
+  - formats: ["tar.gz"]
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
       {{ .ProjectName }}_
@@ -81,7 +83,7 @@ archives:
     # use zip for windows archives
     format_overrides:
     - goos: windows
-      format: zip
+      formats: ["zip"]
     files:
       - README.md
       - LICENSE
@@ -112,105 +114,29 @@ docker_signs:
       - "${artifact}@${digest}"
       - --yes
 
-dockers:
-  -
-    id: "linux-amd64"
-    goos: linux
-    goarch: amd64
-    use: buildx
-    dockerfile: "Dockerfile.goreleaser"
-    image_templates:
-    - "{{.Env.IMAGE_NAME}}:latest-amd64"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}-amd64"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-amd64"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-amd64"
-    # Template of the docker build flags.
-    build_flag_templates:
-    - "--pull"
-    - "--platform=linux/amd64"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    - "--label=org.opencontainers.image.description={{ .ProjectName }}"
-    - "--label=org.opencontainers.image.url=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.source=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.licenses=MIT"
-  -
-    id: "linux-arm64"
-    goos: linux
-    goarch: arm64
-    use: buildx
-    dockerfile: "Dockerfile.goreleaser"
-    image_templates:
-    - "{{.Env.IMAGE_NAME}}:latest-arm64"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}-arm64"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-arm64"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-arm64"
-    # Template of the docker build flags.
-    build_flag_templates:
-    - "--pull"
-    - "--platform=linux/arm64"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    - "--label=org.opencontainers.image.description={{ .ProjectName }}"
-    - "--label=org.opencontainers.image.url=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.source=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.licenses=MIT"
-  -
-    id: "linux-armv7"
-    goos: linux
-    goarch: arm
-    goarm: 7
-    use: buildx
-    dockerfile: "Dockerfile.goreleaser"
-    image_templates:
-    - "{{.Env.IMAGE_NAME}}:latest-armv7"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}-armv7"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-armv7"
-    - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-armv7"
-    # Template of the docker build flags.
-    build_flag_templates:
-    - "--pull"
-    - "--platform=linux/arm64"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    - "--label=org.opencontainers.image.description={{ .ProjectName }}"
-    - "--label=org.opencontainers.image.url=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.source=https://github.com/tbckr/{{ .ProjectName }}"
-    - "--label=org.opencontainers.image.licenses=MIT"
-
-docker_manifests:
-- name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}"
-  image_templates:
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-amd64"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-arm64"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}.{{.Patch}}-armv7"
-- name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}"
-  image_templates:
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-amd64"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-arm64"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}.{{.Minor}}-armv7"
-- name_template: "{{.Env.IMAGE_NAME}}:{{ .Major }}"
-  image_templates:
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}-amd64"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}-arm64"
-  - "{{.Env.IMAGE_NAME}}:{{ .Major }}-armv7"
-- name_template: "{{.Env.IMAGE_NAME}}:latest"
-  image_templates:
-  - "{{.Env.IMAGE_NAME}}:latest-amd64"
-  - "{{.Env.IMAGE_NAME}}:latest-arm64"
-  - "{{.Env.IMAGE_NAME}}:latest-armv7"
+dockers_v2:
+  - images:
+      - "{{.Env.IMAGE_NAME}}"
+    tags:
+      - "{{ .Major }}.{{.Minor}}.{{.Patch}}"
+      - "{{ .Major }}.{{.Minor}}"
+      - "{{ .Major }}"
+      - "latest"
+    labels:
+      "org.opencontainers.image.created": "{{.Date}}"
+      "org.opencontainers.image.title": "{{.ProjectName}}"
+      "org.opencontainers.image.revision": "{{.FullCommit}}"
+      "org.opencontainers.image.version": "{{.Version}}"
+      "org.opencontainers.image.description": "{{ .ProjectName }}"
+      "org.opencontainers.image.url": "https://github.com/tbckr/{{ .ProjectName }}"
+      "org.opencontainers.image.source": "https://github.com/tbckr/{{ .ProjectName }}"
+      "org.opencontainers.image.licenses": "MIT"
 
 checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
