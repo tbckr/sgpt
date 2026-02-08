@@ -239,7 +239,7 @@ func (c *OpenAIClient) createPromptMessages(prompts, input []string) (messages [
 			imageData := i
 
 			// Check, if input is a file
-			if !strings.HasPrefix(i, "http") || !strings.HasPrefix(i, "https") {
+			if !strings.HasPrefix(i, "http") && !strings.HasPrefix(i, "https") {
 				// Input is a file, load image data
 				imageData, err = c.buildImageFileData(i)
 				if err != nil {

@@ -500,6 +500,70 @@ func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 	wg.Wait()
 }
 
+func TestSimplePromptWithHTTPURLImageAndChat(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := []string{"what can you see on the picture?"}
+	expected := "The image shows a character that appears to be a stylized robot. It has"
+	inputImage := "http://upload.wikimedia.org/wikipedia/en/c/cb/Marvin_%28HHGG%29.jpg"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(expected)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected+"\n", buf.String())
+	}()
+
+	var result string
+	result, err = client.CreateCompletion(context.Background(), "test_chat", prompt, "txt", []string{inputImage})
+	require.NoError(t, err)
+	require.Equal(t, expected, result)
+	require.NoError(t, writer.Close())
+
+	require.FileExists(t, filepath.Join(testCtx.Config.GetString("cacheDir"), "test_chat"))
+
+	var manager chat.SessionManager
+	manager, err = chat.NewFilesystemChatSessionManager(testCtx.Config)
+	require.NoError(t, err)
+
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession("test_chat")
+	require.NoError(t, err)
+	require.Len(t, messages, 2)
+
+	// Check, if the prompt was added
+	require.Equal(t, openai.ChatMessageRoleUser, messages[0].Role)
+	// The prompt should be empty, because it is a multi content message
+	require.Empty(t, messages[0].Content)
+	require.Len(t, messages[0].MultiContent, 2)
+	// Check, if the prompt is a multi content message
+	require.Equal(t, "text", string(messages[0].MultiContent[0].Type))
+	require.Equal(t, prompt[0], messages[0].MultiContent[0].Text)
+	// Check, if the image was added as a URL (not treated as a local file)
+	require.Equal(t, "image_url", string(messages[0].MultiContent[1].Type))
+	require.Equal(t, inputImage, messages[0].MultiContent[1].ImageURL.URL)
+
+	// Check, if the response was added
+	require.Equal(t, openai.ChatMessageRoleAssistant, messages[1].Role)
+	require.Equal(t, expected, messages[1].Content)
+
+	wg.Wait()
+}
+
 func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
