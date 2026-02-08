@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.17.5](https://github.com/tbckr/sgpt/compare/v2.17.4...v2.17.5) (2026-02-08)
+
+
+### Bug Fixes
+
+* correct boolean logic in image URL detect ([#344](https://github.com/tbckr/sgpt/issues/344)) ([407cfd8](https://github.com/tbckr/sgpt/commit/407cfd8c2296a2cf06c7eb1c6288288421ce9a24))
+* fix govulncheck by upgrading go ([#346](https://github.com/tbckr/sgpt/issues/346)) ([33e6ce4](https://github.com/tbckr/sgpt/commit/33e6ce45207b09cefab22a745e3d5129bcf17ec0))
+
 ## [2.17.4](https://github.com/tbckr/sgpt/compare/v2.17.3...v2.17.4) (2026-01-08)
 
 
