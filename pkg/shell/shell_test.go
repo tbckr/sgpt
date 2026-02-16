@@ -318,3 +318,241 @@ func TestExecuteCommandWithConfirmation(t *testing.T) {
 
 	wg.Wait()
 }
+
+func TestSanitizeCommand_RemovesBidiOverrides(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "LRM (U+200E)",
+			input:    "echo\u200Etest",
+			expected: "echotest",
+		},
+		{
+			name:     "RLM (U+200F)",
+			input:    "echo\u200Ftest",
+			expected: "echotest",
+		},
+		{
+			name:     "LRE (U+202A)",
+			input:    "echo\u202Atest",
+			expected: "echotest",
+		},
+		{
+			name:     "RLE (U+202B)",
+			input:    "echo\u202Btest",
+			expected: "echotest",
+		},
+		{
+			name:     "PDF (U+202C)",
+			input:    "echo\u202Ctest",
+			expected: "echotest",
+		},
+		{
+			name:     "LRO (U+202D)",
+			input:    "echo\u202Dtest",
+			expected: "echotest",
+		},
+		{
+			name:     "RLO (U+202E)",
+			input:    "echo\u202Etest",
+			expected: "echotest",
+		},
+		{
+			name:     "LRI (U+2066)",
+			input:    "echo\u2066test",
+			expected: "echotest",
+		},
+		{
+			name:     "RLI (U+2067)",
+			input:    "echo\u2067test",
+			expected: "echotest",
+		},
+		{
+			name:     "FSI (U+2068)",
+			input:    "echo\u2068test",
+			expected: "echotest",
+		},
+		{
+			name:     "PDI (U+2069)",
+			input:    "echo\u2069test",
+			expected: "echotest",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeCommand(tt.input)
+			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestSanitizeCommand_RemovesANSIEscapes(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "CSI reset",
+			input:    "echo \x1b[0mtest",
+			expected: "echo test",
+		},
+		{
+			name:     "CSI color",
+			input:    "echo \x1b[31mred\x1b[0m",
+			expected: "echo red",
+		},
+		{
+			name:     "CSI bold",
+			input:    "\x1b[1mbold\x1b[0m text",
+			expected: "bold text",
+		},
+		{
+			name:     "OSC sequence",
+			input:    "echo \x1b]0;title\x07test",
+			expected: "echo test",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeCommand(tt.input)
+			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestSanitizeCommand_RemovesControlChars(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "NULL byte",
+			input:    "echo\x00test",
+			expected: "echotest",
+		},
+		{
+			name:     "Bell",
+			input:    "echo\x07test",
+			expected: "echotest",
+		},
+		{
+			name:     "Backspace",
+			input:    "echo\x08test",
+			expected: "echotest",
+		},
+		{
+			name:     "Vertical tab",
+			input:    "echo\x0btest",
+			expected: "echotest",
+		},
+		{
+			name:     "Form feed",
+			input:    "echo\x0ctest",
+			expected: "echotest",
+		},
+		{
+			name:     "Escape",
+			input:    "echo\x1btest",
+			expected: "echotest",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeCommand(tt.input)
+			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestSanitizeCommand_PreservesNewlineAndTab(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Newline preserved",
+			input:    "echo\ntest",
+			expected: "echo\ntest",
+		},
+		{
+			name:     "Tab preserved",
+			input:    "echo\ttest",
+			expected: "echo\ttest",
+		},
+		{
+			name:     "Both preserved",
+			input:    "echo\n\ttest",
+			expected: "echo\n\ttest",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeCommand(tt.input)
+			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestSanitizeCommand_CleanCommandUnchanged(t *testing.T) {
+	cleanCommands := []string{
+		"echo hello",
+		"ls -la",
+		"git status",
+		"rm -rf /tmp/test",
+		"cat file.txt | grep pattern",
+	}
+
+	for _, cmd := range cleanCommands {
+		t.Run(cmd, func(t *testing.T) {
+			result := SanitizeCommand(cmd)
+			require.Equal(t, cmd, result)
+		})
+	}
+}
+
+func TestSanitizeCommand_ZeroWidthChars(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Zero-width no-break space (U+FEFF)",
+			input:    "echo\uFEFFtest",
+			expected: "echotest",
+		},
+		{
+			name:     "Zero-width space (U+200B)",
+			input:    "echo\u200Btest",
+			expected: "echotest",
+		},
+		{
+			name:     "Zero-width non-joiner (U+200C)",
+			input:    "echo\u200Ctest",
+			expected: "echotest",
+		},
+		{
+			name:     "Zero-width joiner (U+200D)",
+			input:    "echo\u200Dtest",
+			expected: "echotest",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeCommand(tt.input)
+			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
