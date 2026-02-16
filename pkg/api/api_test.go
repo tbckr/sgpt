@@ -633,3 +633,40 @@ func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 
 	wg.Wait()
 }
+
+func TestSimplePrompt_EmptyChoices(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	prompt := []string{"Say: Hello World!"}
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterEmptyChatResponse()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, "", buf.String())
+	}()
+
+	var result string
+	result, err = client.CreateCompletion(context.Background(), "", prompt, "txt", nil)
+	require.Error(t, err)
+	require.ErrorIs(t, err, ErrEmptyResponse)
+	require.Equal(t, "", result)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+

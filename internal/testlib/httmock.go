@@ -56,6 +56,19 @@ func RegisterExpectedChatResponse(response string) {
 	)
 }
 
+func RegisterEmptyChatResponse() {
+	httpmock.RegisterResponder(
+		"POST",
+		fmt.Sprintf("%s%s", baseURL, chatCompletionSuffix),
+		httpmock.NewStringResponder(
+			200,
+			`{
+				"choices": []
+			}`,
+		),
+	)
+}
+
 func RegisterExpectedChatResponseStream(response string) {
 	httpmock.RegisterResponder(
 		"POST",
