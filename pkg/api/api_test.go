@@ -669,4 +669,3 @@ func TestSimplePrompt_EmptyChoices(t *testing.T) {
 
 	wg.Wait()
 }
-

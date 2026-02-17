@@ -555,4 +555,3 @@ func TestSanitizeCommand_ZeroWidthChars(t *testing.T) {
 		})
 	}
 }
-

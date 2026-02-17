@@ -52,7 +52,7 @@ func isBidiOverride(r rune) bool {
 	case '\u200E', '\u200F', // LRM, RLM
 		'\u202A', '\u202B', '\u202C', '\u202D', '\u202E', // Embedding and override
 		'\u2066', '\u2067', '\u2068', '\u2069', // Isolate
-		'\uFEFF', // Zero-width no-break space
+		'\uFEFF',                     // Zero-width no-break space
 		'\u200B', '\u200C', '\u200D': // Zero-width space, non-joiner, joiner
 		return true
 	}
