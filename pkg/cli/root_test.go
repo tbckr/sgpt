@@ -36,6 +36,7 @@ import (
 
 	"github.com/atotto/clipboard"
 	"github.com/sashabaranov/go-openai"
+	"github.com/spf13/viper"
 
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -796,4 +797,41 @@ func TestRootCmd_ChatConversation(t *testing.T) {
 	require.Equal(t, strings.TrimSpace(expected), messages[3].Content)
 
 	wg.Wait()
+}
+
+func TestRootCmd_PanicRecovery_ExitsWithCode1(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	// Create a client factory that panics
+	panicClientFn := func(_ *viper.Viper, _ io.Writer) (*api.OpenAIClient, error) {
+		panic("test panic")
+	}
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), panicClientFn)
+
+	root.Execute([]string{"test"})
+	require.Equal(t, 1, mem.code)
+}
+
+func TestLoadViperConfig_TestingFlag(t *testing.T) {
+	config := viper.New()
+	config.Set("TESTING", 1)
+
+	err := loadViperConfig(config)
+	require.NoError(t, err)
+	// When TESTING flag is set, defaults should not be set
+	// Verify cacheDir is not set (would be set by setViperDefaults)
+	require.False(t, config.IsSet("cacheDir"))
+}
+
+func TestLoadViperConfig_NoTestingFlag(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+
+	err := loadViperConfig(testCtx.Config)
+	require.NoError(t, err)
+	// When TESTING flag is not set, defaults should be set
+	// Verify cacheDir is set (by setViperDefaults)
+	require.True(t, testCtx.Config.IsSet("cacheDir"))
 }

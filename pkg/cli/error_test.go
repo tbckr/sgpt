@@ -21,20 +21,57 @@
 
 package cli
 
-import "errors"
+import (
+	"errors"
+	"testing"
 
-var ErrMissingInput = errors.New("no input prompt provided")
+	"github.com/stretchr/testify/require"
+)
 
-type exitError struct {
-	err     error
-	code    int
-	details string
+func TestExitError_Error(t *testing.T) {
+	baseErr := errors.New("test error")
+	exitErr := &exitError{
+		err:     baseErr,
+		code:    42,
+		details: "test details",
+	}
+
+	require.Equal(t, "test error", exitErr.Error())
 }
 
-func (e *exitError) Error() string {
-	return e.err.Error()
+func TestExitError_Unwrap(t *testing.T) {
+	baseErr := errors.New("test error")
+	exitErr := &exitError{
+		err:     baseErr,
+		code:    42,
+		details: "test details",
+	}
+
+	require.Equal(t, baseErr, exitErr.Unwrap())
 }
 
-func (e *exitError) Unwrap() error {
-	return e.err
+func TestExitError_ErrorsIs(t *testing.T) {
+	baseErr := errors.New("test error")
+	exitErr := &exitError{
+		err:     baseErr,
+		code:    42,
+		details: "test details",
+	}
+
+	require.True(t, errors.Is(exitErr, baseErr))
+	require.False(t, errors.Is(exitErr, errors.New("different error")))
+}
+
+func TestExitError_ErrorsAs(t *testing.T) {
+	baseErr := errors.New("test error")
+	exitErr := &exitError{
+		err:     baseErr,
+		code:    42,
+		details: "test details",
+	}
+
+	var target *exitError
+	require.True(t, errors.As(exitErr, &target))
+	require.Equal(t, 42, target.code)
+	require.Equal(t, "test details", target.details)
 }

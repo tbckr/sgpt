@@ -290,6 +290,30 @@ func createTestConfig(t *testing.T) *viper.Viper {
 	return config
 }
 
+func TestFilesystemChatSessionManager_GetSession_ScannerError(t *testing.T) {
+	config := createTestConfig(t)
+
+	manager, err := NewFilesystemChatSessionManager(config)
+	require.NoError(t, err)
+
+	// Create a session file with a line that exceeds bufio.MaxScanTokenSize (64KB)
+	// This will cause scanner.Err() to return an error
+	sessionName := "test_scanner_error"
+	sessionPath := filepath.Join(config.GetString("cacheDir"), sessionName)
+
+	// Create a file with a line longer than bufio.MaxScanTokenSize
+	// bufio.MaxScanTokenSize is 64 * 1024 = 65536 bytes
+	longContent := strings.Repeat("a", 65536+100)
+	err = os.WriteFile(sessionPath, []byte(longContent), 0600)
+	require.NoError(t, err)
+
+	// Try to load the session - should fail with scanner error
+	var messages []openai.ChatCompletionMessage
+	messages, err = manager.GetSession(sessionName)
+	require.Error(t, err)
+	require.Nil(t, messages)
+}
+
 func createTempDir(t *testing.T, suffix string) string {
 	if suffix != "" {
 		suffix = "_" + suffix

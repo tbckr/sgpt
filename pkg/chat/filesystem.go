@@ -123,6 +123,9 @@ func (m FilesystemChatSessionManager) GetSession(sessionName string) ([]openai.C
 		}
 		messages = append(messages, readMessage)
 	}
+	if err = scanner.Err(); err != nil {
+		return nil, err
+	}
 	slog.Debug("Messages from session file imported")
 	return messages, nil
 }

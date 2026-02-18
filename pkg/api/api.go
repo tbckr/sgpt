@@ -49,6 +49,8 @@ var (
 	DefaultModel = strings.Clone(openai.GPT3Dot5Turbo)
 	// ErrMissingAPIKey is returned, if the OPENAI_API_KEY environment variable is not set.
 	ErrMissingAPIKey = fmt.Errorf("%s env variable is not set", envKeyOpenAIApi)
+	// ErrEmptyResponse is returned when the API response contains no choices.
+	ErrEmptyResponse = errors.New("no choices returned in API response")
 )
 
 // OpenAIClient is a client for the OpenAI API.
@@ -300,6 +302,9 @@ func (c *OpenAIClient) retrieveChatCompletion(ctx context.Context, req openai.Ch
 		return
 	}
 	slog.Debug("Received response")
+	if len(resp.Choices) == 0 {
+		return openai.ChatCompletionMessage{}, ErrEmptyResponse
+	}
 	message = resp.Choices[0].Message
 
 	_, err = fmt.Fprintln(c.out, message.Content)
@@ -330,6 +335,9 @@ func (c *OpenAIClient) retrieveChatCompletionStream(ctx context.Context, req ope
 			return openai.ChatCompletionMessage{}, streamErr
 		}
 
+		if len(response.Choices) == 0 {
+			continue
+		}
 		receivedContent := response.Choices[0].Delta.Content
 		// 1. Append received content to message
 		receivedMessage.Content += receivedContent

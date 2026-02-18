@@ -75,6 +75,7 @@ func (r *rootCmd) Execute(args []string) {
 	defer func() {
 		if err := recover(); err != nil {
 			slog.Error("Panic occurred", "error", err)
+			r.exit(1)
 		}
 	}()
 
@@ -314,7 +315,7 @@ func createFlagsWithConfigBinding(cmd *cobra.Command, config *viper.Viper) {
 }
 
 func loadViperConfig(config *viper.Viper) error {
-	if !viper.IsSet("TESTING") {
+	if !config.IsSet("TESTING") {
 		slog.Debug("Loading config")
 		err := setViperDefaults(config)
 		if err != nil {

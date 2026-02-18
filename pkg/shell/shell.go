@@ -29,7 +29,10 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
+	"strings"
+	"unicode"
 )
 
 func IsPipedShell() (bool, error) {
@@ -43,7 +46,46 @@ func IsPipedShell() (bool, error) {
 	return true, nil
 }
 
+// isBidiOverride checks if a rune is a Unicode bidirectional override character
+func isBidiOverride(r rune) bool {
+	switch r {
+	case '\u200E', '\u200F', // LRM, RLM
+		'\u202A', '\u202B', '\u202C', '\u202D', '\u202E', // Embedding and override
+		'\u2066', '\u2067', '\u2068', '\u2069', // Isolate
+		'\uFEFF',                     // Zero-width no-break space
+		'\u200B', '\u200C', '\u200D': // Zero-width space, non-joiner, joiner
+		return true
+	}
+	return false
+}
+
+// SanitizeCommand removes ANSI escape sequences, Unicode bidi overrides, and non-printable control characters
+// from a command string to prevent display manipulation attacks. Newlines and tabs are preserved.
+func SanitizeCommand(command string) string {
+	// Remove ANSI escape sequences (CSI and OSC)
+	ansiRegex := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]|\x1b\][^\x07]*\x07`)
+	command = ansiRegex.ReplaceAllString(command, "")
+
+	// Remove Unicode bidi overrides and zero-width characters
+	var sb strings.Builder
+	sb.Grow(len(command))
+	for _, r := range command {
+		// Skip bidi overrides and zero-width characters
+		if isBidiOverride(r) {
+			continue
+		}
+		// Skip non-printable control characters except newline and tab
+		if unicode.IsControl(r) && r != '\n' && r != '\t' {
+			continue
+		}
+		sb.WriteRune(r)
+	}
+	return sb.String()
+}
+
 func ExecuteCommandWithConfirmation(ctx context.Context, input io.Reader, output io.Writer, command string) error {
+	// Sanitize command to prevent display manipulation
+	command = SanitizeCommand(command)
 	// Require user confirmation
 	ok, err := getUserConfirmation(input, output)
 	if err != nil {
