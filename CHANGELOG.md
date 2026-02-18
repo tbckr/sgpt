@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.6](https://github.com/tbckr/sgpt/compare/v2.17.5...v2.17.6) (2026-02-18)
+
+
+### Bug Fixes
+
+* security fixes ([#347](https://github.com/tbckr/sgpt/issues/347)) ([288f76c](https://github.com/tbckr/sgpt/commit/288f76c3ea884d4399ab28910fd332a28db58eea))
+
 ## [2.17.5](https://github.com/tbckr/sgpt/compare/v2.17.4...v2.17.5) (2026-02-08)
 
 
