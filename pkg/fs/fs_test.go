@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 
@@ -172,4 +173,17 @@ func TestGetImageFileType(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestReadAll_PreservesNewlines(t *testing.T) {
+	input := "name: Dave\ncountry: France\n"
+	result, err := ReadAll(strings.NewReader(input))
+	require.NoError(t, err)
+	require.Equal(t, input, result)
+}
+
+func TestReadAll_Empty(t *testing.T) {
+	result, err := ReadAll(strings.NewReader(""))
+	require.NoError(t, err)
+	require.Equal(t, "", result)
 }

@@ -87,6 +87,16 @@ func ReadString(in io.Reader) (string, error) {
 	return input, nil
 }
 
+// ReadAll reads all bytes from in and returns them as a string, preserving newlines.
+// Unlike ReadString, this is suitable for structured data formats like YAML and JSON.
+func ReadAll(in io.Reader) (string, error) {
+	data, err := io.ReadAll(in)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
 // GetImageFileType returns the file type of images
 func GetImageFileType(inputFile string) (string, error) {
 	file, err := os.Open(inputFile)

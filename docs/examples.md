@@ -41,6 +41,18 @@ Do you want to commit your changes with this commit message? [y/N] y
 A compilation of beneficial bash aliases and functions, including an updated gsum function, is available
 in [.bashrc](https://github.com/tbckr/sgpt/blob/main/.bashrc).
 
+## Prompt Templating
+
+Use `--template` (`-T`) to pipe YAML or JSON variables into a prompt:
+
+```shell
+$ echo "name: Dave\ncountry: France" | sgpt --template "What would {{ .name }} be called in {{ .country }}?"
+
+$ echo "lang: Go" | sgpt code --template "Write a fibonacci function in {{ .lang }}"
+```
+
+See the [full documentation](./usage/templates.md) for all options and constraints.
+
 ## Using Personas to Generate More Accurate Responses
 
 SGPT allows you to specify a persona to generate more accurate responses. This is particularly useful when you want to

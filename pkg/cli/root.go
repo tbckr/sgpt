@@ -45,6 +45,7 @@ type rootCmd struct {
 	execute         bool
 	copyToClipboard bool
 	input           []string
+	templateStr     string
 
 	verbose bool
 }
@@ -151,6 +152,12 @@ $ sgpt sh --chat ls-files "list all files directory"
 ls
 $ sgpt sh --chat ls-files "sort by name"
 ls | sort
+
+# Use a template with piped YAML variables
+$ echo "name: Dave\ncountry: France" | sgpt --template "What would {{ .name }} be called in {{ .country }}?"
+
+# Use a template with a persona
+$ echo "lang: Python" | sgpt code --template "Write a hello world program in {{ .lang }}"
 `,
 		DisableFlagsInUseLine: true,
 		SilenceUsage:          true,
@@ -177,7 +184,44 @@ ls | sort
 			var prompts []string
 			mode := "txt"
 
-			if isPiped {
+			if root.templateStr != "" {
+				// Template mode: piped input provides YAML/JSON variables; template string is the prompt.
+				if !isPiped {
+					return ErrTemplateRequiresPipe
+				}
+				// --execute reads stdin for confirmation after the command is generated, but
+				// --template already drains stdin for variable data. Prohibit the combination.
+				if root.execute {
+					return ErrTemplateWithExecute
+				}
+				// With --template, args can be: none (mode=txt) or one (mode=persona).
+				// Two args would mean both a persona AND a positional prompt, which conflicts.
+				if len(args) == 2 {
+					return ErrTemplateWithTwoArgs
+				}
+				slog.Debug("Template mode: reading piped variables")
+				var rawData string
+				rawData, err = fs.ReadAll(cmd.InOrStdin())
+				if err != nil {
+					return err
+				}
+				var vars map[string]interface{}
+				vars, err = parseTemplateData(rawData)
+				if err != nil {
+					return err
+				}
+				var rendered string
+				rendered, err = renderTemplate(root.templateStr, vars)
+				if err != nil {
+					return err
+				}
+				prompts = append(prompts, rendered)
+				if len(args) == 1 {
+					slog.Debug("Persona provided via command line args")
+					mode = args[0]
+				}
+
+			} else if isPiped {
 				var stdinInput string
 				slog.Debug("Piped shell detected")
 				// input is provided via stdin
@@ -251,6 +295,7 @@ ls | sort
 	cmd.Flags().BoolVarP(&root.copyToClipboard, "clipboard", "b", false, "send client response to clipboard")
 	cmd.Flags().StringVarP(&root.chat, "chat", "c", "", "use an existing chat session or create a new one")
 	cmd.Flags().StringSliceVarP(&root.input, "input", "i", nil, "provide images via command line args to a file or url (experimental)")
+	cmd.Flags().StringVarP(&root.templateStr, "template", "T", "", "Go template string; piped input provides template variables (YAML/JSON)")
 
 	// flags with config binding
 	createFlagsWithConfigBinding(cmd, config)

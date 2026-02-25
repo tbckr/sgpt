@@ -835,3 +835,228 @@ func TestLoadViperConfig_NoTestingFlag(t *testing.T) {
 	// Verify cacheDir is set (by setViperDefaults)
 	require.True(t, testCtx.Config.IsSet("cacheDir"))
 }
+
+func TestRootCmd_TemplateWithPipedYAML(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	yamlInput := "name: Dave\ncountry: France\n"
+	response := "David"
+	expected := "David\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(yamlInput))
+		require.NoError(t, errWrite)
+		require.NoError(t, stdinWriter.Close())
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"--template", "What would {{ .name }} be called in {{ .country }}?"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_TemplateWithPipedJSON(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	jsonInput := `{"name": "Dave", "country": "France"}`
+	response := "David"
+	expected := "David\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(jsonInput))
+		require.NoError(t, errWrite)
+		require.NoError(t, stdinWriter.Close())
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"--template", "What would {{ .name }} be called in {{ .country }}?"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_TemplateWithPersona(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, stdoutWriter)
+	require.NoError(t, err)
+
+	yamlInput := "lang: Python\n"
+	response := "print('hello')"
+	expected := "print('hello')\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+	root.cmd.SetOut(stdoutWriter)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := stdinWriter.Write([]byte(yamlInput))
+		require.NoError(t, errWrite)
+		require.NoError(t, stdinWriter.Close())
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errReader)
+		require.NoError(t, stdoutReader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	// "code" is the persona arg; template provides the rendered prompt
+	root.Execute([]string{"code", "--template", "Write hello world in {{ .lang }}"})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, stdinReader.Close())
+	require.NoError(t, stdoutWriter.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_TemplateNotPiped_Error(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	client, err := api.CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.Execute([]string{"--template", "Hello {{ .name }}"})
+	require.Equal(t, 1, mem.code)
+}
+
+func TestRootCmd_TemplateWithTwoArgs_Error(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	client, err := api.CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	// Use a simple reader; the command fails before consuming stdin (args are validated first)
+	root.cmd.SetIn(strings.NewReader("name: Dave\n"))
+
+	// Two args: persona + prompt -- should error when --template is set
+	root.Execute([]string{"code", "extra-prompt-arg", "--template", "Hello {{ .name }}"})
+	require.Equal(t, 1, mem.code)
+}
+
+func TestRootCmd_TemplateMissingVar_Error(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	stdinReader, stdinWriter := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	root.cmd.SetIn(stdinReader)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, _ = stdinWriter.Write([]byte("name: Dave\n"))
+		_ = stdinWriter.Close()
+	}()
+
+	// Template references .country but it's not in the piped YAML
+	root.Execute([]string{"--template", "{{ .name }} lives in {{ .country }}"})
+	require.Equal(t, 1, mem.code)
+	require.NoError(t, stdinReader.Close())
+
+	wg.Wait()
+}
+
+func TestRootCmd_TemplateWithExecute_Error(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	client, err := api.CreateClient(testCtx.Config, nil)
+	require.NoError(t, err)
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(true, nil), useMockClient(client))
+	// --template drains stdin; --execute also needs stdin for confirmation — must be rejected.
+	root.cmd.SetIn(strings.NewReader("cmd: ls\n"))
+	root.Execute([]string{"sh", "--template", "run {{ .cmd }}", "--execute"})
+	require.Equal(t, 1, mem.code)
+}

@@ -17,6 +17,8 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
   find solutions to coding problems.
 - ChatGPT Integration: Utilize ChatGPT's interactive chat capabilities to refine your prompts and achieve more precise
   results, benefiting from the powerful language model.
+- Prompt Templating: Inject structured YAML or JSON variables into reusable prompt templates using Go's `text/template`
+  syntax.
 - Bash Functions and Aliases: Seamlessly integrate SGPT responses into custom bash functions and aliases, optimizing
   your workflows and making your daily tasks more efficient.
 
