@@ -72,6 +72,8 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   your workflows and making your daily tasks more efficient.
 - **OpenRouter Support:** Use [OpenRouter](https://openrouter.ai) to access various large language models (LLMs) via a
   single API, providing flexibility and convenience in your interactions with different models.
+- **Prompt Templating:** Inject structured data into prompts using Go `text/template` syntax. Pipe YAML or JSON
+  variables via stdin to build dynamic, reusable prompt patterns.
 
 By offering these versatile features, SGPT serves as a powerful tool to enhance your overall productivity, streamline
 your workflow, and simplify complex tasks.
@@ -415,6 +417,18 @@ SGPT will return the appropriate Python code to address the FizzBuzz problem.
 
 The `code` command is a default persona to generate code. For more information on personas, see
 the [docs](https://sgpt.readthedocs.io/en/latest/usage/personas/).
+
+### Prompt Templating
+
+The `--template` flag (`-T`) lets you pipe YAML or JSON data as variables into a Go template string:
+
+```shell
+$ echo "name: Dave\ncountry: France" | sgpt --template "What would {{ .name }} be called in {{ .country }}?"
+
+$ echo "lang: Python" | sgpt code --template "Write a hello world program in {{ .lang }}"
+```
+
+See the [full documentation](https://sgpt.readthedocs.io/en/latest/usage/templates/) for all options and constraints.
 
 ### Enhancing Your Workflow with Bash Aliases and Functions
 
