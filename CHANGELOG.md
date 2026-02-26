@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.18.0](https://github.com/tbckr/sgpt/compare/v2.17.6...v2.18.0) (2026-02-26)
+
+
+### Features
+
+* add prompt templating with --template flag ([#349](https://github.com/tbckr/sgpt/issues/349)) ([8bf40f9](https://github.com/tbckr/sgpt/commit/8bf40f9d980e41dc4126b8d719e7c36aad42d3bd))
+
 ## [2.17.6](https://github.com/tbckr/sgpt/compare/v2.17.5...v2.17.6) (2026-02-18)
 
 
