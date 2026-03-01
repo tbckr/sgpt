@@ -25,12 +25,21 @@ import (
 	"bufio"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
 )
+
+const (
+	// maxInputSize is the upper limit for ReadAll (1 MiB).
+	maxInputSize = 1 << 20
+)
+
+// ErrInputTooLarge is returned by ReadAll when the input exceeds maxInputSize.
+var ErrInputTooLarge = errors.New("input exceeds 1 MiB limit")
 
 const (
 	defaultDirPermissions = 0755
@@ -89,10 +98,14 @@ func ReadString(in io.Reader) (string, error) {
 
 // ReadAll reads all bytes from in and returns them as a string, preserving newlines.
 // Unlike ReadString, this is suitable for structured data formats like YAML and JSON.
+// Returns ErrInputTooLarge if the input exceeds 1 MiB.
 func ReadAll(in io.Reader) (string, error) {
-	data, err := io.ReadAll(in)
+	data, err := io.ReadAll(io.LimitReader(in, maxInputSize+1))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("read input: %w", err)
+	}
+	if len(data) > maxInputSize {
+		return "", ErrInputTooLarge
 	}
 	return string(data), nil
 }

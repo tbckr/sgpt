@@ -189,6 +189,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	var configFile *os.File
 	configFile, err = os.Create(filepath.Join(testCtx.ConfigDir, "config.yaml"))
 	require.NoError(t, err)
+	defer func() { _ = configFile.Close() }()
 
 	_, err = fmt.Fprintf(configFile, "model: \"%s\"\n", openai.GPT4)
 	require.NoError(t, err)

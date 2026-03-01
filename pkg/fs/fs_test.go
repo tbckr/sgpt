@@ -187,3 +187,10 @@ func TestReadAll_Empty(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "", result)
 }
+
+func TestReadAll_LimitExceeded(t *testing.T) {
+	// maxInputSize is 1 MiB; send one byte more to trigger ErrInputTooLarge.
+	large := strings.NewReader(strings.Repeat("a", maxInputSize+1))
+	_, err := ReadAll(large)
+	require.ErrorIs(t, err, ErrInputTooLarge)
+}
