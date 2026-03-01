@@ -36,7 +36,7 @@ type checkCmd struct {
 	cmd *cobra.Command
 }
 
-func newCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *checkCmd {
+func newCheckCmd(config *viper.Viper, createClientFn func(*viper.Viper, io.Writer) (api.Completer, error)) *checkCmd {
 	check := &checkCmd{}
 	cmd := &cobra.Command{
 		Use:   "check",

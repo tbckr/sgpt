@@ -69,7 +69,9 @@ func Execute(args []string) {
 		slog.Error("Failed to create viper config", "error", err)
 		os.Exit(1)
 	}
-	newRootCmd(os.Exit, viperConfig, shell.IsPipedShell, api.CreateClient).Execute(args)
+	newRootCmd(os.Exit, viperConfig, shell.IsPipedShell, func(v *viper.Viper, w io.Writer) (api.Completer, error) {
+		return api.CreateClient(v, w)
+	}).Execute(args)
 }
 
 func (r *rootCmd) Execute(args []string) {
@@ -105,7 +107,7 @@ func (r *rootCmd) Execute(args []string) {
 	r.exit(0)
 }
 
-func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func(*viper.Viper, io.Writer) (*api.OpenAIClient, error)) *rootCmd {
+func newRootCmd(exit func(int), config *viper.Viper, isPipedShell func() (bool, error), createClientFn func(*viper.Viper, io.Writer) (api.Completer, error)) *rootCmd {
 	root := &rootCmd{
 		exit: exit,
 	}
@@ -261,7 +263,7 @@ $ echo "lang: Python" | sgpt code --template "Write a hello world program in {{ 
 			}
 
 			// Create client
-			var client *api.OpenAIClient
+			var client api.Completer
 			client, err = createClientFn(config, cmd.OutOrStdout())
 			if err != nil {
 				return err

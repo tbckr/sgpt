@@ -53,6 +53,24 @@ var (
 	ErrEmptyResponse = errors.New("no choices returned in API response")
 )
 
+// Completer is the interface that wraps the CreateCompletion method.
+// It is satisfied by *OpenAIClient and allows CLI code to depend on an
+// abstraction rather than the concrete type, enabling lightweight fakes in tests.
+type Completer interface {
+	CreateCompletion(ctx context.Context, chatID string, prompt []string, modifier string, input []string) (string, error)
+}
+
+// ClientOption is a functional option for configuring an OpenAIClient.
+type ClientOption func(*OpenAIClient)
+
+// WithSessionManager injects a custom SessionManager into the client.
+// When not provided, CreateClient creates a FilesystemChatSessionManager automatically.
+func WithSessionManager(sm chat.SessionManager) ClientOption {
+	return func(c *OpenAIClient) {
+		c.chatSessionManager = sm
+	}
+}
+
 // OpenAIClient is a client for the OpenAI API.
 type OpenAIClient struct {
 	HTTPClient         *http.Client
@@ -63,7 +81,8 @@ type OpenAIClient struct {
 }
 
 // CreateClient creates a new OpenAI client with the given config and output writer.
-func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
+// Optional ClientOptions can be passed to override defaults (e.g. WithSessionManager).
+func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*OpenAIClient, error) {
 	// Check, if api key was set
 	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
 	if !exists {
@@ -88,21 +107,27 @@ func CreateClient(config *viper.Viper, out io.Writer) (*OpenAIClient, error) {
 		slog.Debug("Setting API base url to " + baseURL)
 	}
 
-	// Initialize chat session manager
-	chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
-	if err != nil {
-		return nil, err
-	}
-	slog.Debug("Chat session manager initialized")
-
-	// Create client
+	// Build client and apply options
 	client := &OpenAIClient{
-		HTTPClient:         httpClient,
-		config:             config,
-		api:                openai.NewClientWithConfig(clientConfig),
-		out:                out,
-		chatSessionManager: chatSessionManager,
+		HTTPClient: httpClient,
+		config:     config,
+		api:        openai.NewClientWithConfig(clientConfig),
+		out:        out,
 	}
+	for _, opt := range opts {
+		opt(client)
+	}
+
+	// Fall back to filesystem-backed session manager if none was injected
+	if client.chatSessionManager == nil {
+		chatSessionManager, err := chat.NewFilesystemChatSessionManager(config)
+		if err != nil {
+			return nil, err
+		}
+		client.chatSessionManager = chatSessionManager
+		slog.Debug("Chat session manager initialized")
+	}
+
 	slog.Debug("OpenAI client created")
 	return client, nil
 }

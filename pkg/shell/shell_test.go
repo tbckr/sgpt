@@ -27,6 +27,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"testing"
 
@@ -264,6 +265,9 @@ func TestGetUserConfirmationAsked2Times(t *testing.T) {
 }
 
 func TestExecuteShellCommandEcho(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell execution tests require bash and are not supported on Windows")
+	}
 	stdoutReader, stdoutWriter := io.Pipe()
 
 	var wg sync.WaitGroup
@@ -288,6 +292,9 @@ func TestExecuteShellCommandEcho(t *testing.T) {
 }
 
 func TestExecuteCommandWithConfirmation(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell execution tests require bash and are not supported on Windows")
+	}
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()
 

@@ -1,5 +1,8 @@
 # Custom
 /.idea
+CLAUDE.md
+.claude/
+di.md
 
 dist/
 manpages/

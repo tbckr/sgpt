@@ -22,13 +22,14 @@
 package cli
 
 import (
+	"io"
+	"os"
 	"testing"
 
-	"github.com/tbckr/sgpt/v2/pkg/api"
-
-	"github.com/tbckr/sgpt/v2/internal/testlib"
-
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
+	"github.com/tbckr/sgpt/v2/internal/testlib"
+	"github.com/tbckr/sgpt/v2/pkg/api"
 )
 
 func TestCheckCmd(t *testing.T) {
@@ -36,9 +37,9 @@ func TestCheckCmd(t *testing.T) {
 	testlib.SetAPIKey(t)
 	mem := &exitMemento{}
 
-	testlib.SetAPIKey(t)
-
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), func(v *viper.Viper, w io.Writer) (api.Completer, error) {
+		return api.CreateClient(v, w)
+	}).Execute([]string{"check"})
 	require.Equal(t, 0, mem.code)
 }
 
@@ -46,6 +47,17 @@ func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	mem := &exitMemento{}
 
-	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), api.CreateClient).Execute([]string{"check"})
+	// Ensure OPENAI_API_KEY is absent for this test regardless of the shell environment.
+	prev, had := os.LookupEnv("OPENAI_API_KEY")
+	require.NoError(t, os.Unsetenv("OPENAI_API_KEY"))
+	t.Cleanup(func() {
+		if had {
+			_ = os.Setenv("OPENAI_API_KEY", prev)
+		}
+	})
+
+	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), func(v *viper.Viper, w io.Writer) (api.Completer, error) {
+		return api.CreateClient(v, w)
+	}).Execute([]string{"check"})
 	require.Equal(t, 1, mem.code)
 }

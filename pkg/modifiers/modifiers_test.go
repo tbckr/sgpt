@@ -37,11 +37,7 @@ import (
 func TestGetChatModifierShell(t *testing.T) {
 	config := createTestConfig(t)
 
-	err := os.Setenv("SHELL", "/bin/bash")
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		require.NoError(t, os.Unsetenv("SHELL"))
-	})
+	t.Setenv("SHELL", "/bin/bash")
 
 	modifier, err := GetChatModifier(config, "sh")
 	require.NoError(t, err)
@@ -57,10 +53,12 @@ You are an expert in %s and translate the question at the end to valid syntax.`
 
 	config := createTestConfig(t)
 
-	shellEnv := os.Getenv("SHELL")
+	prevShell, hadShell := os.LookupEnv("SHELL")
 	require.NoError(t, os.Unsetenv("SHELL"))
 	t.Cleanup(func() {
-		require.NoError(t, os.Setenv("SHELL", shellEnv))
+		if hadShell {
+			_ = os.Setenv("SHELL", prevShell)
+		}
 	})
 
 	modifier, err := GetChatModifier(config, "sh")

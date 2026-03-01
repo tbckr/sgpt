@@ -28,6 +28,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -47,6 +48,7 @@ import (
 func TestRootCmd_SimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -86,6 +88,7 @@ func TestRootCmd_SimplePrompt(t *testing.T) {
 func TestRootCmd_SimplePromptOnly(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -127,6 +130,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -170,6 +174,7 @@ func TestRootCmd_SimpleClipboard(t *testing.T) {
 func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -218,6 +223,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	client, err := api.CreateClient(testCtx.Config, nil)
@@ -232,6 +238,7 @@ func TestRootCmd_SimplePromptNoPrompt(t *testing.T) {
 func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -271,6 +278,7 @@ func TestRootCmd_SimplePromptVerbose(t *testing.T) {
 func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -321,6 +329,7 @@ func TestRootCmd_SimplePromptViaPipedShell(t *testing.T) {
 func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -363,6 +372,7 @@ func TestRootCmd_PipedShell_NoInput(t *testing.T) {
 func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -396,6 +406,7 @@ func TestRootCmd_SimplePrompt_PipedShellError(t *testing.T) {
 func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -446,6 +457,7 @@ func TestRootCmd_SimplePromptViaPipedShellAndModifier(t *testing.T) {
 func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -497,6 +509,7 @@ func TestRootCmd_PipedShellAndModifierAndPrompt(t *testing.T) {
 func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -513,11 +526,7 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	err = os.Setenv("SHELL", "/bin/bash")
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		require.NoError(t, os.Unsetenv("SHELL"))
-	})
+	t.Setenv("SHELL", "/bin/bash")
 
 	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
 	root.cmd.SetOut(writer)
@@ -540,8 +549,12 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 }
 
 func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell execution requires bash and is not supported on Windows")
+	}
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -559,11 +572,7 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	err = os.Setenv("SHELL", "/bin/bash")
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = os.Unsetenv("SHELL")
-	})
+	t.Setenv("SHELL", "/bin/bash")
 
 	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
 	root.cmd.SetIn(stdinReader)
@@ -600,6 +609,7 @@ func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -657,6 +667,7 @@ func TestRootCmd_SimplePromptWithChat(t *testing.T) {
 func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -674,11 +685,7 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	err = os.Setenv("SHELL", "/bin/bash")
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		require.NoError(t, os.Unsetenv("SHELL"))
-	})
+	t.Setenv("SHELL", "/bin/bash")
 
 	var fileHandler *os.File
 	fileHandler, err = os.Create(filepath.Join(testCtx.Config.GetString("personas"), "my-persona"))
@@ -733,6 +740,7 @@ func TestRootCmd_SimplePromptWithChatAndCustomPersona(t *testing.T) {
 func TestRootCmd_ChatConversation(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -803,10 +811,11 @@ func TestRootCmd_ChatConversation(t *testing.T) {
 func TestRootCmd_PanicRecovery_ExitsWithCode1(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	// Create a client factory that panics
-	panicClientFn := func(_ *viper.Viper, _ io.Writer) (*api.OpenAIClient, error) {
+	panicClientFn := func(_ *viper.Viper, _ io.Writer) (api.Completer, error) {
 		panic("test panic")
 	}
 
@@ -840,6 +849,7 @@ func TestLoadViperConfig_NoTestingFlag(t *testing.T) {
 func TestRootCmd_TemplateWithPipedYAML(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -890,6 +900,7 @@ func TestRootCmd_TemplateWithPipedYAML(t *testing.T) {
 func TestRootCmd_TemplateWithPipedJSON(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -940,6 +951,7 @@ func TestRootCmd_TemplateWithPipedJSON(t *testing.T) {
 func TestRootCmd_TemplateWithPersona(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -991,6 +1003,7 @@ func TestRootCmd_TemplateWithPersona(t *testing.T) {
 func TestRootCmd_TemplateNotPiped_Error(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	client, err := api.CreateClient(testCtx.Config, nil)
@@ -1004,6 +1017,7 @@ func TestRootCmd_TemplateNotPiped_Error(t *testing.T) {
 func TestRootCmd_TemplateWithTwoArgs_Error(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	client, err := api.CreateClient(testCtx.Config, nil)
@@ -1021,6 +1035,7 @@ func TestRootCmd_TemplateWithTwoArgs_Error(t *testing.T) {
 func TestRootCmd_TemplateMissingVar_Error(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	var wg sync.WaitGroup
@@ -1050,6 +1065,7 @@ func TestRootCmd_TemplateMissingVar_Error(t *testing.T) {
 func TestRootCmd_TemplateWithExecute_Error(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 	mem := &exitMemento{}
 
 	client, err := api.CreateClient(testCtx.Config, nil)
