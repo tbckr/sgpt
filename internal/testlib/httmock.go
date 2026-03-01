@@ -99,7 +99,7 @@ func createStreamedMessages(response string) []byte {
 	var buff bytes.Buffer
 	for _, char := range response {
 		buff.WriteString(eventMessage)
-		buff.WriteString(fmt.Sprintf(dataMessageTemplate, fmt.Sprintf(messageTemplate, char)))
+		fmt.Fprintf(&buff, dataMessageTemplate, fmt.Sprintf(messageTemplate, char))
 	}
 	buff.WriteString(eventDone)
 	buff.WriteString(dataDone)

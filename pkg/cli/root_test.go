@@ -190,7 +190,7 @@ func TestRootCmd_SimplePromptOverrideValuesWithConfigFile(t *testing.T) {
 	configFile, err = os.Create(filepath.Join(testCtx.ConfigDir, "config.yaml"))
 	require.NoError(t, err)
 
-	_, err = configFile.WriteString(fmt.Sprintf("model: \"%s\"\n", openai.GPT4))
+	_, err = fmt.Fprintf(configFile, "model: \"%s\"\n", openai.GPT4)
 	require.NoError(t, err)
 
 	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
