@@ -39,21 +39,26 @@ import (
 )
 
 func TestCreateClient(t *testing.T) {
-	// Set the api key
-	err := os.Setenv("OPENAI_API_KEY", "test")
-	require.NoError(t, err)
+	t.Setenv("OPENAI_API_KEY", "test")
 
 	var client *OpenAIClient
+	var err error
 	client, err = CreateClient(nil, nil)
 	require.NoError(t, err)
 	require.NotNil(t, client)
 }
 
 func TestCreateClientMissingApiKey(t *testing.T) {
-	err := os.Unsetenv("OPENAI_API_KEY")
-	require.NoError(t, err)
+	prev, had := os.LookupEnv("OPENAI_API_KEY")
+	require.NoError(t, os.Unsetenv("OPENAI_API_KEY"))
+	t.Cleanup(func() {
+		if had {
+			_ = os.Setenv("OPENAI_API_KEY", prev)
+		}
+	})
 
 	var client *OpenAIClient
+	var err error
 	client, err = CreateClient(nil, nil)
 	require.Error(t, err)
 	require.ErrorIs(t, err, ErrMissingAPIKey)
@@ -63,6 +68,7 @@ func TestCreateClientMissingApiKey(t *testing.T) {
 func TestSimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -112,6 +118,7 @@ func TestSimplePrompt(t *testing.T) {
 func TestStreamSimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -150,6 +157,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 func TestPromptSaveAsChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -205,6 +213,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 func TestPromptLoadChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -270,6 +279,7 @@ func TestPromptLoadChat(t *testing.T) {
 func TestPromptWithModifier(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -285,11 +295,7 @@ func TestPromptWithModifier(t *testing.T) {
 	t.Cleanup(httpmock.DeactivateAndReset)
 	testlib.RegisterExpectedChatResponse(response)
 
-	err = os.Setenv("SHELL", "/bin/bash")
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		require.NoError(t, os.Unsetenv("SHELL"))
-	})
+	t.Setenv("SHELL", "/bin/bash")
 
 	testCtx.Config.Set("chat", "test_chat")
 
@@ -337,6 +343,7 @@ func TestPromptWithModifier(t *testing.T) {
 func TestSimplePromptWithLocalImage(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -374,6 +381,7 @@ func TestSimplePromptWithLocalImage(t *testing.T) {
 func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -439,6 +447,7 @@ func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
 func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -503,6 +512,7 @@ func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 func TestSimplePromptWithHTTPURLImageAndChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -567,6 +577,7 @@ func TestSimplePromptWithHTTPURLImageAndChat(t *testing.T) {
 func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
@@ -637,6 +648,7 @@ func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 func TestSimplePrompt_EmptyChoices(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()

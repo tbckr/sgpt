@@ -21,18 +21,17 @@
 
 package testlib
 
-import (
-	"os"
-	"testing"
+import "testing"
 
-	"github.com/stretchr/testify/require"
-)
-
+// SetAPIKey sets OPENAI_API_KEY to a test value and restores the original on cleanup.
 func SetAPIKey(t *testing.T) {
-	err := os.Setenv("OPENAI_API_KEY", "test")
-	require.NoError(t, err)
+	t.Helper()
+	t.Setenv("OPENAI_API_KEY", "test")
+}
 
-	t.Cleanup(func() {
-		_ = os.Unsetenv("OPENAI_API_KEY")
-	})
+// SetAPIBase pins OPENAI_API_BASE to the URL httpmock registers against so that
+// tests pass regardless of what the developer has set in their shell.
+func SetAPIBase(t *testing.T) {
+	t.Helper()
+	t.Setenv("OPENAI_API_BASE", "https://api.openai.com/v1")
 }
