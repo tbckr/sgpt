@@ -119,7 +119,6 @@ jobs:
           args: --timeout=5m -c .golangci.yaml
           install-mode: "goinstall"
           skip-cache: true
-          only-new-issues: true
 
   vuln_check:
     runs-on: ubuntu-latest

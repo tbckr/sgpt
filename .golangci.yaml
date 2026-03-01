@@ -41,6 +41,16 @@ linters:
       - third_party$
       - builtin$
       - examples$
+    rules:
+      - linters: [revive]
+        path: "internal/buildinfo/"
+        text: "var-naming"
+      - linters: [revive]
+        path: "pkg/api/"
+        text: "var-naming"
+      - linters: [revive]
+        path: "pkg/fs/"
+        text: "var-naming"
 formatters:
   enable:
     - goimports

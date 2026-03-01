@@ -107,14 +107,16 @@ func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if char == '\n' || char == '\r' || char == 'Y' || char == 'y' {
+		switch char {
+		case '\n', '\r', 'Y', 'y':
 			slog.Debug("User confirmed")
 			return true, nil
-		} else if char == 'N' || char == 'n' {
+		case 'N', 'n':
 			slog.Debug("User denied")
 			return false, nil
+		default:
+			slog.Debug("User entered unrecognised input for confirmation")
 		}
-		slog.Debug("User entered unrecognised input for confirmation: " + string(char))
 	}
 }
 

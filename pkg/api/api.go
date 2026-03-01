@@ -114,10 +114,7 @@ func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID string, prom
 	var messages []openai.ChatCompletionMessage
 	var err error
 
-	isChat := false
-	if chatID != "" {
-		isChat = true
-	}
+	isChat := chatID != ""
 
 	// Load existing chat messages:
 	// If this is a chat, load existing messages from chat session.
