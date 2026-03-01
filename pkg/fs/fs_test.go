@@ -23,7 +23,6 @@ package fs
 
 import (
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -33,16 +32,10 @@ import (
 )
 
 func TestGetAppCacheDir(t *testing.T) {
-	existingEnv := os.Getenv("XDG_CACHE_HOME")
-	t.Cleanup(func() {
-		_ = os.Setenv("XDG_CACHE_HOME", existingEnv)
-	})
-
 	tempDir := t.TempDir()
+	t.Setenv("XDG_CACHE_HOME", tempDir)
 
-	err := os.Setenv("XDG_CACHE_HOME", tempDir)
-	require.NoError(t, err)
-
+	var err error
 	var cacheDir string
 	cacheDir, err = GetAppCacheDir()
 	require.NoError(t, err)
@@ -51,16 +44,10 @@ func TestGetAppCacheDir(t *testing.T) {
 }
 
 func TestGetAppConfigDir(t *testing.T) {
-	existingEnv := os.Getenv("XDG_CONFIG_HOME")
-	t.Cleanup(func() {
-		_ = os.Setenv("XDG_CACHE_HOME", existingEnv)
-	})
-
 	tempDir := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", tempDir)
 
-	err := os.Setenv("XDG_CONFIG_HOME", tempDir)
-	require.NoError(t, err)
-
+	var err error
 	var cacheDir string
 	cacheDir, err = GetAppConfigPath()
 	require.NoError(t, err)
