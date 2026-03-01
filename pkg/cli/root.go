@@ -205,7 +205,7 @@ $ echo "lang: Python" | sgpt code --template "Write a hello world program in {{ 
 				if err != nil {
 					return err
 				}
-				var vars map[string]interface{}
+				var vars map[string]any
 				vars, err = parseTemplateData(rawData)
 				if err != nil {
 					return err

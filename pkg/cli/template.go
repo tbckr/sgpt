@@ -48,8 +48,8 @@ var (
 // parseTemplateData parses YAML or JSON data into a variable map.
 // yaml.Unmarshal accepts JSON as valid YAML (JSON is a subset of YAML).
 // The original parse error is preserved via wrapping so callers get diagnostic detail.
-func parseTemplateData(data string) (map[string]interface{}, error) {
-	var vars map[string]interface{}
+func parseTemplateData(data string) (map[string]any, error) {
+	var vars map[string]any
 	if err := yaml.Unmarshal([]byte(data), &vars); err != nil {
 		// Wrap with both the sentinel (for errors.Is) and the underlying cause (for diagnostics).
 		return nil, fmt.Errorf("%w: %w", ErrTemplateDataParse, err)
@@ -67,7 +67,7 @@ func parseTemplateData(data string) (map[string]interface{}, error) {
 // must only be called with template strings sourced from the authenticated local user (CLI flag).
 // Do not pass template strings from files, environment variables, or network inputs without
 // additional validation.
-func renderTemplate(templateStr string, vars map[string]interface{}) (string, error) {
+func renderTemplate(templateStr string, vars map[string]any) (string, error) {
 	slog.Debug("Rendering prompt template")
 	t, err := template.New("prompt").Option("missingkey=error").Parse(templateStr)
 	if err != nil {
