@@ -24,6 +24,7 @@ package fs
 import (
 	"io"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -32,6 +33,9 @@ import (
 )
 
 func TestGetAppCacheDir(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("os.UserCacheDir() ignores XDG_CACHE_HOME on Windows")
+	}
 	tempDir := t.TempDir()
 	t.Setenv("XDG_CACHE_HOME", tempDir)
 
@@ -44,6 +48,9 @@ func TestGetAppCacheDir(t *testing.T) {
 }
 
 func TestGetAppConfigDir(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("os.UserConfigDir() ignores XDG_CONFIG_HOME on Windows")
+	}
 	tempDir := t.TempDir()
 	t.Setenv("XDG_CONFIG_HOME", tempDir)
 

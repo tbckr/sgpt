@@ -28,6 +28,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -548,6 +549,9 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 }
 
 func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell execution requires bash and is not supported on Windows")
+	}
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
 	testlib.SetAPIBase(t)
