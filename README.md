@@ -20,35 +20,33 @@ Developed with the help of [SGPT](https://github.com/tbckr/sgpt).
 This is a Go implementation. For the original Python implementation,
 visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind when reporting issues.
 
-> [!NOTE]
-> Currently under heavy refactoring for v3, but v2 is still maintained.
-
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- param::isNotitle::true:: -->
 
-- [Features](#features)
-- [Installation](#installation)
-  - [Linux](#linux)
-  - [macOS](#macos)
-  - [Windows](#windows)
-  - [Using Go](#using-go)
-  - [Docker](#docker)
-  - [Ansible](#ansible)
-  - [Other platforms](#other-platforms)
-- [Usage Guide](#usage-guide)
-  - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
-  - [Querying OpenAI Models](#querying-openai-models)
-  - [GPT-4o and GPT-4 Vision API Support](#gpt-4o-and-gpt-4-vision-api-support)
-  - [o1 API Support](#o1-api-support)
-  - [OpenRouter API Support](#openrouter-api-support)
-  - [Chat Capabilities](#chat-capabilities)
-  - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
-  - [Interactive Shell Sessions](#interactive-shell-sessions)
-  - [Code Generation Capabilities](#code-generation-capabilities)
-  - [Prompt Templating](#prompt-templating)
-  - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
-- [Acknowledgements](#acknowledgements)
+- [SGPT](#sgpt)
+  - [Features](#features)
+  - [Installation](#installation)
+    - [Linux](#linux)
+    - [macOS](#macos)
+    - [Windows](#windows)
+    - [Using Go](#using-go)
+    - [Docker](#docker)
+    - [Ansible](#ansible)
+    - [Other platforms](#other-platforms)
+  - [Usage Guide](#usage-guide)
+    - [Getting started: Obtaining an OpenAI API Key](#getting-started-obtaining-an-openai-api-key)
+    - [Querying OpenAI Models](#querying-openai-models)
+    - [GPT-4o and GPT-4 Vision API Support](#gpt-4o-and-gpt-4-vision-api-support)
+    - [o1 API Support](#o1-api-support)
+    - [OpenRouter API Support](#openrouter-api-support)
+    - [Chat Capabilities](#chat-capabilities)
+    - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
+    - [Interactive Shell Sessions](#interactive-shell-sessions)
+    - [Code Generation Capabilities](#code-generation-capabilities)
+    - [Prompt Templating](#prompt-templating)
+    - [Enhancing Your Workflow with Bash Aliases and Functions](#enhancing-your-workflow-with-bash-aliases-and-functions)
+  - [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
