@@ -1,5 +1,5 @@
 ARG BUILDPLATFORM=linux/amd64
-ARG BASE_IMAGE_VERSION=cgr.dev/chainguard/static:latest@sha256:d6d54da1c5bf5d9cecb231786adca86934607763067c8d7d9d22057abe6d5dbc
+ARG BASE_IMAGE_VERSION=cgr.dev/chainguard/static:latest@sha256:6d508f497fe786ba47d57f4a3cffce12ca05c04e94712ab0356b94a93c4b457f
 FROM --platform=$BUILDPLATFORM ${BASE_IMAGE_VERSION}
 ENV HOME /home/nonroot
 VOLUME /home/nonroot
