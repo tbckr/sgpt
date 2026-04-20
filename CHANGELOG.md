@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.19.0](https://github.com/tbckr/sgpt/compare/v2.18.0...v2.19.0) (2026-03-01)
+
+
+### Features
+
+* **lint:** enforce full linting and fix reported issues ([#351](https://github.com/tbckr/sgpt/issues/351)) ([14f0d36](https://github.com/tbckr/sgpt/commit/14f0d361a8a722c16c6fcada3f42c52e69902e47))
+
+
+### Bug Fixes
+
+* fix env isolation and add DI improvements ([#354](https://github.com/tbckr/sgpt/issues/354)) ([9b8bfb8](https://github.com/tbckr/sgpt/commit/9b8bfb82f30493d7b52730620a082735868c7cc1))
+
 ## [2.18.0](https://github.com/tbckr/sgpt/compare/v2.17.6...v2.18.0) (2026-02-26)
 
 

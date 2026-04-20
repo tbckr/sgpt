@@ -31,13 +31,13 @@ repos:
       - id: check-executables-have-shebangs
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.0
+    rev: v8.30.1
     hooks:
       - id: gitleaks-docker
 
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.13.8
+    rev: v4.13.10
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen
@@ -45,7 +45,7 @@ repos:
 
   # Text file hooks
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.47.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint
         args:
@@ -54,7 +54,7 @@ repos:
 
   # GitHub Actions hooks
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.36.2
+    rev: 0.37.1
     hooks:
       - id: check-github-workflows
         files: ^\.github/workflows/.*\.ya?ml$
