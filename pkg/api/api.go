@@ -27,9 +27,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/tbckr/sgpt/v2/pkg/fs"
 
@@ -42,6 +44,18 @@ import (
 const (
 	// envKeyOpenAIApi is the environment variable key for the OpenAI API key.
 	envKeyOpenAIApi = "OPENAI_API_KEY"
+
+	// Defaults for the OpenAI HTTP client. Without these, sgpt inherits
+	// http.Client's zero value and can hang indefinitely when the
+	// configured endpoint (OPENAI_API_BASE) is slow or unresponsive,
+	// which is particularly bad in CI/CD pipelines where there is no
+	// interactive recovery path. We intentionally do not set a client-wide
+	// Timeout because sgpt supports streaming responses that can legitimately
+	// stay open for several minutes; ResponseHeaderTimeout is enough to
+	// short-circuit slowloris-style endpoints that never produce headers.
+	defaultDialTimeout           = 10 * time.Second
+	defaultResponseHeaderTimeout = 30 * time.Second
+	defaultTLSHandshakeTimeout   = 10 * time.Second
 )
 
 var (
@@ -90,9 +104,13 @@ func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*Op
 	}
 	clientConfig := openai.DefaultConfig(apiKey)
 
-	// Set HTTP Proxy
+	// Set HTTP Proxy and sensible timeouts; the previous zero-value
+	// http.Client would hang forever on a slow or unresponsive endpoint.
 	transport := &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
+		Proxy:                 http.ProxyFromEnvironment,
+		DialContext:           (&net.Dialer{Timeout: defaultDialTimeout}).DialContext,
+		ResponseHeaderTimeout: defaultResponseHeaderTimeout,
+		TLSHandshakeTimeout:   defaultTLSHandshakeTimeout,
 	}
 	httpClient := &http.Client{
 		Transport: transport,
