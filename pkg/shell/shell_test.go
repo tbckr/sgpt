@@ -391,7 +391,8 @@ func TestSanitizeCommand_RemovesBidiOverrides(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := SanitizeCommand(tt.input)
+			result, err := SanitizeCommand(tt.input)
+			require.NoError(t, err)
 			require.Equal(t, tt.expected, result)
 		})
 	}
@@ -427,7 +428,8 @@ func TestSanitizeCommand_RemovesANSIEscapes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := SanitizeCommand(tt.input)
+			result, err := SanitizeCommand(tt.input)
+			require.NoError(t, err)
 			require.Equal(t, tt.expected, result)
 		})
 	}
@@ -473,41 +475,43 @@ func TestSanitizeCommand_RemovesControlChars(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := SanitizeCommand(tt.input)
+			result, err := SanitizeCommand(tt.input)
+			require.NoError(t, err)
 			require.Equal(t, tt.expected, result)
 		})
 	}
 }
 
-func TestSanitizeCommand_PreservesNewlineAndTab(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "Newline preserved",
-			input:    "echo\ntest",
-			expected: "echo\ntest",
-		},
-		{
-			name:     "Tab preserved",
-			input:    "echo\ttest",
-			expected: "echo\ttest",
-		},
-		{
-			name:     "Both preserved",
-			input:    "echo\n\ttest",
-			expected: "echo\n\ttest",
-		},
+func TestSanitizeCommand_RejectsMultilineInjection(t *testing.T) {
+	// A prompt-injected `ls\nrm -rf ~` would execute both commands under
+	// `bash -c` once the user confirms. SanitizeCommand must refuse any
+	// command containing \n or \r so the caller can abort before the
+	// confirmation prompt (#360).
+	tests := []string{
+		"echo\ntest",
+		"ls\nrm -rf ~",
+		"echo hi\r\necho bye",
+		"echo\r",
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := SanitizeCommand(tt.input)
-			require.Equal(t, tt.expected, result)
+	for _, cmd := range tests {
+		t.Run(cmd, func(t *testing.T) {
+			result, err := SanitizeCommand(cmd)
+			require.ErrorIs(t, err, ErrMultilineCommand)
+			require.Empty(t, result)
 		})
 	}
+}
+
+func TestSanitizeCommand_PreservesTab(t *testing.T) {
+	// Tabs are a legitimate part of shell invocations (printf args etc)
+	// and must pass through.
+	result, err := SanitizeCommand("printf 'a\\tb'")
+	require.NoError(t, err)
+	require.Equal(t, "printf 'a\\tb'", result)
+
+	result, err = SanitizeCommand("echo\ttest")
+	require.NoError(t, err)
+	require.Equal(t, "echo\ttest", result)
 }
 
 func TestSanitizeCommand_CleanCommandUnchanged(t *testing.T) {
@@ -521,7 +525,8 @@ func TestSanitizeCommand_CleanCommandUnchanged(t *testing.T) {
 
 	for _, cmd := range cleanCommands {
 		t.Run(cmd, func(t *testing.T) {
-			result := SanitizeCommand(cmd)
+			result, err := SanitizeCommand(cmd)
+			require.NoError(t, err)
 			require.Equal(t, cmd, result)
 		})
 	}
@@ -557,7 +562,8 @@ func TestSanitizeCommand_ZeroWidthChars(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := SanitizeCommand(tt.input)
+			result, err := SanitizeCommand(tt.input)
+			require.NoError(t, err)
 			require.Equal(t, tt.expected, result)
 		})
 	}
