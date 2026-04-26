@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.20.0](https://github.com/tbckr/sgpt/compare/v2.19.0...v2.20.0) (2026-04-26)
+
+
+### Features
+
+* give the OpenAI HTTP transport dial and header timeouts ([#363](https://github.com/tbckr/sgpt/issues/363)) ([177a1cd](https://github.com/tbckr/sgpt/commit/177a1cd755e32c2e9172ffcf27f19b87914c19d7)), closes [#357](https://github.com/tbckr/sgpt/issues/357)
+* **shell:** reject multi-line LLM output so bash -c can't execute hidden commands ([#365](https://github.com/tbckr/sgpt/issues/365)) ([d3ba6ad](https://github.com/tbckr/sgpt/commit/d3ba6ad0df0c675088d74cfafa535b85e7c35985)), closes [#360](https://github.com/tbckr/sgpt/issues/360)
+
 ## [2.19.0](https://github.com/tbckr/sgpt/compare/v2.18.0...v2.19.0) (2026-03-01)
 
 
