@@ -24,6 +24,7 @@ package shell
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -59,9 +60,19 @@ func isBidiOverride(r rune) bool {
 	return false
 }
 
+// ErrMultilineCommand is returned by SanitizeCommand when the LLM
+// output contains newline or carriage-return separators. bash -c treats
+// them identically to ';', so a prompt-injected multi-line response
+// would execute as multiple commands once the user confirms - see
+// #360.
+var ErrMultilineCommand = errors.New("command contains newline; rejected as potential injection")
+
 // SanitizeCommand removes ANSI escape sequences, Unicode bidi overrides, and non-printable control characters
-// from a command string to prevent display manipulation attacks. Newlines and tabs are preserved.
-func SanitizeCommand(command string) string {
+// from a command string to prevent display manipulation attacks. Tabs are preserved because they are
+// legitimately used in `printf` arguments etc. Newlines and carriage returns are rejected outright
+// because `bash -c` would treat them as command separators, letting a single confirmed run
+// silently execute multiple commands (#360).
+func SanitizeCommand(command string) (string, error) {
 	// Remove ANSI escape sequences (CSI and OSC)
 	ansiRegex := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]|\x1b\][^\x07]*\x07`)
 	command = ansiRegex.ReplaceAllString(command, "")
@@ -74,18 +85,32 @@ func SanitizeCommand(command string) string {
 		if isBidiOverride(r) {
 			continue
 		}
-		// Skip non-printable control characters except newline and tab
-		if unicode.IsControl(r) && r != '\n' && r != '\t' {
+		// Skip non-printable control characters except tab.
+		// Newlines and carriage returns are handled explicitly after the
+		// cleanup pass so we can reject them with a clear error rather
+		// than silently stripping them.
+		if unicode.IsControl(r) && r != '\n' && r != '\r' && r != '\t' {
 			continue
 		}
 		sb.WriteRune(r)
 	}
-	return sb.String()
+	sanitized := sb.String()
+	if strings.ContainsAny(sanitized, "\n\r") {
+		return "", ErrMultilineCommand
+	}
+	return sanitized, nil
 }
 
 func ExecuteCommandWithConfirmation(ctx context.Context, input io.Reader, output io.Writer, command string) error {
-	// Sanitize command to prevent display manipulation
-	command = SanitizeCommand(command)
+	// Sanitize command to prevent display manipulation and reject
+	// multi-line payloads before the user is given a confirmation prompt
+	// that can't see the hidden trailing commands.
+	sanitized, err := SanitizeCommand(command)
+	if err != nil {
+		fmt.Fprintf(output, "Refusing to execute suggested command: %s\n", err.Error())
+		return err
+	}
+	command = sanitized
 	// Require user confirmation
 	ok, err := getUserConfirmation(input, output)
 	if err != nil {
