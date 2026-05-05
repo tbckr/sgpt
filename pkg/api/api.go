@@ -29,6 +29,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -117,12 +118,14 @@ func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*Op
 	}
 	clientConfig.HTTPClient = httpClient
 
-	// Check, if API base url was set
-	baseURL, isSet := os.LookupEnv("OPENAI_API_BASE")
-	if isSet {
-		// Set base url
+	// Validate OPENAI_API_BASE before applying it; an unvalidated override
+	// can redirect the Authorization header to an attacker-controlled host.
+	if baseURL, isSet := os.LookupEnv("OPENAI_API_BASE"); isSet {
+		if err := validateAPIBaseURL(baseURL); err != nil {
+			return nil, err
+		}
 		clientConfig.BaseURL = baseURL
-		slog.Debug("Setting API base url to " + baseURL)
+		slog.Warn("OPENAI_API_BASE override active", "url", baseURL)
 	}
 
 	// Build client and apply options
@@ -148,6 +151,20 @@ func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*Op
 
 	slog.Debug("OpenAI client created")
 	return client, nil
+}
+
+// validateAPIBaseURL requires an absolute https URL with a non-empty host.
+// Hostname-agnostic to preserve compatibility with Azure OpenAI, OpenRouter,
+// and self-hosted backends (Ollama, LiteLLM) fronted by TLS.
+func validateAPIBaseURL(raw string) error {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return fmt.Errorf("OPENAI_API_BASE must be a valid https URL: %w", err)
+	}
+	if u.Scheme != "https" || u.Host == "" {
+		return fmt.Errorf("OPENAI_API_BASE must be a valid https URL: %q", raw)
+	}
+	return nil
 }
 
 // CreateCompletion creates a completion for the given prompt and modifier. If chatID is provided, the chat is reused
