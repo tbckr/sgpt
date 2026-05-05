@@ -65,6 +65,42 @@ func TestCreateClientMissingApiKey(t *testing.T) {
 	require.Nil(t, client)
 }
 
+func TestCreateClientAPIBaseValidation(t *testing.T) {
+	tests := []struct {
+		name    string
+		baseURL string
+		wantErr bool
+	}{
+		{"openai", "https://api.openai.com/v1", false},
+		{"openrouter", "https://openrouter.ai/api/v1", false},
+		{"azure", "https://my-resource.openai.azure.com/openai/deployments/x", false},
+		{"localhost over https", "https://localhost:8443/v1", false},
+		{"http openai", "http://api.openai.com/v1", true},
+		{"imds via http", "http://169.254.169.254/latest/meta-data/", true},
+		{"private rfc1918 http", "http://10.0.0.1/v1", true},
+		{"empty", "", true},
+		{"missing scheme", "api.openai.com/v1", true},
+		{"file scheme", "file:///etc/passwd", true},
+		{"javascript scheme", "javascript:alert(1)", true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv("OPENAI_API_KEY", "test")
+			t.Setenv("OPENAI_API_BASE", tc.baseURL)
+
+			client, err := CreateClient(nil, nil)
+			if tc.wantErr {
+				require.Error(t, err)
+				require.Nil(t, client)
+				require.Contains(t, err.Error(), "OPENAI_API_BASE")
+			} else {
+				require.NoError(t, err)
+				require.NotNil(t, client)
+			}
+		})
+	}
+}
+
 func TestSimplePrompt(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
