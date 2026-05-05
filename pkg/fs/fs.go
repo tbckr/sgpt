@@ -114,15 +114,20 @@ func GetPersonasPath() (string, error) {
 
 func ReadString(in io.Reader) (string, error) {
 	var buf []byte
-	scanner := bufio.NewScanner(in)
+	scanner := bufio.NewScanner(io.LimitReader(in, maxInputSize+1))
+	// Allow a single token to fill the whole input cap so oversized streams
+	// surface as ErrInputTooLarge below rather than bufio.ErrTooLong.
+	scanner.Buffer(make([]byte, 0, 64*1024), maxInputSize+2)
 	for scanner.Scan() {
 		buf = append(buf, scanner.Bytes()...)
+		if len(buf) > maxInputSize {
+			return "", ErrInputTooLarge
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		return "", err
 	}
-	input := string(buf)
-	return input, nil
+	return string(buf), nil
 }
 
 // ReadAll reads all bytes from in and returns them as a string, preserving newlines.
