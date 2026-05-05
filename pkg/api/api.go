@@ -317,16 +317,25 @@ func (c *OpenAIClient) createPromptMessages(prompts, input []string) (messages [
 }
 
 func (c *OpenAIClient) buildImageFileData(inputFile string) (imageData string, err error) {
+	// Reject paths outside the working directory so --input cannot
+	// exfiltrate arbitrary files (e.g. /etc/passwd, ~/.ssh/id_rsa)
+	// to the OpenAI API.
+	var resolved string
+	resolved, err = fs.ResolveUnderCwd(inputFile)
+	if err != nil {
+		return
+	}
+
 	// Get image filetype
 	var filetype string
-	filetype, err = fs.GetImageFileType(inputFile)
+	filetype, err = fs.GetImageFileType(resolved)
 	if err != nil {
 		return
 	}
 
 	// Load image from file
 	var b64Image string
-	b64Image, err = fs.LoadBase64ImageFromFile(inputFile)
+	b64Image, err = fs.LoadBase64ImageFromFile(resolved)
 	if err != nil {
 		return
 	}

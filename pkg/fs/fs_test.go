@@ -23,6 +23,7 @@ package fs
 
 import (
 	"io"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -187,4 +188,48 @@ func TestReadAll_LimitExceeded(t *testing.T) {
 	large := strings.NewReader(strings.Repeat("a", maxInputSize+1))
 	_, err := ReadAll(large)
 	require.ErrorIs(t, err, ErrInputTooLarge)
+}
+
+func TestResolveUnderCwd_AcceptsFileInCwd(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+
+	target := filepath.Join(dir, "image.png")
+	require.NoError(t, os.WriteFile(target, []byte("data"), 0o600))
+
+	got, err := ResolveUnderCwd("image.png")
+	require.NoError(t, err)
+	require.Equal(t, target, got)
+}
+
+func TestResolveUnderCwd_RejectsAbsolutePathOutsideCwd(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+
+	outside := "/etc/passwd"
+	if runtime.GOOS == "windows" {
+		outside = `C:\Windows\System32\drivers\etc\hosts`
+	}
+
+	_, err := ResolveUnderCwd(outside)
+	require.ErrorIs(t, err, ErrPathOutsideCwd)
+}
+
+func TestResolveUnderCwd_RejectsRelativeTraversal(t *testing.T) {
+	parent := t.TempDir()
+	child := filepath.Join(parent, "child")
+	require.NoError(t, os.Mkdir(child, 0o755))
+	t.Chdir(child)
+
+	_, err := ResolveUnderCwd("../escape.txt")
+	require.ErrorIs(t, err, ErrPathOutsideCwd)
+}
+
+func TestGetImageFileType_RejectsNonImage(t *testing.T) {
+	dir := t.TempDir()
+	notImage := filepath.Join(dir, "passwd")
+	require.NoError(t, os.WriteFile(notImage, []byte("root:x:0:0:root:/root:/bin/bash\n"), 0o600))
+
+	_, err := GetImageFileType(notImage)
+	require.ErrorIs(t, err, ErrNotImage)
 }
