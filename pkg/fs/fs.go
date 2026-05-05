@@ -31,6 +31,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -40,6 +41,34 @@ const (
 
 // ErrInputTooLarge is returned by ReadAll when the input exceeds maxInputSize.
 var ErrInputTooLarge = errors.New("input exceeds 1 MiB limit")
+
+// ErrPathOutsideCwd is returned by ResolveUnderCwd when the input path
+// resolves to a location outside the current working directory.
+var ErrPathOutsideCwd = errors.New("path is outside the working directory")
+
+// ErrNotImage is returned by GetImageFileType when the sniffed content
+// type does not begin with "image/".
+var ErrNotImage = errors.New("file is not an image")
+
+// ResolveUnderCwd resolves p to an absolute path and rejects it if it
+// escapes the current working directory. It is used to prevent --input
+// from reading arbitrary files outside the working directory and
+// transmitting their contents to the OpenAI API.
+func ResolveUnderCwd(p string) (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("get working directory: %w", err)
+	}
+	abs, err := filepath.Abs(p)
+	if err != nil {
+		return "", fmt.Errorf("resolve path: %w", err)
+	}
+	rel, err := filepath.Rel(cwd, abs)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return "", fmt.Errorf("%w: %q", ErrPathOutsideCwd, p)
+	}
+	return abs, nil
+}
 
 const (
 	defaultDirPermissions = 0755
@@ -132,6 +161,10 @@ func GetImageFileType(inputFile string) (string, error) {
 
 	// Always returns a valid content-type and "application/octet-stream" if no others seemed to match.
 	contentType := http.DetectContentType(buffer)
+
+	if !strings.HasPrefix(contentType, "image/") {
+		return "", fmt.Errorf("%w: %s detected for %q", ErrNotImage, contentType, inputFile)
+	}
 
 	return contentType, nil
 }
