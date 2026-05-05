@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.21.0](https://github.com/tbckr/sgpt/compare/v2.20.0...v2.21.0) (2026-05-05)
+
+
+### Features
+
+* **chat:** create session files with 0600 owner-only permissions ([#366](https://github.com/tbckr/sgpt/issues/366)) ([d29d346](https://github.com/tbckr/sgpt/commit/d29d3464496682bb94ec23c316aa9e1e81b39c01))
+* **config:** validate OPENAI_API_BASE against SSRF risks ([#367](https://github.com/tbckr/sgpt/issues/367)) ([262af09](https://github.com/tbckr/sgpt/commit/262af0936bebf0e53393e40c3360378cc8b571f9))
+* **input:** restrict --input file reads to safe roots ([#369](https://github.com/tbckr/sgpt/issues/369)) ([757d173](https://github.com/tbckr/sgpt/commit/757d17378e9ff5821d62f552ea9f30ef2641b2f5))
+* **stdin:** cap input size to prevent unbounded memory growth ([#368](https://github.com/tbckr/sgpt/issues/368)) ([151bab9](https://github.com/tbckr/sgpt/commit/151bab9f8a130cf2e868ca5124dd77cab5f512d0))
+
 ## [2.20.0](https://github.com/tbckr/sgpt/compare/v2.19.0...v2.20.0) (2026-04-26)
 
 
