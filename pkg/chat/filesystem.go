@@ -161,8 +161,8 @@ func (m FilesystemChatSessionManager) SaveSession(sessionName string, messages [
 		}
 		slog.Debug("Existing session file opened and truncated")
 	} else {
-		// Create file
-		file, err = os.Create(sessionFilepath)
+		// Create file with owner-only permissions; sessions may contain sensitive data.
+		file, err = os.OpenFile(sessionFilepath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, defaultFilePermissions)
 		if err != nil {
 			return err
 		}

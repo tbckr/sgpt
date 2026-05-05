@@ -290,6 +290,33 @@ func createTestConfig(t *testing.T) *viper.Viper {
 	return config
 }
 
+func TestFilesystemChatSessionManager_SaveSession_FilePermissions(t *testing.T) {
+	config := createTestConfig(t)
+
+	manager, err := NewFilesystemChatSessionManager(config)
+	require.NoError(t, err)
+
+	messages := createTestMessages()
+
+	// New session: file is created via os.Create.
+	err = manager.SaveSession("perm_new", messages)
+	require.NoError(t, err)
+
+	info, err := os.Stat(filepath.Join(config.GetString("cacheDir"), "perm_new"))
+	require.NoError(t, err)
+	require.Equal(t, os.FileMode(0600), info.Mode().Perm(),
+		"new session file must be owner-only (0600), got %o", info.Mode().Perm())
+
+	// Existing session: file is reopened via os.OpenFile with defaultFilePermissions.
+	err = manager.SaveSession("perm_new", messages)
+	require.NoError(t, err)
+
+	info, err = os.Stat(filepath.Join(config.GetString("cacheDir"), "perm_new"))
+	require.NoError(t, err)
+	require.Equal(t, os.FileMode(0600), info.Mode().Perm(),
+		"reopened session file must remain owner-only (0600), got %o", info.Mode().Perm())
+}
+
 func TestFilesystemChatSessionManager_GetSession_ScannerError(t *testing.T) {
 	config := createTestConfig(t)
 

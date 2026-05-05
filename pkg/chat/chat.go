@@ -31,7 +31,7 @@ import (
 )
 
 const (
-	defaultFilePermissions = 0755
+	defaultFilePermissions = 0600
 	sessionNameMaxLength   = 65
 )
 
