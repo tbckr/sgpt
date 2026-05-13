@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.21.1](https://github.com/tbckr/sgpt/compare/v2.21.0...v2.21.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* **config:** allow http OPENAI_API_BASE for loopback and RFC1918 ([#372](https://github.com/tbckr/sgpt/issues/372)) ([08ccc0f](https://github.com/tbckr/sgpt/commit/08ccc0fa58b9fcbfcab655876c7d4972b61171d7))
+
 ## [2.21.0](https://github.com/tbckr/sgpt/compare/v2.20.0...v2.21.0) (2026-05-05)
 
 
