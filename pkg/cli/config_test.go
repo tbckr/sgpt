@@ -51,8 +51,8 @@ func TestConfigCmdInit(t *testing.T) {
 	// config must only contain values for model, maxtokens, temperature, topp
 	require.NoError(t, testCtx.Config.ReadInConfig())
 	// TESTING may be in the config, because this is a test
-	require.Equal(t, 8, len(testCtx.Config.AllSettings()))
-	for _, key := range []string{"model", "maxtokens", "temperature", "topp", "cachedir", "personas", "stream", "testing"} {
+	require.Equal(t, 9, len(testCtx.Config.AllSettings()))
+	for _, key := range []string{"model", "maxtokens", "temperature", "topp", "cachedir", "personas", "stream", "insecureapibase", "testing"} {
 		require.Contains(t, testCtx.Config.AllSettings(), key)
 	}
 }

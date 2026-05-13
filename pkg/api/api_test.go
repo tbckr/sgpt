@@ -33,6 +33,7 @@ import (
 
 	"github.com/jarcoal/httpmock"
 	"github.com/sashabaranov/go-openai"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	"github.com/tbckr/sgpt/v2/internal/testlib"
 	"github.com/tbckr/sgpt/v2/pkg/chat"
@@ -71,13 +72,38 @@ func TestCreateClientAPIBaseValidation(t *testing.T) {
 		baseURL string
 		wantErr bool
 	}{
+		// https is always allowed
 		{"openai", "https://api.openai.com/v1", false},
 		{"openrouter", "https://openrouter.ai/api/v1", false},
 		{"azure", "https://my-resource.openai.azure.com/openai/deployments/x", false},
 		{"localhost over https", "https://localhost:8443/v1", false},
+
+		// http allowed for loopback and private ranges (local LLM containers)
+		{"http localhost", "http://localhost:8080/v1", false},
+		{"http loopback ipv4", "http://127.0.0.1:11434/v1", false},
+		{"http loopback ipv6", "http://[::1]:8080/v1", false},
+		{"http rfc1918 10", "http://10.0.0.5/v1", false},
+		{"http rfc1918 172.16", "http://172.16.0.1/v1", false},
+		{"http rfc1918 192.168", "http://192.168.1.10:8080/v1", false},
+		{"http ipv6 ula", "http://[fd00::1]/v1", false},
+
+		// http rejected for public hosts and IMDS
 		{"http openai", "http://api.openai.com/v1", true},
+		{"http public ipv4", "http://1.2.3.4/v1", true},
 		{"imds via http", "http://169.254.169.254/latest/meta-data/", true},
-		{"private rfc1918 http", "http://10.0.0.1/v1", true},
+		{"http single-label hostname", "http://thinkbox:8080/v1", true},
+
+		// explicit link-local / unspecified rejections
+		{"http ipv6 link-local", "http://[fe80::1]/v1", true},
+		{"http ipv4 unspecified", "http://0.0.0.0:11434/v1", true},
+		{"http ipv4 zero-prefix", "http://0.1.2.3/v1", true},
+		{"http cgnat", "http://100.64.0.1/v1", true},
+		// IPv4-mapped IPv6 of IMDS — Go's IsLinkLocalUnicast classifies it correctly
+		{"http ipv4-mapped imds", "http://[::ffff:169.254.169.254]/", true},
+		// userinfo trick: localhost in userinfo, evil.com as host
+		{"http userinfo trick", "http://localhost@evil.com/", true},
+
+		// malformed / non-network schemes
 		{"empty", "", true},
 		{"missing scheme", "api.openai.com/v1", true},
 		{"file scheme", "file:///etc/passwd", true},
@@ -99,6 +125,20 @@ func TestCreateClientAPIBaseValidation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCreateClientAPIBaseInsecureOptOut(t *testing.T) {
+	// insecureAPIBase=true bypasses validation entirely so single-label LAN
+	// hostnames work (the reporter's http://thinkbox:8080/v1 case in #371).
+	t.Setenv("OPENAI_API_KEY", "test")
+	t.Setenv("OPENAI_API_BASE", "http://thinkbox:8080/v1")
+
+	v := viper.New()
+	v.Set("insecureAPIBase", true)
+
+	client, err := CreateClient(v, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
 }
 
 func TestSimplePrompt(t *testing.T) {

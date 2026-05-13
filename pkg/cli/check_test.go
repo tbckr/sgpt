@@ -61,3 +61,25 @@ func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
 	}).Execute([]string{"check"})
 	require.Equal(t, 1, mem.code)
 }
+
+func TestCheckCmdInsecureAPIBaseFlag(t *testing.T) {
+	// Exercise the full --insecure-api-base flag path: cobra parses, viper
+	// reads, and CreateClient skips validation for a single-label LAN host.
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	t.Setenv("OPENAI_API_BASE", "http://thinkbox:8080/v1")
+
+	// Without the flag, validation rejects the URL.
+	memFail := &exitMemento{}
+	newRootCmd(memFail.Exit, testCtx.Config, mockIsPipedShell(false, nil), func(v *viper.Viper, w io.Writer) (api.Completer, error) {
+		return api.CreateClient(v, w)
+	}).Execute([]string{"check"})
+	require.Equal(t, 1, memFail.code)
+
+	// With the flag, validation is skipped and the client builds.
+	memOK := &exitMemento{}
+	newRootCmd(memOK.Exit, testlib.NewTestCtx(t).Config, mockIsPipedShell(false, nil), func(v *viper.Viper, w io.Writer) (api.Completer, error) {
+		return api.CreateClient(v, w)
+	}).Execute([]string{"--insecure-api-base", "check"})
+	require.Equal(t, 0, memOK.code)
+}
