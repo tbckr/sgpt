@@ -39,6 +39,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [GPT-4o and GPT-4 Vision API Support](#gpt-4o-and-gpt-4-vision-api-support)
   - [o1 API Support](#o1-api-support)
   - [OpenRouter API Support](#openrouter-api-support)
+  - [Local LLM Support](#local-llm-support)
   - [Chat Capabilities](#chat-capabilities)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
   - [Interactive Shell Sessions](#interactive-shell-sessions)
@@ -300,6 +301,30 @@ Browse the complete list of available models on the [OpenRouter models page](htt
 > Under [Integrations](https://openrouter.ai/settings/integrations) in your OpenRouter account, you can link your
 > existing OpenAI API key. This allows you to use any remaining OpenAI credits when accessing OpenAI models through
 > OpenRouter.
+
+### Local LLM Support
+
+SGPT works with any OpenAI-compatible local LLM backend (Ollama, LiteLLM, vLLM, llama.cpp, etc.) by pointing
+`OPENAI_API_BASE` at the backend's URL. For local setups, plain `http://` is permitted for loopback and private
+network ranges:
+
+```shell
+export OPENAI_API_KEY="dummy"  # most local backends ignore the key but the env var must be set
+export OPENAI_API_BASE="http://localhost:11434/v1"  # e.g. Ollama
+sgpt -m "llama3" "mass of sun"
+```
+
+LAN hostnames that aren't IP literals (e.g. `http://thinkbox:8080/v1`) need an explicit opt-out because they can't
+be classified as private without DNS resolution. Pass the flag on the command line, or set the key in your config
+file:
+
+```shell
+sgpt --insecure-api-base "..."
+# or set `insecureAPIBase: true` in ~/.config/sgpt/config.yaml
+```
+
+See [Query Models — Override OpenAI API base URL](docs/usage/query-models.md#override-openai-api-base-url) for the
+full validation rules and the rationale.
 
 ### Chat Capabilities
 

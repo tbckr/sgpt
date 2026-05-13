@@ -120,12 +120,22 @@ func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*Op
 
 	// Validate OPENAI_API_BASE before applying it; an unvalidated override
 	// can redirect the Authorization header to an attacker-controlled host.
+	// The insecureAPIBase opt-out lets users with single-label LAN hostnames
+	// (e.g. http://thinkbox:8080/v1) bypass validation entirely.
+	allowInsecure := false
+	if config != nil {
+		allowInsecure = config.GetBool("insecureAPIBase")
+	}
 	if baseURL, isSet := os.LookupEnv("OPENAI_API_BASE"); isSet {
-		if err := validateAPIBaseURL(baseURL); err != nil {
+		if err := validateAPIBaseURL(baseURL, allowInsecure); err != nil {
 			return nil, err
 		}
 		clientConfig.BaseURL = baseURL
-		slog.Warn("OPENAI_API_BASE override active", "url", baseURL)
+		if allowInsecure {
+			slog.Warn("OPENAI_API_BASE validation skipped via insecure-api-base", "url", baseURL)
+		} else {
+			slog.Debug("OPENAI_API_BASE override active", "url", baseURL)
+		}
 	}
 
 	// Build client and apply options
@@ -153,18 +163,53 @@ func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*Op
 	return client, nil
 }
 
-// validateAPIBaseURL requires an absolute https URL with a non-empty host.
-// Hostname-agnostic to preserve compatibility with Azure OpenAI, OpenRouter,
-// and self-hosted backends (Ollama, LiteLLM) fronted by TLS.
-func validateAPIBaseURL(raw string) error {
+// validateAPIBaseURL accepts https for any host, and http only for loopback
+// (localhost, 127.0.0.0/8, ::1) or private addresses (RFC1918 + RFC4193 ULA).
+// This blocks the cloud IMDS attack vector (169.254.0.0/16 is link-local, not
+// private) while permitting the dominant local-LLM pattern of plain-http
+// containers on the same host. When allowInsecure is true, the check is
+// skipped entirely so users with single-label LAN hostnames (e.g.
+// http://thinkbox:8080/v1) that can't be classified by IP literal can opt out.
+//
+// Note: 100.64.0.0/10 (CGNAT, RFC6598) is intentionally NOT in the allow-list
+// because IsPrivate() does not cover it; cloud and Tailscale environments use
+// this range for infrastructure that we don't want to silently route to.
+func validateAPIBaseURL(raw string, allowInsecure bool) error {
+	if allowInsecure {
+		return nil
+	}
 	u, err := url.Parse(raw)
 	if err != nil {
-		return fmt.Errorf("OPENAI_API_BASE must be a valid https URL: %w", err)
+		return fmt.Errorf("OPENAI_API_BASE must be a valid URL: %w", err)
 	}
-	if u.Scheme != "https" || u.Host == "" {
-		return fmt.Errorf("OPENAI_API_BASE must be a valid https URL: %q", raw)
+	if u.Host == "" {
+		return fmt.Errorf("OPENAI_API_BASE must include a host: %q", raw)
 	}
-	return nil
+	switch u.Scheme {
+	case "https":
+		return nil
+	case "http":
+		host := u.Hostname()
+		if host == "localhost" {
+			return nil
+		}
+		ip := net.ParseIP(host)
+		if ip == nil {
+			return fmt.Errorf("OPENAI_API_BASE: http only allowed for loopback or RFC1918/ULA hosts; use https or set insecureAPIBase=true (--insecure-api-base or insecureAPIBase: true in config.yaml) to override: %q", raw)
+		}
+		// Explicitly reject link-local (IPv4 169.254/16 — cloud IMDS;
+		// IPv6 fe80::/10 — cross-VM same-segment exfiltration) and the
+		// IPv4 unspecified range (0.0.0.0/8 — routes ambiguously).
+		if ip.IsLinkLocalUnicast() || ip.IsUnspecified() {
+			return fmt.Errorf("OPENAI_API_BASE: http to link-local or unspecified addresses is not allowed: %q", raw)
+		}
+		if ip.IsLoopback() || ip.IsPrivate() {
+			return nil
+		}
+		return fmt.Errorf("OPENAI_API_BASE: http only allowed for loopback or RFC1918/ULA hosts; use https or set insecureAPIBase=true (--insecure-api-base or insecureAPIBase: true in config.yaml) to override: %q", raw)
+	default:
+		return fmt.Errorf("OPENAI_API_BASE scheme must be http or https: %q", raw)
+	}
 }
 
 // CreateCompletion creates a completion for the given prompt and modifier. If chatID is provided, the chat is reused

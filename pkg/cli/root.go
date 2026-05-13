@@ -306,6 +306,21 @@ $ echo "lang: Python" | sgpt code --template "Write a hello world program in {{ 
 	cmd.PersistentFlags().BoolVarP(&root.verbose, "verbose", "v", false,
 		"enable more verbose output for debugging")
 
+	// insecure-api-base persistent flag — opt-out for OPENAI_API_BASE validation,
+	// needed for LAN hostnames (single-label, mDNS) that can't be classified by
+	// IP literal. Deliberately NOT bound to an env var: the #358 threat model
+	// assumes attacker control of environment, and an env-var opt-out would
+	// undo the validation guarantee. The flag plus a config-file key
+	// (insecureAPIBase) are intentional opt-ins that require either CLI access
+	// or write access to ~/.config/sgpt/, both of which are stronger trust
+	// signals than env var manipulation.
+	cmd.PersistentFlags().Bool("insecure-api-base", false,
+		"skip OPENAI_API_BASE validation (allows arbitrary http:// hosts)")
+	if err := config.BindPFlag("insecureAPIBase", cmd.PersistentFlags().Lookup("insecure-api-base")); err != nil {
+		slog.Error("Failed to bind insecure-api-base flag to viper", "error", err)
+		panic("Failed to bind insecure-api-base flag to viper")
+	}
+
 	cmd.AddCommand(
 		newChatCmd(config).cmd,
 		newCheckCmd(config, createClientFn).cmd,
@@ -407,6 +422,8 @@ func setViperDefaults(config *viper.Viper) error {
 	config.SetDefault("topP", 1)
 	// stream
 	config.SetDefault("stream", false)
+	// insecure-api-base
+	config.SetDefault("insecureAPIBase", false)
 
 	return nil
 }
