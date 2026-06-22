@@ -39,6 +39,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [GPT-4o and GPT-4 Vision API Support](#gpt-4o-and-gpt-4-vision-api-support)
   - [o1 API Support](#o1-api-support)
   - [OpenRouter API Support](#openrouter-api-support)
+  - [Requesty API Support](#requesty-api-support)
   - [Local LLM Support](#local-llm-support)
   - [Chat Capabilities](#chat-capabilities)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
@@ -301,6 +302,32 @@ Browse the complete list of available models on the [OpenRouter models page](htt
 > Under [Integrations](https://openrouter.ai/settings/integrations) in your OpenRouter account, you can link your
 > existing OpenAI API key. This allows you to use any remaining OpenAI credits when accessing OpenAI models through
 > OpenRouter.
+
+### Requesty API Support
+
+SGPT also works with the [Requesty API](https://requesty.ai), an OpenAI-compatible LLM gateway that routes to a wide
+range of models with caching, failover, and cost controls.
+
+1. Set the Requesty API base URL environment variable:
+   ```shell
+   export OPENAI_API_BASE="https://router.requesty.ai/v1"
+   ```
+
+2. Create an API key in the [Requesty dashboard](https://app.requesty.ai/router) and set it as your environment
+   variable:
+   ```shell
+   export OPENAI_API_KEY="your_requesty_key"
+   ```
+
+Once configured, you can specify any Requesty-supported model with the `-m` flag using the `provider/model` naming
+convention:
+
+```shell
+$ sgpt -m "anthropic/claude-sonnet-4-5" "mass of sun"
+The Sun's mass is approximately 2 × 10^30 kilograms (about 333,000 times the mass of Earth).
+```
+
+Browse the complete list of available models on the [Requesty models page](https://app.requesty.ai/router/list).
 
 ### Local LLM Support
 
