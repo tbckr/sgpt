@@ -114,7 +114,7 @@ jobs:
           cache: true
       # Run linter
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@82606bf257cbaff209d206a39f5134f0cfbfd2ee # v9
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9
         with:
           args: --timeout=5m -c .golangci.yaml
           install-mode: "goinstall"
