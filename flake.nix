@@ -57,6 +57,7 @@
             unstable.addlicense
             unstable.mkdocs
             unstable.python311Packages.mkdocs-material
+            unstable.nodejs-slim_24
             pkgs.nixpkgs-fmt
           ];
         };
