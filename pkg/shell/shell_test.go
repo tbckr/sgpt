@@ -28,6 +28,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 
@@ -233,7 +234,12 @@ func TestGetUserConfirmationAsked2Times(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		_, errWrite := stdinWriter.Write([]byte("abcd\n"))
+		// A single unrecognised byte with no newline, written separately
+		// from the confirming "Y\n" below. With getUserConfirmation's
+		// bufio.Reader now shared across loop iterations (#379), the "Y\n"
+		// written in the second Write call is still readable on the second
+		// iteration instead of being lost with a discarded reader.
+		_, errWrite := stdinWriter.Write([]byte("z"))
 		require.NoError(t, errWrite)
 		_, errWrite = stdinWriter.Write([]byte("Y\n"))
 		require.NoError(t, errWrite)
@@ -262,6 +268,21 @@ func TestGetUserConfirmationAsked2Times(t *testing.T) {
 	require.Equal(t, true, ok)
 
 	wg.Wait()
+}
+
+func TestGetUserConfirmation_BufferedInputNotLost(t *testing.T) {
+	// #379 regression: a single stream carrying an unrecognised byte
+	// followed by the confirming "Y\n" must not lose the "Y" to a discarded
+	// bufio.Reader's internal buffer. Using a plain strings.Reader (no
+	// goroutines) makes this deterministic - the old code would hang or
+	// error on the second ReadRune once the buffered "Y\n" is gone.
+	input := strings.NewReader("zY\n")
+	var output bytes.Buffer
+
+	ok, err := getUserConfirmation(input, &output)
+
+	require.NoError(t, err)
+	require.True(t, ok)
 }
 
 func TestExecuteShellCommandEcho(t *testing.T) {

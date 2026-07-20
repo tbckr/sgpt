@@ -123,11 +123,14 @@ func ExecuteCommandWithConfirmation(ctx context.Context, input io.Reader, output
 }
 
 func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
+	// Constructed once, outside the loop: bufio.Reader fills its internal
+	// buffer from input on first use, so rebuilding it every iteration would
+	// discard any bytes already buffered but not yet consumed (#379).
+	reader := bufio.NewReader(input)
 	for {
 		if _, err := fmt.Fprint(output, "Do you want to execute this command? (Y/n) "); err != nil {
 			return false, err
 		}
-		reader := bufio.NewReader(input)
 		char, _, err := reader.ReadRune()
 		if err != nil {
 			return false, err
