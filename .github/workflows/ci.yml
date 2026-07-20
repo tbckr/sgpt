@@ -97,7 +97,11 @@ jobs:
       - uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
         with:
           distribution: goreleaser
-          version: latest
+          # Pinned to the last v2.15.x release: goreleaser v2.16.0 makes `check` fail
+          # on the deprecated `dockers`/`docker_manifests`/`brews` blocks still used in
+          # .goreleaser.yaml. Unpin once migrated to `dockers_v2` + `homebrew_casks`.
+          # See https://goreleaser.com/deprecations
+          version: "v2.15.4"
           args: check
       - run: ./sgpt version
 
