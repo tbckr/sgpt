@@ -139,6 +139,20 @@ func TestLoadBase64ImageFromFile(t *testing.T) {
 	}
 }
 
+func TestLoadBase64ImageFromFile_LimitExceeded(t *testing.T) {
+	dir := t.TempDir()
+	large := filepath.Join(dir, "large.png")
+
+	f, err := os.Create(large)
+	require.NoError(t, err)
+	// Write one byte more than maxImageSize without holding it all in memory.
+	require.NoError(t, f.Truncate(maxImageSize+1))
+	require.NoError(t, f.Close())
+
+	_, err = LoadBase64ImageFromFile(large)
+	require.ErrorIs(t, err, ErrImageTooLarge)
+}
+
 func TestGetImageFileType(t *testing.T) {
 	type args struct {
 		inputFile string

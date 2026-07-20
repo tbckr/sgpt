@@ -37,10 +37,17 @@ import (
 const (
 	// maxInputSize is the upper limit for ReadAll (1 MiB).
 	maxInputSize = 1 << 20
+	// maxImageSize is the upper limit for LoadBase64ImageFromFile (20 MiB),
+	// matching the OpenAI vision API's per-image limit.
+	maxImageSize = 20 << 20
 )
 
 // ErrInputTooLarge is returned by ReadAll when the input exceeds maxInputSize.
 var ErrInputTooLarge = errors.New("input exceeds 1 MiB limit")
+
+// ErrImageTooLarge is returned by LoadBase64ImageFromFile when the image
+// exceeds maxImageSize.
+var ErrImageTooLarge = errors.New("image exceeds 20 MiB limit")
 
 // ErrPathOutsideCwd is returned by ResolveUnderCwd when the input path
 // resolves to a location outside the current working directory.
@@ -215,13 +222,25 @@ func GetImageFileType(inputFile string) (string, error) {
 	return contentType, nil
 }
 
-// LoadBase64ImageFromFile loads a base64 encoded image from a file
+// LoadBase64ImageFromFile loads a base64 encoded image from a file.
+// Returns ErrImageTooLarge if the file exceeds maxImageSize.
 func LoadBase64ImageFromFile(inputFile string) (string, error) {
-	// Load image from file
-	imageBytes, err := os.ReadFile(inputFile)
+	file, err := os.Open(inputFile)
 	if err != nil {
 		return "", err
 	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	imageBytes, err := io.ReadAll(io.LimitReader(file, maxImageSize+1))
+	if err != nil {
+		return "", fmt.Errorf("read image: %w", err)
+	}
+	if len(imageBytes) > maxImageSize {
+		return "", ErrImageTooLarge
+	}
+
 	// Convert image to base64
 	b64Image := base64.StdEncoding.EncodeToString(imageBytes)
 	return b64Image, nil
