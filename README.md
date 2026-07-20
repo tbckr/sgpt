@@ -40,6 +40,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [o1 API Support](#o1-api-support)
   - [OpenRouter API Support](#openrouter-api-support)
   - [Requesty API Support](#requesty-api-support)
+  - [Google Gemini Support](#google-gemini-support)
   - [Local LLM Support](#local-llm-support)
   - [Chat Capabilities](#chat-capabilities)
   - [Generating and Executing Shell Commands](#generating-and-executing-shell-commands)
@@ -328,6 +329,36 @@ The Sun's mass is approximately 2 × 10^30 kilograms (about 333,000 times the ma
 ```
 
 Browse the complete list of available models on the [Requesty models page](https://app.requesty.ai/router/list).
+
+### Google Gemini Support
+
+Google's Gemini models are reachable over an OpenAI-compatible chat completions API, so SGPT supports them without any
+Gemini-specific code. You can either go directly to Google or route through a gateway such as OpenRouter.
+
+Directly against Google's endpoint — create a key in [Google AI Studio](https://aistudio.google.com/apikey), then:
+
+```shell
+export OPENAI_API_BASE="https://generativelanguage.googleapis.com/v1beta/openai"
+export OPENAI_API_KEY="your_gemini_api_key"
+
+sgpt -m "gemini-3.5-flash" "mass of sun"
+```
+
+Or through OpenRouter, where Gemini models carry the `google/` prefix:
+
+```shell
+export OPENAI_API_BASE="https://openrouter.ai/api/v1"
+export OPENAI_API_KEY="your_openrouter_api_key"
+
+sgpt -m "google/gemini-3.5-flash" "mass of sun"
+```
+
+> [!NOTE]
+> SGPT reads the key from `OPENAI_API_KEY`, not `GEMINI_API_KEY`. The variable name refers to the protocol SGPT
+> speaks, not to the provider behind it.
+
+See [Google Gemini Support](docs/usage/gemini.md) for the trade-offs between both routes and the limitations of the
+compatibility layer.
 
 ### Local LLM Support
 
