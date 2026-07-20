@@ -73,6 +73,11 @@ You can override the OpenAI base URL by setting the `OPENAI_API_BASE` environmen
 export OPENAI_API_BASE=https://api.openai.com/v1
 ```
 
+Alternatively, set `base_url` (and `api_key`) in `config.yaml` — see
+[Configuration](../configuration.md#api-key-and-base-url). The environment
+variable always takes precedence when set; the config file value is only used
+as a fallback.
+
 ### Validation rules
 
 To prevent an attacker-set environment variable from silently redirecting your

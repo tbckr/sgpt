@@ -66,6 +66,108 @@ func TestCreateClientMissingApiKey(t *testing.T) {
 	require.Nil(t, client)
 }
 
+func TestCreateClientApiKeyFromConfig(t *testing.T) {
+	// No OPENAI_API_KEY in the environment; the key comes from config.yaml
+	// (key "api_key") instead (#228).
+	prev, had := os.LookupEnv("OPENAI_API_KEY")
+	require.NoError(t, os.Unsetenv("OPENAI_API_KEY"))
+	t.Cleanup(func() {
+		if had {
+			_ = os.Setenv("OPENAI_API_KEY", prev)
+		}
+	})
+
+	v := viper.New()
+	v.Set("api_key", "from-config")
+
+	client, err := CreateClient(v, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+}
+
+func TestCreateClientApiKeyEnvOverridesConfig(t *testing.T) {
+	// Both the environment variable and config.yaml provide a key; the
+	// environment variable must win (#228).
+	t.Setenv("OPENAI_API_KEY", "from-env")
+
+	v := viper.New()
+	v.Set("api_key", "from-config")
+
+	client, err := CreateClient(v, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+}
+
+func TestCreateClientApiKeyEmptyEnvFallsBackToConfig(t *testing.T) {
+	// An OPENAI_API_KEY explicitly set to the empty string must not shadow
+	// a usable config.yaml value.
+	t.Setenv("OPENAI_API_KEY", "")
+
+	v := viper.New()
+	v.Set("api_key", "from-config")
+
+	client, err := CreateClient(v, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+}
+
+func TestCreateClientBaseURLFromConfig(t *testing.T) {
+	// No OPENAI_API_BASE in the environment; the base URL comes from
+	// config.yaml (key "base_url") instead, and is still validated (#228).
+	t.Setenv("OPENAI_API_KEY", "test")
+	prev, had := os.LookupEnv("OPENAI_API_BASE")
+	require.NoError(t, os.Unsetenv("OPENAI_API_BASE"))
+	t.Cleanup(func() {
+		if had {
+			_ = os.Setenv("OPENAI_API_BASE", prev)
+		}
+	})
+
+	v := viper.New()
+	v.Set("base_url", "https://api.openai.com/v1")
+
+	client, err := CreateClient(v, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+}
+
+func TestCreateClientBaseURLFromConfigRejectsUnsafeHost(t *testing.T) {
+	// A public http:// host from config.yaml goes through the same SSRF
+	// guard as the environment variable channel (#228).
+	t.Setenv("OPENAI_API_KEY", "test")
+	prev, had := os.LookupEnv("OPENAI_API_BASE")
+	require.NoError(t, os.Unsetenv("OPENAI_API_BASE"))
+	t.Cleanup(func() {
+		if had {
+			_ = os.Setenv("OPENAI_API_BASE", prev)
+		}
+	})
+
+	v := viper.New()
+	v.Set("base_url", "http://1.2.3.4/v1")
+
+	client, err := CreateClient(v, nil)
+	require.Error(t, err)
+	require.Nil(t, client)
+	require.Contains(t, err.Error(), "OPENAI_API_BASE")
+}
+
+func TestCreateClientBaseURLEnvOverridesConfig(t *testing.T) {
+	// Both the environment variable and config.yaml provide a base URL; the
+	// environment variable must win (#228). The config value would fail
+	// validation if it were the one applied, so a successful client proves
+	// the env value ("https://api.openai.com/v1") was used instead.
+	t.Setenv("OPENAI_API_KEY", "test")
+	t.Setenv("OPENAI_API_BASE", "https://api.openai.com/v1")
+
+	v := viper.New()
+	v.Set("base_url", "http://1.2.3.4/v1")
+
+	client, err := CreateClient(v, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+}
+
 func TestCreateClientAPIBaseValidation(t *testing.T) {
 	tests := []struct {
 		name    string

@@ -45,6 +45,8 @@ import (
 const (
 	// envKeyOpenAIApi is the environment variable key for the OpenAI API key.
 	envKeyOpenAIApi = "OPENAI_API_KEY"
+	// envKeyOpenAIApiBase is the environment variable key for the OpenAI API base URL.
+	envKeyOpenAIApiBase = "OPENAI_API_BASE"
 
 	// Defaults for the OpenAI HTTP client. Without these, sgpt inherits
 	// http.Client's zero value and can hang indefinitely when the
@@ -98,9 +100,14 @@ type OpenAIClient struct {
 // CreateClient creates a new OpenAI client with the given config and output writer.
 // Optional ClientOptions can be passed to override defaults (e.g. WithSessionManager).
 func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*OpenAIClient, error) {
-	// Check, if api key was set
-	apiKey, exists := os.LookupEnv(envKeyOpenAIApi)
-	if !exists {
+	// Check, if api key was set. The environment variable takes precedence;
+	// config.yaml (key "api_key") is a fallback for users who prefer not to
+	// export it into their shell environment (#228).
+	apiKey := os.Getenv(envKeyOpenAIApi)
+	if apiKey == "" && config != nil {
+		apiKey = config.GetString("api_key")
+	}
+	if apiKey == "" {
 		return nil, ErrMissingAPIKey
 	}
 	clientConfig := openai.DefaultConfig(apiKey)
@@ -122,11 +129,18 @@ func CreateClient(config *viper.Viper, out io.Writer, opts ...ClientOption) (*Op
 	// can redirect the Authorization header to an attacker-controlled host.
 	// The insecureAPIBase opt-out lets users with single-label LAN hostnames
 	// (e.g. http://thinkbox:8080/v1) bypass validation entirely.
+	// The environment variable takes precedence; config.yaml (key "base_url")
+	// is a fallback, and is validated the same way regardless of source (#228).
 	allowInsecure := false
 	if config != nil {
 		allowInsecure = config.GetBool("insecureAPIBase")
 	}
-	if baseURL, isSet := os.LookupEnv("OPENAI_API_BASE"); isSet {
+	baseURL, isSet := os.LookupEnv(envKeyOpenAIApiBase)
+	if !isSet && config != nil {
+		baseURL = config.GetString("base_url")
+		isSet = baseURL != ""
+	}
+	if isSet {
 		if err := validateAPIBaseURL(baseURL, allowInsecure); err != nil {
 			return nil, err
 		}
