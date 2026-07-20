@@ -1,6 +1,6 @@
 module github.com/tbckr/sgpt/v2
 
-go 1.26.3
+go 1.26.5
 
 require (
 	github.com/atotto/clipboard v0.1.4
