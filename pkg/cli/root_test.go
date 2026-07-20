@@ -604,6 +604,51 @@ func TestRootCmd_ArgsPersonaCasePreservedVerbatim(t *testing.T) {
 	wg.Wait()
 }
 
+func TestRootCmd_ArgsUppercaseBuiltinPersonaUnsupported(t *testing.T) {
+	// #381 regression, other half of TestRootCmd_ArgsPersonaCasePreservedVerbatim:
+	// dropping the args channel's lowercasing also removed the only case
+	// folding for built-in personas, since GetChatModifier matches "sh"/
+	// "code" with a case-sensitive switch. "SH" must now fail to resolve
+	// (exit 1) rather than silently behaving as "sh". A valid chat response
+	// is registered so the *only* way to reach a non-zero exit is modifier
+	// resolution - if lowercasing were reintroduced, "SH" would resolve to
+	// "sh", the mocked request would succeed, and this would fail by
+	// observing exit code 0 instead of 1.
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
+	mem := &exitMemento{}
+
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse("ls")
+
+	t.Setenv("SHELL", "/bin/bash")
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errDiscard := io.Copy(io.Discard, reader)
+		require.NoError(t, errDiscard)
+		require.NoError(t, reader.Close())
+	}()
+
+	root.Execute([]string{"SH", "list all files in the current directory"})
+	require.Equal(t, 1, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
 func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("shell execution requires bash and is not supported on Windows")

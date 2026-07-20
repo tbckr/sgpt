@@ -171,6 +171,34 @@ func TestGetChatModifierInvalidWhitespacesInName(t *testing.T) {
 	require.Empty(t, modifier)
 }
 
+func TestGetChatModifierBuiltinCaseSensitive(t *testing.T) {
+	// #381 regression: the CLI's args channel used to lowercase the
+	// persona before it reached GetChatModifier, which masked the fact
+	// that built-in personas are matched with a case-sensitive switch
+	// (below). Now that all input channels pass the persona verbatim,
+	// this case-sensitivity is user-visible: "sh"/"code" resolve but
+	// "SH"/"Sh"/"CODE"/"Code" do not. Pin that here so a future change to
+	// GetChatModifier's matching can't silently drift from what the CLI
+	// layer assumes.
+	config := createTestConfig(t)
+	t.Setenv("SHELL", "/bin/bash")
+
+	for _, modifier := range []string{"sh", "code"} {
+		t.Run(modifier, func(t *testing.T) {
+			result, err := GetChatModifier(config, modifier)
+			require.NoError(t, err)
+			require.NotEmpty(t, result)
+		})
+	}
+
+	for _, modifier := range []string{"SH", "Sh", "CODE", "Code"} {
+		t.Run(modifier, func(t *testing.T) {
+			_, err := GetChatModifier(config, modifier)
+			require.ErrorIs(t, err, ErrUnsupportedModifier)
+		})
+	}
+}
+
 func TestGetChatModifierTxt(t *testing.T) {
 	config := createTestConfig(t)
 
