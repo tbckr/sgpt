@@ -22,6 +22,7 @@
 package fs
 
 import (
+	"encoding/base64"
 	"io"
 	"os"
 	"path/filepath"
@@ -153,6 +154,23 @@ func TestLoadBase64ImageFromFile_LimitExceeded(t *testing.T) {
 	require.ErrorIs(t, err, ErrImageTooLarge)
 }
 
+func TestLoadBase64ImageFromFile_ExactlyAtLimit(t *testing.T) {
+	dir := t.TempDir()
+	atLimit := filepath.Join(dir, "at-limit.png")
+
+	f, err := os.Create(atLimit)
+	require.NoError(t, err)
+	// A file of exactly maxImageSize bytes must be accepted - only strictly
+	// larger files should trip ErrImageTooLarge.
+	require.NoError(t, f.Truncate(maxImageSize))
+	require.NoError(t, f.Close())
+
+	got, err := LoadBase64ImageFromFile(atLimit)
+	require.NoError(t, err)
+	// base64 encodes 3 bytes as 4 characters (with padding for the remainder).
+	require.Equal(t, base64.StdEncoding.EncodedLen(maxImageSize), len(got))
+}
+
 func TestGetImageFileType(t *testing.T) {
 	type args struct {
 		inputFile string
@@ -221,9 +239,17 @@ func TestResolveUnderCwd_AcceptsFileInCwd(t *testing.T) {
 	target := filepath.Join(dir, "image.png")
 	require.NoError(t, os.WriteFile(target, []byte("data"), 0o600))
 
+	// ResolveUnderCwd returns the symlink-resolved path (see
+	// TestResolveUnderCwd_AcceptsSymlinkWithinCwd for why), so compare
+	// against the resolved form rather than the lexical one - on platforms
+	// where the temp dir itself sits behind a symlink (e.g. macOS) they
+	// would otherwise differ even though no symlink escape occurred.
+	realTarget, err := filepath.EvalSymlinks(target)
+	require.NoError(t, err)
+
 	got, err := ResolveUnderCwd("image.png")
 	require.NoError(t, err)
-	require.Equal(t, target, got)
+	require.Equal(t, realTarget, got)
 }
 
 func TestResolveUnderCwd_RejectsSymlinkEscape(t *testing.T) {
@@ -244,6 +270,67 @@ func TestResolveUnderCwd_RejectsSymlinkEscape(t *testing.T) {
 	require.NoError(t, os.Symlink(secret, link))
 
 	_, err := ResolveUnderCwd("photo.png")
+	require.ErrorIs(t, err, ErrPathOutsideCwd)
+}
+
+func TestResolveUnderCwd_AcceptsSymlinkWithinCwd(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("symlink creation requires elevated privileges on Windows")
+	}
+
+	dir := t.TempDir()
+	t.Chdir(dir)
+
+	target := filepath.Join(dir, "actual.png")
+	require.NoError(t, os.WriteFile(target, []byte("data"), 0o600))
+
+	// The symlink and its target both live inside cwd, so this must be
+	// accepted - the containment fix must not reject every symlink
+	// wholesale, only ones that escape the working directory.
+	link := filepath.Join(dir, "link.png")
+	require.NoError(t, os.Symlink(target, link))
+
+	realTarget, err := filepath.EvalSymlinks(target)
+	require.NoError(t, err)
+
+	got, err := ResolveUnderCwd("link.png")
+	require.NoError(t, err)
+	require.Equal(t, realTarget, got)
+}
+
+func TestResolveUnderCwd_AcceptsNonExistentFileInCwd(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+
+	realDir, err := filepath.EvalSymlinks(dir)
+	require.NoError(t, err)
+
+	// "not-created-yet.png" does not exist, so ResolveUnderCwd must fall
+	// back to resolving the nearest existing ancestor (cwd itself) via
+	// resolveSymlinksBestEffort rather than failing outright.
+	got, err := ResolveUnderCwd("not-created-yet.png")
+	require.NoError(t, err)
+	require.Equal(t, filepath.Join(realDir, "not-created-yet.png"), got)
+}
+
+func TestResolveUnderCwd_RejectsNonExistentFileBehindSymlinkEscape(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("symlink creation requires elevated privileges on Windows")
+	}
+
+	dir := t.TempDir()
+	t.Chdir(dir)
+
+	outsideDir := t.TempDir()
+
+	// The symlinked directory itself exists and lives inside cwd, but the
+	// file underneath it does not exist yet - this exercises the recursive
+	// branch of resolveSymlinksBestEffort walking up to an existing
+	// ancestor that turns out to be a symlink escaping cwd.
+	link := filepath.Join(dir, "outside-link")
+	require.NoError(t, os.Symlink(outsideDir, link))
+
+	_, err := ResolveUnderCwd(filepath.Join("outside-link", "not-created-yet.png"))
 	require.ErrorIs(t, err, ErrPathOutsideCwd)
 }
 

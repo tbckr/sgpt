@@ -87,10 +87,11 @@ func ResolveUnderCwd(p string) (string, error) {
 	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		return "", fmt.Errorf("%w: %q", ErrPathOutsideCwd, p)
 	}
-	// Return the lexical (non-symlink-resolved) path so callers open the
-	// file the user actually named; the symlink resolution above is only
-	// used to decide containment.
-	return abs, nil
+	// Return the symlink-resolved path, not the lexical one: callers must
+	// open the same path that was just checked for containment, otherwise
+	// a symlink swapped in between this check and the caller's os.Open
+	// would let the open silently escape cwd again (TOCTOU).
+	return realAbs, nil
 }
 
 // resolveSymlinksBestEffort resolves symlinks in p. If p does not exist
