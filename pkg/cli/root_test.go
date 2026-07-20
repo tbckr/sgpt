@@ -548,6 +548,62 @@ func TestRootCmd_SimpleShellPrompt(t *testing.T) {
 	wg.Wait()
 }
 
+func TestRootCmd_ArgsPersonaCasePreservedVerbatim(t *testing.T) {
+	// #381 regression: the args-only branch used to lowercase the persona
+	// name before resolution, while the piped and --template branches did
+	// not. Persona resolution is a case-sensitive exact match against the
+	// on-disk filename, so a mixed-case custom persona supplied via args
+	// used to be silently unresolvable. It must now reach the modifier
+	// resolver verbatim, exactly like the piped/--template channels.
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
+	mem := &exitMemento{}
+
+	var wg sync.WaitGroup
+	reader, writer := io.Pipe()
+
+	client, err := api.CreateClient(testCtx.Config, writer)
+	require.NoError(t, err)
+
+	persona := "This is my custom persona"
+	prompt := "Say: Hello World!"
+	response := "Hello World!"
+	expected := "Hello World!\n"
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+	testlib.RegisterExpectedChatResponse(response)
+
+	t.Setenv("SHELL", "/bin/bash")
+
+	var fileHandler *os.File
+	fileHandler, err = os.Create(filepath.Join(testCtx.Config.GetString("personas"), "My-Persona"))
+	require.NoError(t, err)
+	_, err = fileHandler.WriteString(persona)
+	require.NoError(t, err)
+	require.NoError(t, fileHandler.Close())
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), useMockClient(client))
+	root.cmd.SetOut(writer)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errReader := io.Copy(&buf, reader)
+		require.NoError(t, errReader)
+		require.NoError(t, reader.Close())
+		require.Equal(t, expected, buf.String())
+	}()
+
+	root.Execute([]string{"My-Persona", prompt})
+	require.Equal(t, 0, mem.code)
+	require.NoError(t, writer.Close())
+
+	wg.Wait()
+}
+
 func TestRootCmd_SimpleShellPromptWithExecution(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("shell execution requires bash and is not supported on Windows")
