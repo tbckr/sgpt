@@ -212,6 +212,27 @@ func TestResolveUnderCwd_AcceptsFileInCwd(t *testing.T) {
 	require.Equal(t, target, got)
 }
 
+func TestResolveUnderCwd_RejectsSymlinkEscape(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("symlink creation requires elevated privileges on Windows")
+	}
+
+	dir := t.TempDir()
+	t.Chdir(dir)
+
+	outsideDir := t.TempDir()
+	secret := filepath.Join(outsideDir, "id_rsa")
+	require.NoError(t, os.WriteFile(secret, []byte("private key"), 0o600))
+
+	// Symlink lives inside cwd but points outside it - the lexical check
+	// alone would accept this.
+	link := filepath.Join(dir, "photo.png")
+	require.NoError(t, os.Symlink(secret, link))
+
+	_, err := ResolveUnderCwd("photo.png")
+	require.ErrorIs(t, err, ErrPathOutsideCwd)
+}
+
 func TestResolveUnderCwd_RejectsAbsolutePathOutsideCwd(t *testing.T) {
 	dir := t.TempDir()
 	t.Chdir(dir)

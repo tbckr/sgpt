@@ -54,20 +54,61 @@ var ErrNotImage = errors.New("file is not an image")
 // escapes the current working directory. It is used to prevent --input
 // from reading arbitrary files outside the working directory and
 // transmitting their contents to the OpenAI API.
+//
+// The containment check is performed on the symlink-resolved form of both
+// the working directory and p, so a symlink placed inside the working
+// directory that targets a location outside it is rejected rather than
+// silently followed.
 func ResolveUnderCwd(p string) (string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", fmt.Errorf("get working directory: %w", err)
 	}
+	realCwd, err := filepath.EvalSymlinks(cwd)
+	if err != nil {
+		return "", fmt.Errorf("resolve working directory: %w", err)
+	}
 	abs, err := filepath.Abs(p)
 	if err != nil {
 		return "", fmt.Errorf("resolve path: %w", err)
 	}
-	rel, err := filepath.Rel(cwd, abs)
+	realAbs, err := resolveSymlinksBestEffort(abs)
+	if err != nil {
+		return "", fmt.Errorf("resolve path: %w", err)
+	}
+	rel, err := filepath.Rel(realCwd, realAbs)
 	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		return "", fmt.Errorf("%w: %q", ErrPathOutsideCwd, p)
 	}
+	// Return the lexical (non-symlink-resolved) path so callers open the
+	// file the user actually named; the symlink resolution above is only
+	// used to decide containment.
 	return abs, nil
+}
+
+// resolveSymlinksBestEffort resolves symlinks in p. If p does not exist
+// yet, it walks up to the nearest existing ancestor, resolves that, and
+// re-appends the unresolved remainder - this lets ResolveUnderCwd check
+// containment for paths that will be created later while still catching
+// symlinks that point outside the working directory.
+func resolveSymlinksBestEffort(p string) (string, error) {
+	resolved, err := filepath.EvalSymlinks(p)
+	if err == nil {
+		return resolved, nil
+	}
+	if !os.IsNotExist(err) {
+		return "", err
+	}
+	parent := filepath.Dir(p)
+	if parent == p {
+		// Reached the root without finding an existing ancestor.
+		return p, nil
+	}
+	resolvedParent, err := resolveSymlinksBestEffort(parent)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(resolvedParent, filepath.Base(p)), nil
 }
 
 const (
