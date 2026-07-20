@@ -164,6 +164,9 @@ func executeShellCommand(ctx context.Context, output io.Writer, command string) 
 
 	cmd := exec.CommandContext(ctx, executeCommand, args...)
 	cmd.Stdout = output
+	// Without Stderr wired, os/exec discards it entirely, leaving the user
+	// with only a bare "exit status N" on failure (#380).
+	cmd.Stderr = output
 	err := cmd.Run()
 	if err != nil {
 		return err

@@ -312,6 +312,35 @@ func TestExecuteShellCommandEcho(t *testing.T) {
 	wg.Wait()
 }
 
+func TestExecuteShellCommand_StderrForwarded(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell execution tests require bash and are not supported on Windows")
+	}
+	// #380 regression: a failing command's stderr must reach the output
+	// writer instead of being silently discarded by os/exec.
+	stdoutReader, stdoutWriter := io.Pipe()
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var buf bytes.Buffer
+		_, errRead := io.Copy(&buf, stdoutReader)
+		require.NoError(t, errRead)
+		require.NoError(t, stdoutReader.Close())
+		require.Contains(t, buf.String(), "oops")
+	}()
+
+	err := executeShellCommand(context.Background(), stdoutWriter, "echo oops >&2; exit 1")
+
+	require.NoError(t, stdoutWriter.Close())
+
+	require.Error(t, err)
+
+	wg.Wait()
+}
+
 func TestExecuteCommandWithConfirmation(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("shell execution tests require bash and are not supported on Windows")
