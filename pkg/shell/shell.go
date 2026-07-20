@@ -123,11 +123,14 @@ func ExecuteCommandWithConfirmation(ctx context.Context, input io.Reader, output
 }
 
 func getUserConfirmation(input io.Reader, output io.Writer) (bool, error) {
+	// Constructed once, outside the loop: bufio.Reader fills its internal
+	// buffer from input on first use, so rebuilding it every iteration would
+	// discard any bytes already buffered but not yet consumed (#379).
+	reader := bufio.NewReader(input)
 	for {
 		if _, err := fmt.Fprint(output, "Do you want to execute this command? (Y/n) "); err != nil {
 			return false, err
 		}
-		reader := bufio.NewReader(input)
 		char, _, err := reader.ReadRune()
 		if err != nil {
 			return false, err
@@ -161,6 +164,9 @@ func executeShellCommand(ctx context.Context, output io.Writer, command string) 
 
 	cmd := exec.CommandContext(ctx, executeCommand, args...)
 	cmd.Stdout = output
+	// Without Stderr wired, os/exec discards it entirely, leaving the user
+	// with only a bare "exit status N" on failure (#380).
+	cmd.Stderr = output
 	err := cmd.Run()
 	if err != nil {
 		return err

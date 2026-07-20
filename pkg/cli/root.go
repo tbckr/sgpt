@@ -26,7 +26,6 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"strings"
 
 	"github.com/tbckr/sgpt/v2/pkg/api"
 	"github.com/tbckr/sgpt/v2/pkg/fs"
@@ -257,7 +256,11 @@ $ echo "lang: Python" | sgpt code --template "Write a hello world program in {{ 
 				} else {
 					// input and mode are provided via command line args
 					slog.Debug("Mode and prompt provided via command line args")
-					mode = strings.ToLower(args[0])
+					// Passed verbatim, matching the piped and --template
+					// channels: persona resolution is a case-sensitive exact
+					// match, so lowercasing only here silently broke
+					// case-sensitive custom personas supplied via args (#381).
+					mode = args[0]
 					prompts = append(prompts, args[1])
 				}
 			}

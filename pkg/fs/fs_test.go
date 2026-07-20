@@ -85,6 +85,30 @@ func TestReadString(t *testing.T) {
 	wg.Wait()
 }
 
+func TestReadString_PreservesInternalNewlines(t *testing.T) {
+	// #377: ReadString used to scan line-by-line and never re-add the
+	// stripped terminator, silently gluing multi-line piped prompts into
+	// one line. Only the trailing terminator should be trimmed.
+	reader, writer := io.Pipe()
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := writer.Write([]byte("line1\nline2\n"))
+		require.NoError(t, writer.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	out, err := ReadString(reader)
+	require.NoError(t, err)
+	require.Equal(t, "line1\nline2", out)
+	require.NoError(t, reader.Close())
+
+	wg.Wait()
+}
+
 func TestReadString_LimitExceeded(t *testing.T) {
 	// Without a cap, a piped stream much larger than maxInputSize would grow
 	// the buffer until OOM. Send a no-newline stream past the cap and assert
@@ -92,6 +116,40 @@ func TestReadString_LimitExceeded(t *testing.T) {
 	large := strings.NewReader(strings.Repeat("a", maxInputSize+1))
 	_, err := ReadString(large)
 	require.ErrorIs(t, err, ErrInputTooLarge)
+}
+
+func TestReadString_TrailingAndCRLF(t *testing.T) {
+	// Characterizes the exact trimming behavior of the #377 rewrite:
+	// strings.TrimRight(data, "\r\n") strips *all* trailing line
+	// terminators (not just one) while leaving internal newlines -
+	// including internal blank lines - untouched. Pinning this table
+	// guards against a well-intentioned but behavior-changing tweak (e.g.
+	// swapping in TrimSuffix, which would only strip one terminator)
+	// slipping through unnoticed.
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"no trailing newline", "foo", "foo"},
+		{"single trailing LF", "foo\n", "foo"},
+		{"single trailing CRLF", "foo\r\n", "foo"},
+		{"multiple trailing LF", "foo\n\n\n", "foo"},
+		{"multiple trailing CRLF", "foo\r\n\r\n", "foo"},
+		{"internal LF preserved", "line1\nline2\n", "line1\nline2"},
+		{"internal CRLF preserved", "line1\r\nline2\r\n", "line1\r\nline2"},
+		{"internal blank line preserved", "a\n\nb\n", "a\n\nb"},
+		{"empty input", "", ""},
+		{"only trailing terminators", "\r\n\r\n", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out, err := ReadString(strings.NewReader(tt.input))
+			require.NoError(t, err)
+			require.Equal(t, tt.want, out)
+		})
+	}
 }
 
 func TestLoadBase64ImageFromFile(t *testing.T) {
