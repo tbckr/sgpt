@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.21.2](https://github.com/tbckr/sgpt/compare/v2.21.1...v2.21.2) (2026-07-20)
+
+
+### Bug Fixes
+
+* address security issues in chat rm, --input path containment, and image size ([#382](https://github.com/tbckr/sgpt/issues/382)) ([b3e598c](https://github.com/tbckr/sgpt/commit/b3e598c95b62893699d4e84567deb240761e7595))
+* **deps:** upgrade go to 1.26.5 ([63ef87c](https://github.com/tbckr/sgpt/commit/63ef87cdc44e35234f557744a1d17782efae1e74))
+* input/exec bugs [#377](https://github.com/tbckr/sgpt/issues/377), [#379](https://github.com/tbckr/sgpt/issues/379), [#380](https://github.com/tbckr/sgpt/issues/380), [#381](https://github.com/tbckr/sgpt/issues/381) ([#385](https://github.com/tbckr/sgpt/issues/385)) ([906aa48](https://github.com/tbckr/sgpt/commit/906aa482abedef30958dd96526884b5a90c5349e))
+
 ## [2.21.1](https://github.com/tbckr/sgpt/compare/v2.21.0...v2.21.1) (2026-05-13)
 
 
