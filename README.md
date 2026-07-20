@@ -381,8 +381,9 @@ sgpt --insecure-api-base "..."
 # or set `insecureAPIBase: true` in ~/.config/sgpt/config.yaml
 ```
 
-See [Query Models — Override OpenAI API base URL](docs/usage/query-models.md#override-openai-api-base-url) for the
-full validation rules and the rationale.
+See [Local LLM Support](docs/usage/local-llm.md) for base URLs of common backends and the LAN hostname opt-out, and
+[Query Models — Override OpenAI API base URL](docs/usage/query-models.md#override-openai-api-base-url) for the full
+validation rules and the rationale.
 
 ### Chat Capabilities
 

@@ -73,6 +73,7 @@ nav:
       - o1 API Support: 'usage/o1.md'
       - OpenRouter API Support: 'usage/openrouter.md'
       - Google Gemini Support: 'usage/gemini.md'
+      - Local LLM Support: 'usage/local-llm.md'
       - Chat: 'usage/chat.md'
       - Docker: 'usage/docker.md'
       - Personas: 'usage/personas.md'
