@@ -22,7 +22,6 @@
 package fs
 
 import (
-	"bufio"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -161,22 +160,19 @@ func GetPersonasPath() (string, error) {
 	return createPath(configPath, "personas")
 }
 
+// ReadString reads piped input intended as a single prompt string. Internal
+// newlines are preserved (a multi-line piped prompt must not be glued into
+// one line - see #377); only the trailing line terminator is trimmed, so
+// `echo "foo" | sgpt` still sends "foo" rather than "foo\n".
 func ReadString(in io.Reader) (string, error) {
-	var buf []byte
-	scanner := bufio.NewScanner(io.LimitReader(in, maxInputSize+1))
-	// Allow a single token to fill the whole input cap so oversized streams
-	// surface as ErrInputTooLarge below rather than bufio.ErrTooLong.
-	scanner.Buffer(make([]byte, 0, 64*1024), maxInputSize+2)
-	for scanner.Scan() {
-		buf = append(buf, scanner.Bytes()...)
-		if len(buf) > maxInputSize {
-			return "", ErrInputTooLarge
-		}
+	data, err := io.ReadAll(io.LimitReader(in, maxInputSize+1))
+	if err != nil {
+		return "", fmt.Errorf("read input: %w", err)
 	}
-	if err := scanner.Err(); err != nil {
-		return "", err
+	if len(data) > maxInputSize {
+		return "", ErrInputTooLarge
 	}
-	return string(buf), nil
+	return strings.TrimRight(string(data), "\r\n"), nil
 }
 
 // ReadAll reads all bytes from in and returns them as a string, preserving newlines.

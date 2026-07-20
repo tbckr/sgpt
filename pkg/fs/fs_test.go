@@ -85,6 +85,30 @@ func TestReadString(t *testing.T) {
 	wg.Wait()
 }
 
+func TestReadString_PreservesInternalNewlines(t *testing.T) {
+	// #377: ReadString used to scan line-by-line and never re-add the
+	// stripped terminator, silently gluing multi-line piped prompts into
+	// one line. Only the trailing terminator should be trimmed.
+	reader, writer := io.Pipe()
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, errWrite := writer.Write([]byte("line1\nline2\n"))
+		require.NoError(t, writer.Close())
+		require.NoError(t, errWrite)
+	}()
+
+	out, err := ReadString(reader)
+	require.NoError(t, err)
+	require.Equal(t, "line1\nline2", out)
+	require.NoError(t, reader.Close())
+
+	wg.Wait()
+}
+
 func TestReadString_LimitExceeded(t *testing.T) {
 	// Without a cap, a piped stream much larger than maxInputSize would grow
 	// the buffer until OOM. Send a no-newline stream past the cap and assert
