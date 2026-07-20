@@ -263,6 +263,25 @@ func TestFilesystemChatSessionManager_DeleteNotExistingSession(t *testing.T) {
 	require.False(t, exists)
 }
 
+func TestFilesystemChatSessionManager_DeleteSession_PathTraversal(t *testing.T) {
+	config := createTestConfig(t)
+	cacheDir := config.GetString("cacheDir")
+
+	// Sentinel file living outside the cache directory - a traversal payload
+	// would need to escape cacheDir to reach it.
+	outsideDir := filepath.Dir(cacheDir)
+	sentinel := filepath.Join(outsideDir, "sentinel.txt")
+	require.NoError(t, os.WriteFile(sentinel, []byte("do not delete"), 0o600))
+
+	manager, err := NewFilesystemChatSessionManager(config)
+	require.NoError(t, err)
+
+	traversal := ".." + string(filepath.Separator) + filepath.Base(sentinel)
+	err = manager.DeleteSession(traversal)
+	require.ErrorIs(t, err, ErrChatSessionNameInvalid)
+	require.FileExists(t, sentinel)
+}
+
 func createTestMessages() []openai.ChatCompletionMessage {
 	return []openai.ChatCompletionMessage{
 		{
