@@ -202,6 +202,11 @@ func (m FilesystemChatSessionManager) ListSessions() ([]string, error) {
 }
 
 func (m FilesystemChatSessionManager) DeleteSession(sessionName string) error {
+	// Validate session name
+	if err := validateSessionName(sessionName); err != nil {
+		return err
+	}
+
 	sessionFilepath, err := m.getFilepathForSession(sessionName)
 	slog.Debug("Deleting session file at: " + sessionFilepath)
 	if err != nil {
