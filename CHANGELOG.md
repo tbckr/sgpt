@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.21.3](https://github.com/tbckr/sgpt/compare/v2.21.2...v2.21.3) (2026-08-17)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/jarcoal/httpmock to v1.4.2 ([3306e31](https://github.com/tbckr/sgpt/commit/3306e31041c840a4bfe9037e4456f59787d9be46))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.42.0 ([a46e1cc](https://github.com/tbckr/sgpt/commit/a46e1cc07baff775a9f3577407e0227fcf32523f))
+* **deps:** update module github.com/stretchr/testify to v1.12.0 ([f520db4](https://github.com/tbckr/sgpt/commit/f520db44f7024a39d5886f574fe3302c76b686cd))
+
 ## [2.21.2](https://github.com/tbckr/sgpt/compare/v2.21.1...v2.21.2) (2026-07-20)
 
 
