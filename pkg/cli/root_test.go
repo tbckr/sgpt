@@ -947,6 +947,21 @@ func TestLoadViperConfig_NoTestingFlag(t *testing.T) {
 	require.True(t, testCtx.Config.IsSet("cacheDir"))
 }
 
+func TestLoadViperConfig_MalformedConfigFile(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+
+	// A config file that exists but fails to parse must surface its error -
+	// only a missing file is swallowed by loadViperConfig.
+	configFile := filepath.Join(testCtx.ConfigDir, "config.yaml")
+	require.NoError(t, os.WriteFile(configFile, []byte("key: [unterminated"), 0o600))
+
+	err := loadViperConfig(testCtx.Config)
+	require.Error(t, err)
+
+	var notFoundErr viper.ConfigFileNotFoundError
+	require.NotErrorAs(t, err, &notFoundErr)
+}
+
 func TestRootCmd_TemplateWithPipedYAML(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)

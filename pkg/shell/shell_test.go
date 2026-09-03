@@ -376,6 +376,16 @@ func TestExecuteCommandWithConfirmation(t *testing.T) {
 	wg.Wait()
 }
 
+func TestExecuteCommandWithConfirmation_RefusesMultilineCommand(t *testing.T) {
+	// SanitizeCommand must run - and reject - before the user ever sees a
+	// confirmation prompt or getUserConfirmation reads from input; a hidden
+	// second line must never reach execution.
+	var out bytes.Buffer
+	err := ExecuteCommandWithConfirmation(context.Background(), strings.NewReader(""), &out, "echo test\nrm -rf /")
+	require.ErrorIs(t, err, ErrMultilineCommand)
+	require.Contains(t, out.String(), "Refusing to execute suggested command")
+}
+
 func TestSanitizeCommand_RemovesBidiOverrides(t *testing.T) {
 	tests := []struct {
 		name     string

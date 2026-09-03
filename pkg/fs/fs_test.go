@@ -118,6 +118,15 @@ func TestReadString_LimitExceeded(t *testing.T) {
 	require.ErrorIs(t, err, ErrInputTooLarge)
 }
 
+func TestReadString_LimitBoundary(t *testing.T) {
+	// Exactly maxInputSize bytes must be accepted; the cap only rejects
+	// input strictly larger than the limit.
+	atLimit := strings.NewReader(strings.Repeat("a", maxInputSize))
+	out, err := ReadString(atLimit)
+	require.NoError(t, err)
+	require.Len(t, out, maxInputSize)
+}
+
 func TestReadString_TrailingAndCRLF(t *testing.T) {
 	// Characterizes the exact trimming behavior of the #377 rewrite:
 	// strings.TrimRight(data, "\r\n") strips *all* trailing line
@@ -288,6 +297,15 @@ func TestReadAll_LimitExceeded(t *testing.T) {
 	large := strings.NewReader(strings.Repeat("a", maxInputSize+1))
 	_, err := ReadAll(large)
 	require.ErrorIs(t, err, ErrInputTooLarge)
+}
+
+func TestReadAll_LimitBoundary(t *testing.T) {
+	// Exactly maxInputSize bytes must be accepted; the cap only rejects
+	// input strictly larger than the limit.
+	atLimit := strings.NewReader(strings.Repeat("a", maxInputSize))
+	out, err := ReadAll(atLimit)
+	require.NoError(t, err)
+	require.Len(t, out, maxInputSize)
 }
 
 func TestResolveUnderCwd_AcceptsFileInCwd(t *testing.T) {
