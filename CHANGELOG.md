@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.21.3](https://github.com/tbckr/sgpt/compare/v2.21.2...v2.21.3) (2026-09-03)
+
+
+### Bug Fixes
+
+* **api:** use correct viper keys for maxTokens and topP ([#396](https://github.com/tbckr/sgpt/issues/396)) ([400fb78](https://github.com/tbckr/sgpt/commit/400fb7882bddeffd24994af4e5acb6b141ff5ef1)), closes [#395](https://github.com/tbckr/sgpt/issues/395)
+* **api:** use MaxCompletionTokens instead of deprecated MaxTokens ([#394](https://github.com/tbckr/sgpt/issues/394)) ([dfeb8aa](https://github.com/tbckr/sgpt/commit/dfeb8aa5b24bd261fcf35d2023f2e908e95c12b4)), closes [#393](https://github.com/tbckr/sgpt/issues/393)
+* **ci:** bump go directive to 1.26.8 to resolve govulncheck failures ([#398](https://github.com/tbckr/sgpt/issues/398)) ([e6ba976](https://github.com/tbckr/sgpt/commit/e6ba97658fca196660132253e5c58d75cfd56aaa)), closes [#397](https://github.com/tbckr/sgpt/issues/397)
+* **deps:** update module github.com/jarcoal/httpmock to v1.4.2 ([3306e31](https://github.com/tbckr/sgpt/commit/3306e31041c840a4bfe9037e4456f59787d9be46))
+* **deps:** update module github.com/sashabaranov/go-openai to v1.42.0 ([a46e1cc](https://github.com/tbckr/sgpt/commit/a46e1cc07baff775a9f3577407e0227fcf32523f))
+* **deps:** update module github.com/stretchr/testify to v1.12.0 ([f520db4](https://github.com/tbckr/sgpt/commit/f520db44f7024a39d5886f574fe3302c76b686cd))
+* **deps:** update module github.com/stretchr/testify to v1.12.1 ([34b9b85](https://github.com/tbckr/sgpt/commit/34b9b852ba22fc09a2971f35254802fbb67a7654))
+
 ## [2.21.2](https://github.com/tbckr/sgpt/compare/v2.21.1...v2.21.2) (2026-07-20)
 
 
