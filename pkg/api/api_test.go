@@ -197,7 +197,7 @@ func TestSimplePromptSendsMaxCompletionTokens(t *testing.T) {
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
 	testlib.SetAPIBase(t)
-	testCtx.Config.Set("max-tokens", 512)
+	testCtx.Config.Set("maxTokens", 512)
 
 	client, err := CreateClient(testCtx.Config, io.Discard)
 	require.NoError(t, err)
@@ -237,6 +237,51 @@ func TestSimplePromptSendsMaxCompletionTokens(t *testing.T) {
 	require.NoError(t, json.Unmarshal(capturedBody, &payload))
 	require.Equal(t, float64(512), payload["max_completion_tokens"])
 	require.NotContains(t, payload, "max_tokens")
+}
+
+func TestSimplePromptSendsTopP(t *testing.T) {
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	testlib.SetAPIBase(t)
+	testCtx.Config.Set("topP", 0.5)
+
+	client, err := CreateClient(testCtx.Config, io.Discard)
+	require.NoError(t, err)
+
+	httpmock.ActivateNonDefault(client.HTTPClient)
+	t.Cleanup(httpmock.DeactivateAndReset)
+
+	var capturedBody []byte
+	httpmock.RegisterResponder(
+		"POST",
+		"https://api.openai.com/v1/chat/completions",
+		func(req *http.Request) (*http.Response, error) {
+			var readErr error
+			capturedBody, readErr = io.ReadAll(req.Body)
+			if readErr != nil {
+				return nil, readErr
+			}
+			return httpmock.NewStringResponse(200, `{
+				"choices": [
+					{
+						"index": 0,
+						"finish_reason": "length",
+						"message": {
+							"role": "assistant",
+							"content": "Hello World!"
+						}
+					}
+				]
+			}`), nil
+		},
+	)
+
+	_, err = client.CreateCompletion(context.Background(), "", []string{"Say: Hello World!"}, "txt", nil)
+	require.NoError(t, err)
+
+	var payload map[string]interface{}
+	require.NoError(t, json.Unmarshal(capturedBody, &payload))
+	require.Equal(t, float64(0.5), payload["top_p"])
 }
 
 func TestStreamSimplePrompt(t *testing.T) {
