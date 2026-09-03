@@ -82,6 +82,11 @@ func TestValidateSessionNameValid(t *testing.T) {
 	}
 }
 
+func TestValidateSessionName_LengthBoundary(t *testing.T) {
+	require.NoError(t, validateSessionName(strings.Repeat("a", sessionNameMaxLength)))
+	require.ErrorIs(t, validateSessionName(strings.Repeat("a", sessionNameMaxLength+1)), ErrChatSessionNameTooLong)
+}
+
 func TestFilesystemChatSessionManager_SessionExists(t *testing.T) {
 	config := createTestConfig(t)
 
