@@ -24,6 +24,7 @@ package chat
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -310,6 +311,10 @@ func createTestConfig(t *testing.T) *viper.Viper {
 }
 
 func TestFilesystemChatSessionManager_SaveSession_FilePermissions(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows does not support POSIX permission bits; os.Stat().Mode().Perm() reports 0666 regardless of the mode passed to os.OpenFile")
+	}
+
 	config := createTestConfig(t)
 
 	manager, err := NewFilesystemChatSessionManager(config)
