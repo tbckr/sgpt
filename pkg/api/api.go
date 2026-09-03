@@ -242,12 +242,12 @@ func (c *OpenAIClient) CreateCompletion(ctx context.Context, chatID string, prom
 
 	// Create request
 	req := openai.ChatCompletionRequest{
-		Messages:    messages,
-		Model:       c.config.GetString("model"),
-		MaxTokens:   c.config.GetInt("max-tokens"),
-		Temperature: float32(c.config.GetFloat64("temperature")),
-		TopP:        float32(c.config.GetFloat64("top-p")),
-		Stream:      c.config.GetBool("stream"),
+		Messages:            messages,
+		Model:               c.config.GetString("model"),
+		MaxCompletionTokens: c.config.GetInt("max-tokens"),
+		Temperature:         float32(c.config.GetFloat64("temperature")),
+		TopP:                float32(c.config.GetFloat64("top-p")),
+		Stream:              c.config.GetBool("stream"),
 	}
 
 	// Retrieve response
