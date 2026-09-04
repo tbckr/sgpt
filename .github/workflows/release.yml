@@ -70,7 +70,7 @@ jobs:
           cache: true
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
         if: ${{ steps.release.outputs.release_created }}
-      - uses: anchore/sbom-action/download-syft@aa80c8c5bd439a416a62804f2151ab38c671a638 # v0.24.1
+      - uses: anchore/sbom-action/download-syft@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
         if: ${{ steps.release.outputs.release_created }}
       - uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3
         if: ${{ steps.release.outputs.release_created }}
