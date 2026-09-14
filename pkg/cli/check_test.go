@@ -22,6 +22,7 @@
 package cli
 
 import (
+	"errors"
 	"io"
 	"os"
 	"testing"
@@ -59,6 +60,27 @@ func TestCheckCmdUnsetEnvAPIKey(t *testing.T) {
 	newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), func(v *viper.Viper, w io.Writer) (api.Completer, error) {
 		return api.CreateClient(v, w)
 	}).Execute([]string{"check"})
+	require.Equal(t, 1, mem.code)
+}
+
+type badWriter struct{}
+
+func (badWriter) Write([]byte) (int, error) {
+	return 0, errors.New("write error")
+}
+
+func TestCheckCmdWriteError(t *testing.T) {
+	// Kills the CONDITIONALS_NEGATION mutant at check.go:59:11.
+	// If the mutation flips the error check, the write error is silently dropped.
+	testCtx := testlib.NewTestCtx(t)
+	testlib.SetAPIKey(t)
+	mem := &exitMemento{}
+
+	root := newRootCmd(mem.Exit, testCtx.Config, mockIsPipedShell(false, nil), func(v *viper.Viper, w io.Writer) (api.Completer, error) {
+		return api.CreateClient(v, w)
+	})
+	root.cmd.SetOut(badWriter{})
+	root.Execute([]string{"check"})
 	require.Equal(t, 1, mem.code)
 }
 

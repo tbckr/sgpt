@@ -126,7 +126,7 @@ func TestRootCmd_SimplePromptOnly(t *testing.T) {
 }
 
 func TestRootCmd_SimpleClipboard(t *testing.T) {
-	skipInCI(t)
+	skipIfNoClipboard(t)
 
 	testCtx := testlib.NewTestCtx(t)
 	testlib.SetAPIKey(t)
