@@ -150,6 +150,7 @@ func TestSimplePrompt(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -291,6 +292,7 @@ func TestStreamSimplePrompt(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -330,6 +332,7 @@ func TestPromptSaveAsChat(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -386,6 +389,7 @@ func TestPromptLoadChat(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -452,6 +456,7 @@ func TestPromptWithModifier(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -516,6 +521,7 @@ func TestSimplePromptWithLocalImage(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -554,6 +560,7 @@ func TestSimplePromptWithLocalImageAndChat(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -620,6 +627,7 @@ func TestSimplePromptWithURLImageAndChat(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -685,6 +693,7 @@ func TestSimplePromptWithHTTPURLImageAndChat(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -750,6 +759,7 @@ func TestSimplePromptWithMixedImagesAndChat(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)
@@ -821,6 +831,7 @@ func TestSimplePrompt_EmptyChoices(t *testing.T) {
 
 	var wg sync.WaitGroup
 	reader, writer := io.Pipe()
+	defer func() { _ = reader.Close(); _ = writer.Close() }()
 
 	client, err := CreateClient(testCtx.Config, writer)
 	require.NoError(t, err)

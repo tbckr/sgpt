@@ -64,6 +64,19 @@ func TestGetAppConfigDir(t *testing.T) {
 	require.DirExists(t, cacheDir)
 }
 
+func TestGetPersonasPath(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("os.UserConfigDir() ignores XDG_CONFIG_HOME on Windows")
+	}
+	tempDir := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", tempDir)
+
+	personasPath, err := GetPersonasPath()
+	require.NoError(t, err)
+	require.Equal(t, filepath.Join(tempDir, "sgpt", "personas"), personasPath)
+	require.DirExists(t, personasPath)
+}
+
 func TestReadString(t *testing.T) {
 	reader, writer := io.Pipe()
 

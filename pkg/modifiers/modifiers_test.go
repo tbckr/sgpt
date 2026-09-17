@@ -207,6 +207,19 @@ func TestGetChatModifierTxt(t *testing.T) {
 	require.Empty(t, modifier)
 }
 
+func TestGetChatModifierNoConfigPersonas(t *testing.T) {
+	// Branch where config does NOT have "personas" set — falls through to fs.GetPersonasPath.
+	config := viper.New()
+	config.Set("cacheDir", t.TempDir())
+	// purposely omit config.Set("personas", ...)
+
+	// This exercises the fs.GetPersonasPath path inside getPersonasModifier.
+	// With no personas dir and no custom personas, it should fall back to defaults.
+	modifier, err := GetChatModifier(config, "txt")
+	require.NoError(t, err)
+	require.Empty(t, modifier)
+}
+
 func TestGetChatModifierInvalid(t *testing.T) {
 	config := createTestConfig(t)
 
