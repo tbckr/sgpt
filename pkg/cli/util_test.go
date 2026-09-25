@@ -28,6 +28,7 @@ import (
 
 	"github.com/tbckr/sgpt/v2/pkg/api"
 
+	"github.com/atotto/clipboard"
 	"github.com/spf13/viper"
 )
 
@@ -54,5 +55,11 @@ func mockIsPipedShell(isPiped bool, err error) func() (bool, error) {
 func skipInCI(t *testing.T) {
 	if os.Getenv("CI") != "" {
 		t.Skip("Skipping test on CI")
+	}
+}
+
+func skipIfNoClipboard(t *testing.T) {
+	if err := clipboard.WriteAll("test"); err != nil {
+		t.Skip("Skipping test: no clipboard available")
 	}
 }
