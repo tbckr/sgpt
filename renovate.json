@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>tbckr/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "description": "Keep goreleaser check below v2.16.0 until .goreleaser.yaml is migrated to dockers_v2 + homebrew_casks (see ci.yml)",
+      "matchFileNames": [".github/workflows/ci.yml"],
+      "matchPackageNames": ["goreleaser/goreleaser"],
+      "allowedVersions": "<2.16.0"
+    }
   ]
 }

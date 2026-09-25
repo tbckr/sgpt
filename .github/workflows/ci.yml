@@ -101,7 +101,7 @@ jobs:
           # on the deprecated `dockers`/`docker_manifests`/`brews` blocks still used in
           # .goreleaser.yaml. Unpin once migrated to `dockers_v2` + `homebrew_casks`.
           # See https://goreleaser.com/deprecations
-          version: "v2.18.2"
+          version: "v2.15.4"
           args: check
       - run: ./sgpt version
 
