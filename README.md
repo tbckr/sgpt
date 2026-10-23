@@ -40,6 +40,7 @@ visit [shell-gpt](https://github.com/TheR1D/shell_gpt). Please keep this in mind
   - [o1 API Support](#o1-api-support)
   - [OpenRouter API Support](#openrouter-api-support)
   - [Requesty API Support](#requesty-api-support)
+  - [Cheaper Inference API Support](#cheaper-inference-api-support)
   - [Google Gemini Support](#google-gemini-support)
   - [Local LLM Support](#local-llm-support)
   - [Chat Capabilities](#chat-capabilities)
@@ -329,6 +330,31 @@ The Sun's mass is approximately 2 × 10^30 kilograms (about 333,000 times the ma
 ```
 
 Browse the complete list of available models on the [Requesty models page](https://app.requesty.ai/router/list).
+
+### Cheaper Inference API Support
+
+SGPT also works with the [Cheaper Inference API](https://cheaperinference.com), an OpenAI-compatible LLM gateway. One
+API key gives access to models from several labs.
+
+1. Set the Cheaper Inference API base URL environment variable:
+   ```shell
+   export OPENAI_API_BASE="https://api.cheaperinference.com/v1"
+   ```
+
+2. Create an API key on the [Cheaper Inference sign-up page](https://cheaperinference.com/signup) and set it as your
+   environment variable:
+   ```shell
+   export OPENAI_API_KEY="your_cheaperinference_key"
+   ```
+
+Once configured, you can specify any Cheaper Inference model with the `-m` flag:
+
+```shell
+$ sgpt -m "gpt-5.4-mini" "mass of sun"
+The Sun's mass is about 1.989 × 10^30 kilograms (roughly 333,000 times the mass of Earth).
+```
+
+Browse the complete list of available models on the [Cheaper Inference models page](https://cheaperinference.com/markets).
 
 ### Google Gemini Support
 
